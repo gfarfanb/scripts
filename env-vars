@@ -1,0 +1,42 @@
+#! /usr/bin/env bash
+
+PWD=$(pwd)
+
+if [ -z "$ENV_VARS_FILE" ]; then
+
+  if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
+    echo "Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...' in ~/.bashrc"
+    exit 0
+  fi
+
+  eval "$( grep "ENV_VARS_FILE=*" ~/.bashrc | xargs )"
+fi
+
+var_regex='([[:alpha:]][[:alnum:]]*)=(.*)'
+
+while IFS="" read -r ENV_VAR || [ -n "$ENV_VAR" ]
+do
+  var_def=$(echo "$ENV_VAR" | xargs)
+
+  if [ -n "$var_def" ] && [[ $var_def =~ $var_regex ]]; then
+    var_name=$(echo "$ENV_VAR" | cut -d '=' -f 1)
+    var_value=$(echo "$ENV_VAR" | cut -d '=' -f 2)
+
+    eval "$var_name=$var_value"
+  fi
+done < "$ENV_VARS_FILE"
+
+require_var() {
+  local _var=${1:-}
+  local _val_cmd="echo \$$_var"
+  local _val=$(eval "$_val_cmd")
+
+  if [ -z "$_val" ]; then
+    echo "Undefined environment variable: $_var"
+    exit 0
+  fi
+}
+
+back() {
+  cd $PWD
+}

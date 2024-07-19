@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./env-vars
+require_var JURL_TARGET_FOLDER
+require_var SCRIPTS_FOLDER_PRIVATE_DIR
+
+rsync -av $JURL_TARGET_FOLDER/*.jar "$SCRIPTS_FOLDER_PRIVATE_DIR"

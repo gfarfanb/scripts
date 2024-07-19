@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../env-vars
+require_var PERFECTDARK_HOME
+require_var PERFECTDARK_ROM
+require_var PERFECTDARK_SAVES_HOME
+require_var PERFECTDARK_BACKUP_HOME
+
+rsync -cvrP $PERFECTDARK_BACKUP_HOME $PERFECTDARK_SAVES_HOME
+
+cd $PERFECTDARK_HOME
+
+echo Launching 'perfect_dark' at "$PERFECTDARK_HOME"
+./pd --rom-file "$PERFECTDARK_ROM"
+
+rsync -cvrPa $PERFECTDARK_SAVES_HOME/eeprom.bin $PERFECTDARK_BACKUP_HOME
+
+back

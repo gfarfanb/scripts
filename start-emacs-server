@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./env-vars
+
+echo Launching 'Emacs Server'
+emacs --daemon &

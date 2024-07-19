@@ -1,5 +1,15 @@
 @echo OFF
 
+rem Label [profilesnapshot]
+rem This is an alternative option to create the snapshot
+rem when !delayed! expansion ('setlocal enableDelayedExpansion')
+rem is enabled. That setup removes '!' to the save filenames.
+rem
+rem In this case we need to define (somewhere) a variable using this code:
+rem     for /f "delims=" %%a in ('sha256sum "<save-file-without-exclamation-marks>"') do (
+rem         set "profile_save_file[%%a]=<original-save-file>"
+rem     )
+
 setlocal enableDelayedExpansion
 
 set "_saves_home=%~1\"
@@ -120,14 +130,6 @@ endlocal
 
 
 :profilesnapshot
-rem This is an alternative option to create the snapshot
-rem when !delayed! expansion ('setlocal enableDelayedExpansion')
-rem is enabled. That setup removes '!' to the save filenames.
-rem
-rem In this case we need to define (somewhere) a variable using this code:
-rem     for /f "delims=" %%a in ('sha256sum "<save-file-without-exclamation-marks>"') do (
-rem         set "profile_save_file[%%a]=<original-save-file>"
-rem     )
 
 call "%_profile_tmp%"
 del "%_profile_tmp%"

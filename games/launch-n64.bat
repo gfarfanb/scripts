@@ -24,6 +24,6 @@ set CONFIGURED_JOYSTICK_DEFAULT=1
 
 rem /********** Launcher **********/
 echo Launching 'Mupen64Plus' at "%MUPEN64PLUS_HOME%"
-call Start-Mupen64Plus.bat %*
+call start-mupen64plus.bat %*
 
 take-snapshot "%N64_SAVES_HOME%" eep mpk fla

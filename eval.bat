@@ -6,8 +6,9 @@ set __timestamp=%__timestamp::=_%
 set __timestamp=%__timestamp: =_%
 set __timestamp=%__timestamp:.=_%
 
-set __temp_eval="%TEMP%\eval-%__timestamp%.bat"
+set __eval_bat="%TEMP%\eval-%__timestamp%.bat"
 
-echo %* > "%__temp_eval%"
-call "%__temp_eval%"
-del "%__temp_eval%"
+echo %* > "%__eval_bat%"
+
+call "%__eval_bat%"
+del "%__eval_bat%"

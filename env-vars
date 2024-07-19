@@ -5,7 +5,7 @@ PWD=$(pwd)
 if [ -z "$ENV_VARS_FILE" ]; then
 
   if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
-    echo "Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...' in ~/.bashrc"
+    echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in ~/.bashrc"
     exit 0
   fi
 

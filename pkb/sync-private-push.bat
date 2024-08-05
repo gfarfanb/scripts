@@ -1,12 +1,12 @@
 @echo OFF
 
-:: Pushes all changes from pkb/org-roam/private directory to a backup folder (preferable a hosting service folder)
-:: Required Environment Variables:
-::   SYNC_FOLDER_PRIVATE_DIR=C:\...\
-::   ORG_ROAM_PRIVATE_DIR=C:\...\pkb\org-roam\private
-::   Path=%Path%;%SYNC_FOLDER_PRIVATE_DIR%;%ORG_ROAM_PRIVATE_DIR%
+rem Pushes all changes from pkb/org-roam/private directory to a backup folder (preferable a hosting service folder)
 
-robocopy "%ORG_ROAM_PRIVATE_DIR%" "%SYNC_FOLDER_PRIVATE_DIR%" /e /z
+call env-vars.bat
+call require-var SYNC_FOLDER_PRIVATE_DIR
+call require-var ORG_ROAM_PRIVATE_DIR
 
-echo "Sync private push completed"
+Robocopy "%ORG_ROAM_PRIVATE_DIR%" "%SYNC_FOLDER_PRIVATE_DIR%" /e /z
+
+echo Sync private push completed
 

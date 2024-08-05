@@ -1,6 +1,9 @@
 @echo OFF
 
 call env-vars.bat
+call require-var GEPD_1964_HOME
+call require-var GEPD_1964_SAVES_HOME
+call require-var GEPD_1964_BACKUP_HOME
 
 Robocopy "%GEPD_1964_BACKUP_HOME%" "%GEPD_1964_SAVES_HOME%" /z
 

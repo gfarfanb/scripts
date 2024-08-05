@@ -6,6 +6,7 @@
 ::   Run start-emacs-server.bat
 
 call env-vars.bat
+call require-var EMACS_HOME
 
 cd %EMACS_HOME%
 

@@ -1,6 +1,8 @@
 @echo OFF
 
 call env-vars.bat
+call require-var SNES9X_HOME
+call require-var SNES9X_BACKUP_HOME
 
 cd %SNES9X_HOME%
 

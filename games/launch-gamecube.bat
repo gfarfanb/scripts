@@ -1,6 +1,8 @@
 @echo OFF
 
 call env-vars.bat
+call require-var DOLPHIN_HOME
+call require-var DOLPHIN_BACKUP_HOME
 
 cd %DOLPHIN_HOME%
 

@@ -4,9 +4,6 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./env-vars
 require_var OUTPUT_AUDIO_FOLDER
 
-# Updating package
-# python3 -m pip install -U yt-dlp
-
 while getopts "u:s:l:" FLAG
 do
     case "${FLAG}" in

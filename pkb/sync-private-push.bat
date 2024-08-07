@@ -6,7 +6,7 @@ call env-vars.bat
 call require-var SYNC_FOLDER_PRIVATE_DIR
 call require-var ORG_ROAM_PRIVATE_DIR
 
-Robocopy "%ORG_ROAM_PRIVATE_DIR%" "%SYNC_FOLDER_PRIVATE_DIR%" /e /z
+robocopy "%ORG_ROAM_PRIVATE_DIR%" "%SYNC_FOLDER_PRIVATE_DIR%" /e /z
 
 echo Sync private push completed
 

@@ -2,11 +2,8 @@
 BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
-require_var SNES9X_HOME
 
-cd $SNES9X_HOME
-
-echo Launching 'Snes9x' at "$SNES9X_HOME"
-wine snes9x-x64.exe
+echo Launching 'Snes9x' from Flatpak
+flatpak run com.snes9x.Snes9x
 
 back

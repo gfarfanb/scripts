@@ -5,18 +5,12 @@ call require-var MUPEN64PLUS_HOME
 call require-var N64_ROMS_HOME
 call require-var N64_SAVES_HOME
 call require-var N64_SCREENSHOTS_HOME
-call require-var N64_CONTROLLER_PROFILES_HOME
 call require-var GB_GBC_ROMS_HOME
 call require-var GB_GBC_SAVES_HOME
 
 call n64-profiles.bat
 
 rem /********** Controllers **********/
-echo Controller configuration must be in [%MUPEN64PLUS_HOME%\InputAutoCfg.ini]
-echo Setup for '8BitDo SN30 Pro' [%N64_CONTROLLER_PROFILES_HOME%\8BitDo SN30 Pro.iacfg]
-echo Setup for 'Keyboard' [%N64_CONTROLLER_PROFILES_HOME%\Keyboard.iacfg]
-echo:
-
 set "joystick_name[1]=8BitDo SN30 Pro"
 set "joystick_name[2]=Keyboard"
 rem set "joystick_name[3]=XBox Wireless Controller Series X|S"

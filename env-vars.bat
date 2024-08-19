@@ -7,6 +7,11 @@ if "%ENV_VARS_FILE%"=="" (
     goto :eof
 )
 
+if not exist "%ENV_VARS_FILE%" (
+    echo "Environment variables file not found at: '%ENV_VARS_FILE%'"
+    goto :eof
+)
+
 set __timestamp=%date%-%time%
 set __timestamp=%__timestamp:/=-%
 set __timestamp=%__timestamp::=_%

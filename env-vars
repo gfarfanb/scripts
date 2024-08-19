@@ -12,19 +12,12 @@ if [ -z "$ENV_VARS_FILE" ]; then
   eval "$( grep "ENV_VARS_FILE=*" ~/.bashrc | xargs )"
 fi
 
-var_regex='([[:alpha:]][[:alnum:]]*)=(.*)'
+if [ ! -f "$ENV_VARS_FILE" ]; then
+    echo "Environment variables file not found at: '$ENV_VARS_FILE'"
+    exit 0
+fi
 
-while IFS="" read -r ENV_VAR || [ -n "$ENV_VAR" ]
-do
-  var_def=$(echo "$ENV_VAR" | xargs)
-
-  if [ -n "$var_def" ] && [[ $var_def =~ $var_regex ]]; then
-    var_name=$(echo "$ENV_VAR" | cut -d '=' -f 1)
-    var_value=$(echo "$ENV_VAR" | cut -d '=' -f 2)
-
-    eval "$var_name=$var_value"
-  fi
-done < "$ENV_VARS_FILE"
+. "$ENV_VARS_FILE"
 
 require_var() {
   local _var=${1:-}

@@ -13,8 +13,8 @@ do
     _path=$( cut -d : -f 2 <<< "$_src" )
     _path=$( trim_separator "$_path" )
 
-    rclone copy -P $_config:$_path "$_cloud_home/$_config/$_path"
-    rclone sync -P $_config:$_path "$_cloud_home/$_config/$_path"
+    rclone copy -P "$_cloud_home/$_config/$_path" $_config:$_path
+    rclone sync -P "$_cloud_home/$_config/$_path" $_config:$_path
 
-    echo "[Pull Completed]"
+    echo "[Push Completed]"
 done

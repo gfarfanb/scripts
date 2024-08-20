@@ -42,6 +42,16 @@ __trim_trailing_separator() {
     echo "${1:-}" | sed 's/\/*$//'
 }
 
+__append_env_vars() {
+    local _env_vars="${1:-}/env-vars"
+    if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
+        if [ -f "$_env_vars" ]; then
+            echo 'env-vars' file found, adding environment variable to ~/.bashrc
+            sed -i "$ a\\\nexport ENV_VARS_FILE=\"$_env_vars\"" ~/.bashrc
+        fi
+    fi
+}
+
 echo Enter the cloud directory for:
 echo -e "\t$( hostnamectl | grep 'Operating System:' )"
 read -p "cloud-directory> " CLOUD_DIRECTORY
@@ -68,19 +78,16 @@ if [ -z "$( ls -A $BACKUP_HOME )" ]; then
     rclone copy -P $RCLONE_CONFIG:$BACKUP_DIRECTORY $BACKUP_HOME
 
     echo ;
-    echo "Imported Source: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
+    echo "Imported source: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
     echo "Destination: $BACKUP_HOME"
 
-    if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
-        if [ -f "$BACKUP_HOME/env-vars" ]; then
-            echo 'env-vars' file found, adding environment variable
-            sed -i "$ a\\\nexport ENV_VARS_FILE=\"$BACKUP_HOME/env-vars\"" ~/.bashrc
-        fi
-    fi
-
-    echo "[Completed]"
+    __append_env_vars
 else
     echo ;
-    echo "Config already imported: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
+    echo "Source already imported: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
+    echo "Destination: $BACKUP_HOME"
+
+    __append_env_vars
 fi
 
+echo "[Completed]"

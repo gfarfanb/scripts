@@ -33,3 +33,11 @@ require_var() {
 back() {
   cd $PWD
 }
+
+trim_separator() {
+    echo "${1:-}" | sed 's/^\/*\|\/*$//g'
+}
+
+trim_trailing_separator() {
+    echo "${1:-}" | sed 's/\/*$//'
+}

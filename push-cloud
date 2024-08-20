@@ -16,5 +16,5 @@ do
     rclone copy -P "$_cloud_home/$_config/$_path" $_config:$_path
     rclone sync -P "$_cloud_home/$_config/$_path" $_config:$_path
 
-    echo "[Push Completed]"
+    echo "[Push completed]"
 done

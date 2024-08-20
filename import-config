@@ -90,4 +90,4 @@ else
     __append_env_vars
 fi
 
-echo "[Completed]"
+echo "[Import completed]"

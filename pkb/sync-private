@@ -1,0 +1,38 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../env-vars
+_require_var SYNC_FOLDER_PRIVATE_DIR
+_require_var ORG_ROAM_PRIVATE_DIR
+
+_usage() {
+    echo "Fetches all changes from backup folder (preferably a"
+    echo "hosting service folder) to the pkb/org-roam/private"
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -p: Push changes to backup folder"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+_push_flag=0
+
+while getopts "ph" opt; do
+    case "$opt" in
+        p)
+            _push_flag=1
+            ;;
+        h)
+            _usage
+            ;;
+    esac
+done
+
+if [ $_push_flag -eq 1 ]; then
+    rsync -av "$ORG_ROAM_PRIVATE_DIR"/*.org "$SYNC_FOLDER_PRIVATE_DIR"
+else
+    rsync -av "$SYNC_FOLDER_PRIVATE_DIR"/*.org "$ORG_ROAM_PRIVATE_DIR"
+fi
+
+echo "[Completed]"

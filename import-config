@@ -3,6 +3,15 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ./libs
 
+_usage() {
+    echo "Imports configuration from a cloud provider."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
 _append_env_vars() {
     local _env_vars="${1:-}/env-vars"
     if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
@@ -13,13 +22,21 @@ _append_env_vars() {
     fi
 }
 
-echo Enter the cloud directory for:
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
+
+echo "Enter the cloud directory for:"
 echo -e "\t$( hostnamectl | grep 'Operating System:' )"
 read -p "cloud-directory> " CLOUD_DIRECTORY
 eval "CLOUD_DIRECTORY=\$( _trim_trailing_separator \"$CLOUD_DIRECTORY\" )"
 
 echo ;
-echo Enter the rclone config:
+echo "Enter the rclone config:"
 read -p "rclone-config> " RCLONE_CONFIG
 
 CLOUD_DIRECTORY="$CLOUD_DIRECTORY/$RCLONE_CONFIG"
@@ -27,7 +44,7 @@ CLOUD_DIRECTORY="$CLOUD_DIRECTORY/$RCLONE_CONFIG"
 _validate_dir "$CLOUD_DIRECTORY"
 
 echo ;
-echo Enter the backup directory for:
+echo "Enter the backup directory for:"
 read -p 'backup-directory> ' BACKUP_DIRECTORY
 eval "BACKUP_DIRECTORY=\$( _trim_separator \"$BACKUP_DIRECTORY\" )"
 

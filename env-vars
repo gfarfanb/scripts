@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
 
-. ./libs
-
 if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
     echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in ~/.bashrc"
     exit 0

@@ -2,6 +2,7 @@
 BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ./env-vars
+_require_var EMACS_WAIT_SECS
 
 _usage() {
     echo "Usage: $0 [<option>]*"
@@ -29,6 +30,7 @@ _emacs_pid=$( pidof -x  emacs )
 if [ -z "$_emacs_pid" ]; then
     echo "Launching 'Emacs Server'"
     emacs --daemon &
+    sleep $EMACS_WAIT_SECS
 else
     echo "'Emacs Server' running at: $_emacs_pid"
 fi

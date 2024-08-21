@@ -2,76 +2,109 @@
 BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ./env-vars
-require_var OUTPUT_AUDIO_FOLDER
+_require_var OUTPUT_AUDIO_FOLDER
+_require_var DOWNLOADS_HOME
 
-while getopts "u:s:l:" FLAG
-do
-    case "${FLAG}" in
-        u) # Resource URL option
-            RSC_URL="$OPTARG"
-            ;;
-        s) # Playlist start index
-            PLAYLIST_START=${OPTARG:-1}
-            PLAYLIST_FLAG="true"
-            ;;
-        l) # List of URLs
-            LIST_FILE="$OPTARG"
-            ;;
-    esac
-done
+_usage() {
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -u <URL>:      Resource URL"
+    echo "    -s <index>:    Playlist start index"
+    echo "    -l <location>: File for a list of URLs"
+    echo "    -m:            Move all ZIP files to 'DOWLOADS_HOME' location"
+    echo "    -h:            Displays this help message"
+    exit 0
+}
 
-download_audio() {
+_move_outputs() {
+    if [ -n "$(ls -A $OUTPUT_AUDIO_FOLDER | grep *.zip)" ]; then
+        rsync -av --remove-source-files $OUTPUT_AUDIO_FOLDER/*.zip "$DOWNLOADS_HOME"
+        echo "ZIP files moved to: $DOWNLOADS_HOME"
+    else
+        echo "ZIP files not found"
+    fi
+    exit 0
+}
+
+_download_audio() {
     local _url=${1:-}
 
-    if [ "$PLAYLIST_FLAG" = "true" ];
-    then
+    if [ $_playlist_flag -eq 1 ]; then
         # youtube-dl
-        yt-dlp -x --audio-format mp3 --audio-quality 4 --playlist-start $PLAYLIST_START --rm-cache-dir $_url
+        yt-dlp -x --audio-format mp3 --audio-quality 4 --playlist-start $_playlist_start --rm-cache-dir $_url
     else
         # youtube-dl
         yt-dlp -x --audio-format mp3 --audio-quality 4 --rm-cache-dir $_url
     fi
 }
 
-pack_downloads() {
-    lastZipFile="$(ls | grep .*\\.zip | sort -V | tail -1)"
-    audioPart="audio"
-    extensionPart=".zip"
-    audioLength=${#audioPart}
-    extensionLength=${#extensionPart}
+_playlist_flag=0
 
-    if [ -z "$lastZipFile" ];
-    then
-        counter=0
-    else
-        lastZipFileLength=${#lastZipFile}
-        counter=${lastZipFile:$audioLength:$(($lastZipFileLength-$audioLength-$extensionLength))}
-        counter=$(($counter+1))
-    fi
-
-    zip -r $audioPart$counter$extensionPart *.mp3
-
-    rm -f *.mp3
-}
+while getopts "u:s:l:mh" opt; do
+    case "$opt" in
+        u)
+            _src_url="$OPTARG"
+            ;;
+        s)
+            _playlist_start=${OPTARG:-1}
+            _playlist_flag=1
+            ;;
+        l)
+            _list_file="$OPTARG"
+            ;;
+        m)
+            _move_outputs
+            ;;
+        h)
+            _usage
+            ;;
+    esac
+done
 
 if [ ! -d "$OUTPUT_AUDIO_FOLDER" ]; then
-  mkdir -p "$OUTPUT_AUDIO_FOLDER"
+    mkdir -p "$OUTPUT_AUDIO_FOLDER"
 fi
 
 cd "$OUTPUT_AUDIO_FOLDER"
 
-if [ -z "$LIST_FILE" ];
-then
-    download_audio $RSC_URL
+if [ -z "$_list_file" ]; then
+    _download_audio $_src_url
+
+    echo $_src_url
 else
-    PLAYLIST_FLAG="false"
+    _playlist_flag=0
 
     while IFS= read -r line; do
-        download_audio "$line"
-    done < $LIST_FILE
+        _download_audio "$line"
+    done < $_list_file
 
-    cat $LIST_FILE
-    rm -f $LIST_FILE
+    cat $_list_file
+    rm -f $_list_file
 fi
 
-pack_downloads
+if [ -n "$(ls -A . | grep *.mp3)" ]; then
+    _last_zip_file="$(ls | grep .*\\.zip | sort -V | tail -1)"
+    _audio_part="audio"
+    _extension_part=".zip"
+    _audio_length=${#_audio_part}
+    _extension_length=${#_extension_part}
+    _counter=0
+
+    if [ -n "$_last_zip_file" ]; then
+        _last_zip_file_length=${#_last_zip_file}
+        _counter=${_last_zip_file:$_audio_length:$(($_last_zip_file_length-$_audio_length-$_extension_length))}
+        _counter=$(($_counter+1))
+    fi
+
+    _package=$_audio_part$_counter$_extension_part
+
+    zip -r $_package *.mp3
+    echo "ZIP generated: $_package"
+
+    rm -f *.mp3
+    echo "MP3 files were cleaned"
+else
+    echo "MP3 files not found"
+fi
+
+echo "[Completed]"

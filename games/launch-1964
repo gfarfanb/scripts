@@ -2,9 +2,9 @@
 BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
-require_var GEPD_1964_HOME
-require_var GEPD_1964_SAVES_HOME
-require_var GEPD_1964_BACKUP_HOME
+_require_var GEPD_1964_HOME
+_require_var GEPD_1964_SAVES_HOME
+_require_var GEPD_1964_BACKUP_HOME
 
 rsync -cvrP $GEPD_1964_BACKUP_HOME $GEPD_1964_SAVES_HOME
 
@@ -15,4 +15,4 @@ wine 1964.exe
 
 rsync -cvrP $GEPD_1964_SAVES_HOME $GEPD_1964_BACKUP_HOME
 
-back
+_back

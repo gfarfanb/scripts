@@ -1,0 +1,50 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./env-vars
+
+_usage() {
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -t: Emacs Client Terminal"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+_terminal_flag=0
+
+while getopts "th" opt; do
+    case "$opt" in
+        t)
+            _terminal_flag=1
+            ;;
+        h)
+            _usage
+            ;;
+    esac
+done
+
+_emacs_pid=$( pidof -x  emacs )
+
+if [ -z "$_emacs_pid" ]; then
+    echo "Launching 'Emacs Server'"
+    emacs --daemon &
+else
+    echo "'Emacs Server' running at: $_emacs_pid"
+fi
+
+_emacsclient_pid=$( pidof -x  emacsclient )
+
+if [ -z "$_emacsclient_pid" ]; then
+    if [ $_terminal_flag -eq 1 ]; then
+        echo "Launching 'Emacs Client Terminal'"
+        emacsclient -t
+    else
+        echo "Launching 'Emacs Client'"
+        emacsclient -c -a 'emacs'
+    fi
+else
+    echo "'Emacs Client' running at: $_emacsclient_pid"
+fi
+
+echo "[Completed]"

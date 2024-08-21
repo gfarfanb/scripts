@@ -6,4 +6,4 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 echo Launching 'Snes9x' from Flatpak
 flatpak run com.snes9x.Snes9x
 
-back
+_back

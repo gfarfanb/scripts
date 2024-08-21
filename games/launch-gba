@@ -6,4 +6,4 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 echo Launching '1964 GEPD Edition' (mGBA-0.x.x-ubuntu64-x/*.deb previously installed)
 mgba-qt
 
-back
+_back

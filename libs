@@ -1,0 +1,71 @@
+#! /usr/bin/env bash
+
+PWD=$(pwd)
+
+_require_var() {
+  local _var=${1:-}
+  local _val_cmd="echo \$$_var"
+  local _val=$(eval "$_val_cmd")
+
+  if [ -z "$_val" ]; then
+    echo "Undefined environment variable: $_var"
+    exit 0
+  fi
+}
+
+_back() {
+  cd $PWD
+}
+
+_print() {
+    echo "$*" >&2
+}
+
+_yes_prompt() {
+    _print "${1:-}"
+    _print "y) Yes (default)"
+    _print "n) No"
+    read -p "y/n> " _yesno
+    if [ -z "$_yesno" ]; then
+        _yesno=y
+    fi
+    echo "$_yesno"
+}
+
+_no_prompt() {
+    _print "${1:-}"
+    _print "y) Yes"
+    _print "n) No (default)"
+    read -p "y/n> " _yesno
+    if [ -z "$_yesno" ]; then
+        _yesno=n
+    fi
+    echo "$_yesno"
+}
+
+_validate_dir() {
+    local _dir=${1:-}
+    if [ ! -d "$_dir" ]; then
+        echo ;
+        echo "Directory does not exist: $_dir"
+        _yesno=$( _yes_prompt "Do you want to create it?" )
+        case $_yesno in
+            [Yy]* )
+                mkdir -p "$_dir"
+            ;;
+            * )
+                echo "[Process stopped]"
+                exit 0
+            ;;
+        esac
+    fi
+}
+
+_trim_separator() {
+    echo "${1:-}" | sed 's/^\/*\|\/*$//g'
+}
+
+_trim_trailing_separator() {
+    echo "${1:-}" | sed 's/\/*$//'
+}
+

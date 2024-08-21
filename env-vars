@@ -1,43 +1,17 @@
 #! /usr/bin/env bash
 
-PWD=$(pwd)
+. ./libs
 
-if [ -z "$ENV_VARS_FILE" ]; then
-
-  if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
+if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
     echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in ~/.bashrc"
     exit 0
-  fi
-
-  eval "$( grep "ENV_VARS_FILE=*" ~/.bashrc | xargs )"
+else
+    eval "$( grep "ENV_VARS_FILE=*" ~/.bashrc | xargs )"
 fi
 
 if [ ! -f "$ENV_VARS_FILE" ]; then
-    echo "Environment variables file not found at: '$ENV_VARS_FILE'"
+    echo "Environment variables file not found: '$ENV_VARS_FILE'"
     exit 0
 fi
 
 . "$ENV_VARS_FILE"
-
-require_var() {
-  local _var=${1:-}
-  local _val_cmd="echo \$$_var"
-  local _val=$(eval "$_val_cmd")
-
-  if [ -z "$_val" ]; then
-    echo "Undefined environment variable: $_var"
-    exit 0
-  fi
-}
-
-back() {
-  cd $PWD
-}
-
-trim_separator() {
-    echo "${1:-}" | sed 's/^\/*\|\/*$//g'
-}
-
-trim_trailing_separator() {
-    echo "${1:-}" | sed 's/\/*$//'
-}

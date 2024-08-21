@@ -1,7 +1,0 @@
-#! /usr/bin/env bash
-BASEDIR=$(dirname $0); cd $BASEDIR
-
-. ./env-vars
-
-echo Launching 'Emacs Client Terminal'
-emacsclient -t

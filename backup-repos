@@ -1,0 +1,42 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./libs
+. ./env-vars
+
+_require_var REPOS_BACKUP_HOME
+_require_var REPOS_LIST_FILE
+
+_usage() {
+    echo "Download the repositories backup."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
+
+cd "$REPOS_BACKUP_HOME"
+
+while IFS= read -r line || [ -n "$line" ]; do
+    line=$( echo "${line//[$'\t\r\n']}" )
+    _repo_zip=$( echo "$line" | cut -d ' ' -f 1 | sed 's/\\/\//g' )
+    _repo_url=$( echo "$line" | cut -d ' ' -f 2 )
+
+    echo ;
+    echo "Output: $_repo_zip"
+    echo "URL: $_repo_url"
+    curl -L --create-dirs -o "${_repo_zip}.zip" "$_repo_url"
+done < $REPOS_LIST_FILE
+
+_back
+
+echo "[Completed]"

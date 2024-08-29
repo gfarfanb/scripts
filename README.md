@@ -24,9 +24,9 @@ Edit the environment variables
 
 ## Debian-based setup
 
-Add the required environment variable to */etc/environment* file
+Add the required environment variable to *~/.bashrc* file
 ```sh
-echo 'ENV_VARS_FILE=<vars-file-location>' | sudo tee -a /etc/environment >/dev/null
+echo 'ENV_VARS_FILE=<vars-file-location>' | sudo tee -a ~/.bashrc >/dev/null
 ```
 
 > * Example *env-vars* file:

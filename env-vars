@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 
-if [ ! "$(grep -in "ENV_VARS_FILE=*" /etc/environment)" ]; then
-    echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in /etc/environment"
+if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
+    echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in ~/.bashrc"
     exit 0
 else
-    eval "$( grep "ENV_VARS_FILE=*" /etc/environment | xargs )"
+    eval "$( grep "ENV_VARS_FILE=*" ~/.bashrc | xargs )"
 fi
 
 if [ ! -f "$ENV_VARS_FILE" ]; then

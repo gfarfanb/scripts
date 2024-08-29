@@ -14,11 +14,11 @@ _usage() {
 
 _append_env_vars() {
     local _env_vars="${1:-}/env-vars"
-    if [ ! "$(grep -in "ENV_VARS_FILE=*" /etc/environment)" ]; then
+    if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
         if [ -f "$_env_vars" ]; then
-            echo 'env-vars' file found, adding environment variable to /etc/environment
+            echo 'env-vars' file found, adding environment variable to ~/.bashrc
             echo "ENV_VARS_FILE=\"$_env_vars\""
-            sudo sed -i "$ a\\\nexport ENV_VARS_FILE=\"$_env_vars\"" /etc/environment
+            sed -i "$ a\\\nexport ENV_VARS_FILE=\"$_env_vars\"" ~/.bashrc
         fi
     fi
 }

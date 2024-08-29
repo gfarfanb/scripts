@@ -12,7 +12,7 @@ Edit the environment variables
 | ENV_VARS_FILE | *Variables file location* \* |
 | Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\games;%SCRIPTS_HOME%\pkb \** |
 
-> * File extension is not needed, example file:
+> * File extension is not needed, example *env-vars* file:
 > ```bat
 > set "VARIABLE_1=VALUE1"
 > set "VARIABLE_2=VALUE2"
@@ -24,12 +24,12 @@ Edit the environment variables
 
 ## Debian-based setup
 
-Add the required environment variable to **.bashrc** file
+Add the required environment variable to */etc/environment* file
 ```sh
-echo 'export ENV_VARS_FILE=<vars-file-location>' | sudo tee -a ~/.bashrc >/dev/null
+echo 'ENV_VARS_FILE=<vars-file-location>' | sudo tee -a /etc/environment >/dev/null
 ```
 
-> * Example file:
+> * Example *env-vars* file:
 > ```bash
 > VARIABLE_1="VALUE1"
 > VARIABLE_2=VALUE2

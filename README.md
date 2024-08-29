@@ -26,7 +26,11 @@ Edit the environment variables
 
 Add the required environment variable to *~/.bashrc* file
 ```sh
-echo 'ENV_VARS_FILE=<vars-file-location>' | sudo tee -a ~/.bashrc >/dev/null
+vim ~/.bashrc
+# vim>
+# export ENV_VARS_FILE="<vars-file-location>"
+
+source ~/.bashrc
 ```
 
 > * Example *env-vars* file:

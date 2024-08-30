@@ -4,7 +4,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./libs
 . ./env-vars
 
-_require_var APP_IMAGES_HOMES
+_require_var EXECS_HOME
 
 _usage() {
     echo "Launches an AppImage file."
@@ -23,30 +23,42 @@ while getopts "h" opt; do
     esac
 done
 
-_app_homes=()
+if [ ! -d "$EXECS_HOME" ]; then
+    echo "Directory not found: $EXECS_HOME"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+_app_paths=($( find "$EXECS_HOME" -type f -name "*.AppImage" ))
+
+if [[ -z ${_app_paths[@]} ]]; then
+    echo "AppImage files not found in: $EXECS_HOME"
+    echo "[Process stopped]"
+    exit 0
+fi
 
 echo "Select an AppImage:"
-for _idx in "${!APP_IMAGES_HOMES[@]}"; do
-    _app_home_cmd="echo \$${APP_IMAGES_HOMES[$_idx]}"
-    _app_home=$( eval $_app_home_cmd )
-    _app_opt=$( ls $_app_home | grep ".*\.AppImage$" )
-    echo "$((_idx+1))) $_app_opt"
-
-    _app_homes+=("$_app_home")
+for _idx in "${!_app_paths[@]}"; do
+    _app_value="${_app_paths[$_idx]}"
+    echo "$((_idx+1))) $( echo $_app_value | sed -r 's/^.+\///' )"
 done
 read -p "app-index> " _app_index
 
-_app_home="${_app_homes[$((_app_index-1))]}"
-
-if [ -z "$_app_home" ]; then
+if [ -z "$_app_index" ]; then
     echo "Invalid console index"
     echo "[Process stopped]"
     exit 0
 fi
 
-cd $_app_home
+_app_path="${_app_paths[$((_app_index-1))]}"
 
-./*.AppImage
+if [ -z "$_app_path" ]; then
+    echo "Invalid console index"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+$_app_path
 
 _back
 

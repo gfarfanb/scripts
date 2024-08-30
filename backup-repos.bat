@@ -1,14 +1,14 @@
 @echo OFF
 
 call env-vars.bat
-call require-var REPOS_BACKUP_HOME
+call require-var REPOS_HOME
 call require-var REPOS_LIST_FILE
 
-echo Backing up repos at "%REPOS_BACKUP_HOME%"
+echo Backing up repos at "%REPOS_HOME%"
 
 setlocal enableDelayedExpansion
 
-cd /d %REPOS_BACKUP_HOME%
+cd /d %REPOS_HOME%
 
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
     set "__repo_zip=%%i.zip"

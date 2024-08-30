@@ -4,7 +4,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./libs
 . ./env-vars
 
-_require_var REPOS_BACKUP_HOME
+_require_var REPOS_HOME
 _require_var REPOS_LIST_FILE
 
 _usage() {
@@ -24,7 +24,7 @@ while getopts "h" opt; do
     esac
 done
 
-cd "$REPOS_BACKUP_HOME"
+cd "$REPOS_HOME"
 
 while IFS= read -r line || [ -n "$line" ]; do
     line=$( echo "${line//[$'\t\r\n']}" )

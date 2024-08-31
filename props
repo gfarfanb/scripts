@@ -1,0 +1,64 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./libs
+. ./env-vars
+
+_usage() {
+    echo "Show the environment variables defined in the 'env-vars' file."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "lh" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
+
+_all_props=( $( cat $ENV_VARS_FILE | grep '^.*=.*' | cut -d "=" -f 1 ) )
+
+echo "Select an environment variable:"
+for _idx in "${!_all_props[@]}"; do
+    _prop_name="${_all_props[$_idx]}"
+    _prop_value=$( eval "echo \$$_prop_name" )
+
+    if [ -z "$_prop_value" ]; then
+        echo "$((_idx+1))) $_prop_name <empty>"
+    else
+        echo "$((_idx+1))) $_prop_name"
+    fi
+done
+read -p "env-index> " _prop_index
+
+if [ -z "$_prop_index" ]; then
+    echo "Invalid environment variable index"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+_prop_name="${_all_props[$((_prop_index-1))]}"
+
+if [ -z "$_prop_name" ]; then
+    echo "Invalid environment variable index"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+echo ;
+
+_prop_value=$( eval "echo \$$_prop_name" )
+
+if [ -z "$_prop_value" ]; then
+    echo "$_prop_name=<empty>"
+else
+    echo "$_prop_name=$_prop_value"
+fi
+
+echo ;
+echo "[Completed]"

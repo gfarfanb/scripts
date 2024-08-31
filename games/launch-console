@@ -21,21 +21,28 @@ while getopts "h" opt; do
     esac
 done
 
-# "mupen64plus|Nintendo 64"
 _consoles=(
     "zelda64|Zelda 64: Recompiled"
     "perfectdark|Perfect Dark port"
     "1964gepd|1964 GEPD Edition"
     "dolphin|GameCube/Wii"
+    "mupen64plus|Nintendo 64"
     "mgba|GBA/GBC/GB"
     "snes9x|SNES"
 )
 echo "Select a console:"
 for _idx in "${!_consoles[@]}"; do
-    _console_opt=$( cut -d \| -f 2 <<< "${_consoles[$_idx]}" ) 
+    _console_opt=$( cut -d \| -f 2 <<< "${_consoles[$_idx]}" )
+
     echo "$((_idx+1))) $_console_opt"
 done
 read -p "console-index> " _console_index
+
+if [ -z "$_console_index" ]; then
+    echo "Invalid console index"
+    echo "[Process stopped]"
+    exit 0
+fi
 
 _emu=$( cut -d \| -f 1 <<< "${_consoles[$((_console_index-1))]}" )
 _console_name=$( cut -d \| -f 2 <<< "${_consoles[$((_console_index-1))]}" )
@@ -91,6 +98,12 @@ _launch_1964gepd() {
 
 _launch_dolphin() {
     flatpak run org.DolphinEmu.dolphin-emu
+}
+
+_launch_mupen64plus() {
+    echo "Not implemented yet"
+    echo "[Completed]"
+    exit 0
 }
 
 _launch_mgba() {

@@ -13,8 +13,7 @@ _usage() {
     echo "Usage: $0 [<option>]*"
     echo "Option:"
     echo "    -s: Apply Rclone sync"
-    echo "    -p: Push changes to cloud"
-    echo "    -d: Test run"
+    echo "    -t: Test run"
     echo "    -h: Displays this help message"
     exit 0
 }
@@ -24,13 +23,10 @@ _sync_flag=0
 _push_flag=0
 _options="-P"
 
-while getopts "spth" opt; do
+while getopts "sth" opt; do
     case "$opt" in
         s)
             _sync_flag=1
-            ;;
-        p)
-            _push_flag=1
             ;;
         t)
             _options="--dry-run"
@@ -40,6 +36,28 @@ while getopts "spth" opt; do
             ;;
     esac
 done
+
+_sync_ops=( "Pull" "Push" )
+
+echo "Select an operation:"
+for _idx in "${!_sync_ops[@]}"; do
+    _op="${_sync_ops[$_idx]}"
+
+    echo "$((_idx+1))) $_op"
+done
+read -p "operation-index> " _op_index
+
+if [ -z "$_op_index" ]; then
+    echo "Invalid operation index"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+_sync_op="${_sync_ops[$((_op_index-1))]}"
+
+if [ "$_sync_op" = "Push" ]; then
+    _push_flag=1
+fi
 
 for _src in "${CLOUD_REMOTE_SOURCES[@]}"; do
     _config=$( cut -d : -f 1 <<< "$_src" ) 

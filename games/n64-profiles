@@ -1,0 +1,57 @@
+#! /usr/bin/env bash
+
+# [SOURCE] Core Parameters: https://mupen64plus.org/wiki/index.php?title=Mupen64Plus_Core_Parameters
+# [SOURCE] Plugin Parameters: https://mupen64plus.org/wiki/index.php?title=Mupen64Plus_Plugin_Parameters
+
+_games=(
+    "Banjo-Kazooie.n64"
+    "Banjo-Tooie.n64"
+    "Pokemon Stadium.n64"
+)
+
+_game_index() {
+    local _game=${1:-}
+    local _index=-1
+    for _idx in "${!_games[@]}"; do
+        if [ "$_game" = "${_games[$_idx]}" ]; then
+            _index=$_idx
+        fi
+    done
+    echo $_index
+}
+
+
+# /********** Banjo-Kazooie **********/
+# [Mupen64 Options]
+# Pak=Rumble pak
+# GFX=mupen64plus-video-rice
+# enumode=Dynamic Recompiler
+_game_idx=$( _game_index "Banjo-Kazooie.n64" )
+declare _pak_game_profile_$_game_idx=""
+declare _gfx_game_profile_$_game_idx=2
+declare _emumode_game_profile_$_game_idx=2
+declare _params_game_profile_$_game_idx=""
+
+
+# /********** Banjo-Tooie **********/
+# [Mupen64 Options]
+# Pak=Rumble pak
+# GFX=mupen64plus-video-rice
+# enumode=Pure Interpreter
+_game_idx=$( _game_index "Banjo-Tooie.n64" )
+declare _pak_game_profile_$_game_idx=""
+declare _gfx_game_profile_$_game_idx=2
+declare _emumode_game_profile_$_game_idx=0
+declare _params_game_profile_$_game_idx=""
+
+
+# /********** Pokémon Stadium **********/
+# [Mupen64 Options]
+# Pak=Transfer pak
+# GFX=mupen64plus-video-glide64mk2
+# enumode=Dynamic Recompiler
+_game_idx=$( _game_index "Pokemon Stadium.n64" )
+declare _pak_game_profile_$_game_idx=4
+declare _gfx_game_profile_$_game_idx=""
+declare _emumode_game_profile_$_game_idx=""
+declare _params_game_profile_$_game_idx=""

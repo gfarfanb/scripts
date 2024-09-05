@@ -101,9 +101,13 @@ _launch_dolphin() {
 }
 
 _launch_mupen64plus() {
-    echo "Not implemented yet"
-    echo "[Completed]"
-    exit 0
+    _require_var N64_ROMS_HOME
+    _require_var N64_CONFIGURED_JOYSTICK_NAMES
+    _require_var N64_CONFIGURED_JOYSTICK_CONFIGS
+    _require_var N64_CONFIGURED_JOYSTICK_DEFAULT
+
+    . ./n64-profiles
+    . ./start-mupen64plus
 }
 
 _launch_mgba() {

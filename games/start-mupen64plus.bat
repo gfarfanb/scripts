@@ -8,174 +8,172 @@ rem set N64_SCREENSHOTS_HOME=...
 rem set GB_GBC_ROMS_HOME=...
 rem set GB_GBC_SAVES_HOME=...
 
+rem set "N64_JOYSTICK_NAMES[<joystick-index>]=<joystick-name>"
+rem set "N64_JOYSTICK_CONFIGS[<joystick-index>]=<joystick-connection>"
+
+rem set N64_CONFIGURED_JOYSTICK_LENGTH=<total-joystick-configs>
+rem set N64_CONFIGURED_JOYSTICK_DEFAULT=<joystick-index-default>
+
 
 rem ######################### Profile definition
-rem set pak_game_profile[<game-hash>]=<pak-value>
-rem set gfx_game_profile[<game-hash>]=<gfx-value>
-rem set emumode_game_profile[<game-hash>]=<emumode-value>
-rem set "params_game_profile[<game-hash>]=<params-value>"
-
-
-rem ######################### Controller definition
-rem set "joystick_name[<controller-index>]=<controller-name>"
-rem set "joystick_config[<controller-index>]=<controller-connection>"
-
-rem set CONFIGURED_JOYSTICK_LENGTH=<total-controller-configs>
-rem set CONFIGURED_JOYSTICK_DEFAULT=<controller-index-default>
+rem set _pak_game_profiles[<game-hash>]=<pak-value>
+rem set _gfx_game_profiles[<game-hash>]=<gfx-value>
+rem set _emumode_game_profiles[<game-hash>]=<emumode-value>
+rem set "_params_game_profiles[<game-hash>]=<params-value>"
 
 
 rem ######################### Default values
-set controller_name[1]=Input-SDL-Control1
-set controller_name[2]=Input-SDL-Control2
-set controller_name[3]=Input-SDL-Control3
-set controller_name[4]=Input-SDL-Control4
+set _controller_names[1]=Input-SDL-Control1
+set _controller_names[2]=Input-SDL-Control2
+set _controller_names[3]=Input-SDL-Control3
+set _controller_names[4]=Input-SDL-Control4
 
-IF "%CONFIGURED_JOYSTICK_LENGTH%"=="" set CONFIGURED_JOYSTICK_LENGTH=0
-IF "%CONFIGURED_JOYSTICK_DEFAULT%"=="" set CONFIGURED_JOYSTICK_DEFAULT=1
+IF "%N64_CONFIGURED_JOYSTICK_LENGTH%"=="" set N64_CONFIGURED_JOYSTICK_LENGTH=0
+IF "%N64_CONFIGURED_JOYSTICK_DEFAULT%"=="" set N64_CONFIGURED_JOYSTICK_DEFAULT=1
 
-set CONTROLLERS_DEFAULT=1
+set _controllers_default=1
 
 rem 1=None
 rem 2=Mem pak
 rem 4=Transfer pak
 rem 5=Rumble pak
-set EXPANSION_PAK_DEFAULT=5
+set _expansion_pak_default=5
 
-set gfx_video_plugin[1]=mupen64plus-video-glide64mk2
-set gfx_video_plugin[2]=mupen64plus-video-rice
-set GFX_VIDEO_PLUGIN_LENGTH=2
-set GFX_VIDEO_PLUGIN_DEFAULT=1
+set _gfx_video_plugins[1]=mupen64plus-video-glide64mk2
+set _gfx_video_plugins[2]=mupen64plus-video-rice
+set _gfx_video_plugin_length=2
+set _gfx_video_plugin_default=1
 
-set RESOLUTION_DEFAULT=1024x768
+set _resolution_default=1024x768
 
-set "emulation_mode[0]=Pure Interpreter"
-set "emulation_mode[1]=Cached Interpreter"
-set "emulation_mode[2]=Dynamic Recompiler"
-set EMULATION_MODE_DEFAULT=2
+set "_emulation_modes[0]=Pure Interpreter"
+set "_emulation_modes[1]=Cached Interpreter"
+set "_emulation_modes[2]=Dynamic Recompiler"
+set _emulation_mode_default=2
 
 
 setlocal enableDelayedExpansion
 
 
 rem /********** N64 Roms menu **********/
-set /a N64_ID=1
+set /a _n64_idx=1
 
 for /f "delims=" %%N in ('dir %N64_ROMS_HOME%\*.n64 /b') do (
-    set n64_filename[!N64_ID!]=%%~N
-    set /a N64_ID+=1
+    set _n64_filenames[!_n64_idx!]=%%~N
+    set /a _n64_idx+=1
 )
 
-set /a LOADED_N64=%N64_ID%-1
+set /a _loaded_n64_count=%_n64_idx%-1
 
-for /L %%i in (1,1,%LOADED_N64%) do (
-    echo [%%i] "!n64_filename[%%i]!"
+for /L %%i in (1,1,%_loaded_n64_count%) do (
+    echo [%%i] "!_n64_filenames[%%i]!"
 )
 
-set /P N64_ROM_IDX="Choose a N64 game number: "
-set "N64_ROM=!n64_filename[%N64_ROM_IDX%]!"
+set /P _n64_rom_idx="Choose a N64 game number: "
+set "_n64_rom=!_n64_filenames[%_n64_rom_idx%]!"
 
-if "%N64_ROM%" == "" goto noromfile
+if "%_n64_rom%" == "" goto noromfile
 goto romselected
 
 
 rem /********** N64 ROM selected **********/
 :romselected
 
-for /f "delims=" %%a in ('sha256sum "%N64_ROM%"') do @set N64_ROM_HASH=%%a
+for /f "delims=" %%a in ('sha256sum "%_n64_rom%"') do @set _n64_rom_hash=%%a
 
 
 rem /********** Number of controls menu **********/
 echo:
-set /P CONTROLS="Enter the number of controls [1-4] (default [%CONTROLLERS_DEFAULT%]): "
-if "%CONTROLS%"=="" set CONTROLS=%CONTROLLERS_DEFAULT%
+set /P _controllers="Enter the number of controls [1-4] (default [%_controllers_default%]): "
+if "%_controllers%"=="" set _controllers=%_controllers_default%
 
 
-rem /********** Controls setup **********/
-set /a CONTROL_ID=1
-set "EXPANSION_PAK_OPTION_PART="
+rem /********** Controllers setup **********/
+set /a _controller_id=1
+set "_expansion_pak_option_part="
 
 
-rem ######################### [BEGIN] Control setup
-:control
+rem ######################### [BEGIN] Controller setup
+:controller
 
 rem /********** Expansion pak menu **********/
 echo:
-set PAK_GAME_PROFILE_EXPANSION_PAK=!pak_game_profile[%N64_ROM_HASH%]!
-if not "%PAK_GAME_PROFILE_EXPANSION_PAK%"=="" set EXPANSION_PAK_DEFAULT=%PAK_GAME_PROFILE_EXPANSION_PAK%
+set _pak_game_profile_expansion_pak=!_pak_game_profiles[%_n64_rom_hash%]!
+if not "%_pak_game_profile_expansion_pak%"=="" set _expansion_pak_default=%_pak_game_profile_expansion_pak%
 
-set /P EXPANSION_PAK_IDX="Choose the Expansion pak for Control-%CONTROL_ID% [1=None, 2=Mem pak, 4=Transfer pak, 5=Rumble pak] (default %EXPANSION_PAK_DEFAULT%): "
-if "%EXPANSION_PAK_IDX%"=="" set EXPANSION_PAK_IDX=%EXPANSION_PAK_DEFAULT%
+set /P _expansion_pak_idx="Choose the Expansion pak for Controller-%_controller_id% [1=None, 2=Mem pak, 4=Transfer pak, 5=Rumble pak] (default %_expansion_pak_default%): "
+if "%_expansion_pak_idx%"=="" set _expansion_pak_idx=%_expansion_pak_default%
 echo:
 
-set CONTROLLER_NAME=!controller_name[%CONTROL_ID%]!
+set _controller_name=!_controller_names[%_controller_id%]!
 
 
 rem /********** Configured joysticks menu **********/
 echo:
 
-for /L %%l in (1,1,%CONFIGURED_JOYSTICK_LENGTH%) do (
-    echo [%%l] "!joystick_name[%%l]!"
+for /L %%l in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
+    echo [%%l] "!N64_JOYSTICK_NAMES[%%l]!"
 )
 
-set /P CONFIGURED_JOYSTICK_IDX="Choose a configured joystick number for Control-%CONTROL_ID% (default %CONFIGURED_JOYSTICK_DEFAULT%): "
-if "%CONFIGURED_JOYSTICK_IDX%"=="" set CONFIGURED_JOYSTICK_IDX=%CONFIGURED_JOYSTICK_DEFAULT%
+set /P _configured_joystick_idx="Choose a configured joystick number for Controller-%_controller_id% (default %N64_CONFIGURED_JOYSTICK_DEFAULT%): "
+if "%_configured_joystick_idx%"=="" set _configured_joystick_idx=%N64_CONFIGURED_JOYSTICK_DEFAULT%
 
-set JOYSTICK_NAME=!joystick_config[%CONFIGURED_JOYSTICK_IDX%]!
+set _n64_joystick_config=!N64_JOYSTICK_CONFIGS[%_configured_joystick_idx%]!
 
 rem /********** Controller options **********/
-set "CONFIGURATION_OPTION_PART=%CONFIGURATION_OPTION_PART% --set %CONTROLLER_NAME%[mode]=1"
-set "PLUGGED_OPTION_PART=%PLUGGED_OPTION_PART% --set %CONTROLLER_NAME%[plugged]=True"
+set "_configuration_option_part=%_configuration_option_part% --set %_controller_name%[mode]=1"
+set "_plugged_option_part=%_plugged_option_part% --set %_controller_name%[plugged]=True"
 
-set "JOYSTICK_OPTION_PART=%JOYSTICK_OPTION_PART% --set %CONTROLLER_NAME%[name]=^"%JOYSTICK_NAME%^""
-set JOYSTICK_OPTION_PART=%JOYSTICK_OPTION_PART:^^=%
+set "_joystick_option_part=%_joystick_option_part% --set %_controller_name%[name]=^"%_n64_joystick_config%^""
+set _joystick_option_part=%_joystick_option_part:^^=%
 
-set "EXPANSION_PAK_OPTION_PART=%EXPANSION_PAK_OPTION_PART% --set %CONTROLLER_NAME%[plugin]=%EXPANSION_PAK_IDX%"
+set "_expansion_pak_option_part=%_expansion_pak_option_part% --set %_controller_name%[plugin]=%_expansion_pak_idx%"
 
-if "%EXPANSION_PAK_IDX%"=="1" set "EXPANSION_PAK_LOADED=%EXPANSION_PAK_LOADED% Control-%CONTROL_ID%='None'"
-if "%EXPANSION_PAK_IDX%"=="2" set "EXPANSION_PAK_LOADED=%EXPANSION_PAK_LOADED% Control-%CONTROL_ID%='Mem pak'"
-if "%EXPANSION_PAK_IDX%"=="4" set "EXPANSION_PAK_LOADED=%EXPANSION_PAK_LOADED% Control-%CONTROL_ID%='Transfer pak'"
-if "%EXPANSION_PAK_IDX%"=="5" set "EXPANSION_PAK_LOADED=%EXPANSION_PAK_LOADED% Control-%CONTROL_ID%='Rumble pak'"
+if "%_expansion_pak_idx%"=="1" set "_expansion_pak_loaded=%_expansion_pak_loaded% Controller-%_controller_id%='None'"
+if "%_expansion_pak_idx%"=="2" set "_expansion_pak_loaded=%_expansion_pak_loaded% Controller-%_controller_id%='Mem pak'"
+if "%_expansion_pak_idx%"=="4" set "_expansion_pak_loaded=%_expansion_pak_loaded% Controller-%_controller_id%='Transfer pak'"
+if "%_expansion_pak_idx%"=="5" set "_expansion_pak_loaded=%_expansion_pak_loaded% Controller-%_controller_id%='Rumble pak'"
 
-if "%EXPANSION_PAK_IDX%"=="4" goto transferpak
-set /a CONTROL_ID+=1
+if "%_expansion_pak_idx%"=="4" goto transferpak
+set /a _controller_id+=1
 
-if "%CONTROL_ID%" gtr "%CONTROLS%" goto loading
-goto control
+if "%_controller_id%" gtr "%_controllers%" goto loading
+goto controller
 
-rem ######################### [END] Control setup
+rem ######################### [END] Controller setup
 
 
 rem ######################### [BEGIN] Transfer pak
 :transferpak
 
-set /a GB_GBC_ID=1
+set /a _gb_gbc_id=1
 
 for /f "delims=" %%G in ('dir %GB_GBC_ROMS_HOME%\*.gb* /b') do (
-    set gb_gbc_filename[!GB_GBC_ID!]=%%~G
-    set /a GB_GBC_ID+=1
+    set gb_gbc_filename[!_gb_gbc_id!]=%%~G
+    set /a _gb_gbc_id+=1
 )
 
-set /a LOADED_GB_GBC=%GB_GBC_ID%-1
+set /a _loaded_gb_gbc_count=%_gb_gbc_id%-1
 
-for /L %%j in (1,1,%LOADED_GB_GBC%) do (
+for /L %%j in (1,1,%_loaded_gb_gbc_count%) do (
     echo [%%j] "!gb_gbc_filename[%%j]!"
 )
 
-set /P GB_GBC_ROM_IDX="Choose a GB/GBC game number for Control-%CONTROL_ID%: "
-set GB_GBC_ROM=!gb_gbc_filename[%GB_GBC_ROM_IDX%]!
+set /P _gb_gbc_rom_idx="Choose a GB/GBC game number for Controller-%_controller_id%: "
+set _gb_gbc_rom=!gb_gbc_filename[%_gb_gbc_rom_idx%]!
 
-set "TRANSFER_PAK_LOADED=%TRANSFER_PAK_LOADED% Control-%CONTROL_ID%='%GB_GBC_ROM%'"
+set "_transfer_pak_loaded=%_transfer_pak_loaded% Controller-%_controller_id%='%_gb_gbc_rom%'"
 
 rem /********** Extracting GB/GBC game name **********/
-for /F "tokens=1 delims=." %%F in ("%GB_GBC_ROM%") do set "GB_GBC_NAME=%%F"
+for /F "tokens=1 delims=." %%F in ("%_gb_gbc_rom%") do set "_gb_gbc_name=%%F"
 
-set "TRANSFER_PAK_PART=%TRANSFER_PAK_PART% --gb-rom-%CONTROL_ID% ^"%GB_GBC_ROMS_HOME%\%GB_GBC_ROM%^" --gb-ram-%CONTROL_ID% ^"%GB_GBC_SAVES_HOME%\%GB_GBC_NAME%.sav^""
-set TRANSFER_PAK_PART=%TRANSFER_PAK_PART:^^=%
+set "_transfer_pak_part=%_transfer_pak_part% --gb-rom-%_controller_id% ^"%GB_GBC_ROMS_HOME%\%_gb_gbc_rom%^" --gb-ram-%_controller_id% ^"%GB_GBC_SAVES_HOME%\%_gb_gbc_name%.sav^""
+set _transfer_pak_part=%_transfer_pak_part:^^=%
 
-set /a CONTROL_ID+=1
+set /a _controller_id+=1
 
-if "%CONTROL_ID%" gtr "%CONTROLS%" goto loading
-goto control
+if "%_controller_id%" gtr "%_controllers%" goto loading
+goto controller
 
 rem ######################### [END] Transfer pak
 
@@ -186,63 +184,63 @@ rem ######################### [BEGIN] Loading game
 
 rem /********** Video plugin menu **********/
 echo:
-for /L %%k in (1,1,%GFX_VIDEO_PLUGIN_LENGTH%) do (
-    echo [%%k] "!gfx_video_plugin[%%k]!"
+for /L %%k in (1,1,%_gfx_video_plugin_length%) do (
+    echo [%%k] "!_gfx_video_plugins[%%k]!"
 )
 
-set GFX_GAME_PROFILE_VIDEO_PLUGIN=!gfx_game_profile[%N64_ROM_HASH%]!
-if not "%GFX_GAME_PROFILE_VIDEO_PLUGIN%"=="" set GFX_VIDEO_PLUGIN_DEFAULT=%GFX_GAME_PROFILE_VIDEO_PLUGIN%
+set _gfx_game_profile_video_plugin=!_gfx_game_profiles[%_n64_rom_hash%]!
+if not "%_gfx_game_profile_video_plugin%"=="" set _gfx_video_plugin_default=%_gfx_game_profile_video_plugin%
 
-set /P GFX_VIDEO_PLUGIN_IDX="Choose a Video plugin number (default [%GFX_VIDEO_PLUGIN_DEFAULT%]): "
-if "%GFX_VIDEO_PLUGIN_IDX%"=="" set GFX_VIDEO_PLUGIN_IDX=%GFX_VIDEO_PLUGIN_DEFAULT%
+set /P _gfx_video_plugin_idx="Choose a Video plugin number (default [%_gfx_video_plugin_default%]): "
+if "%_gfx_video_plugin_idx%"=="" set _gfx_video_plugin_idx=%_gfx_video_plugin_default%
 
-set GFX_VIDEO_PLUGIN=!gfx_video_plugin[%GFX_VIDEO_PLUGIN_IDX%]!
+set _gfx_video_plugin=!_gfx_video_plugins[%_gfx_video_plugin_idx%]!
 
 
 rem /********** Resolution menu **********/
 echo:
-set /P RESOLUTION="Enter the display resolution [640x480, 800x600, 1024x768, etc.] (default [%RESOLUTION_DEFAULT%]): "
-if "%RESOLUTION%"=="" set RESOLUTION=%RESOLUTION_DEFAULT%
+set /P _resolution="Enter the display resolution [640x480, 800x600, 1024x768, etc.] (default [%_resolution_default%]): "
+if "%_resolution%"=="" set _resolution=%_resolution_default%
 
 
 rem /********** Emulation mode menu **********/
 echo:
-set EMUMODE_GAME_PROFILE_EMULATION_MODE=!emumode_game_profile[%N64_ROM_HASH%]!
-if not "%EMUMODE_GAME_PROFILE_EMULATION_MODE%"=="" set EMULATION_MODE_DEFAULT=%EMUMODE_GAME_PROFILE_EMULATION_MODE%
+set _emumode_game_profile_emulation_mode=!_emumode_game_profiles[%_n64_rom_hash%]!
+if not "%_emumode_game_profile_emulation_mode%"=="" set _emulation_mode_default=%_emumode_game_profile_emulation_mode%
 
-set /P EMULATION_MODE_IDX="Enter the emulation mode [0=Pure Interpreter 1=Cached Interpreter 2=Dynamic Recompiler] (default [%EMULATION_MODE_DEFAULT%]): "
-if "%EMULATION_MODE_IDX%"=="" set EMULATION_MODE_IDX=%EMULATION_MODE_DEFAULT%
+set /P _emulation_mode_idx="Enter the emulation mode [0=Pure Interpreter 1=Cached Interpreter 2=Dynamic Recompiler] (default [%_emulation_mode_default%]): "
+if "%_emulation_mode_idx%"=="" set _emulation_mode_idx=%_emulation_mode_default%
 
-set EMULATION_MODE=!emulation_mode[%EMULATION_MODE_IDX%]!
+set _emulation_mode=!_emulation_modes[%_emulation_mode_idx%]!
 
 
 rem /********** Merge all options **********/
-set PARAMS_GAME_PROFILE_PARAMETERS=!params_game_profile[%N64_ROM_HASH%]!
-set "ALL_PARTS=%PARAMS_GAME_PROFILE_PARAMETERS% %CONFIGURATION_OPTION_PART% %PLUGGED_OPTION_PART% %JOYSTICK_OPTION_PART% %EXPANSION_PAK_OPTION_PART% %TRANSFER_PAK_PART%"
+set _params_game_profile_parameters=!_params_game_profiles[%_n64_rom_hash%]!
+set "ALL_PARTS=%_params_game_profile_parameters% %_configuration_option_part% %_plugged_option_part% %_joystick_option_part% %_expansion_pak_option_part% %_transfer_pak_part%"
 
 
 rem /********** Launching Mupen64Plus **********/
 echo:
 echo Loading game...
-echo N64-Rom='%N64_ROM%'
-echo N64-Rom-Hash='%N64_ROM_HASH%'
-echo Expansion-pak:%EXPANSION_PAK_LOADED%
-echo Transfer-pak:%TRANSFER_PAK_LOADED%
-echo Video-plugin='%GFX_VIDEO_PLUGIN%'
-echo Resolution='%RESOLUTION%'
-echo Emulation-mode='%EMULATION_MODE%'
-echo Parameters='%PARAMS_GAME_PROFILE_PARAMETERS%'
+echo N64-Rom='%_n64_rom%'
+echo N64-Rom-Hash='%_n64_rom_hash%'
+echo Expansion-pak:%_expansion_pak_loaded%
+echo Transfer-pak:%_transfer_pak_loaded%
+echo Video-plugin='%_gfx_video_plugin%'
+echo Resolution='%_resolution%'
+echo Emulation-mode='%_emulation_mode%'
+echo Parameters='%_params_game_profile_parameters%'
 
 echo Additional-options=
-set /a ARG_IDX=1
-set "TAB=    "
-for %%A in (%*) do echo %TAB% %%!ARG_IDX! %%A & set /a ARG_IDX+=1
+set /a _arg_idx=1
+set "_tab=    "
+for %%A in (%*) do echo %_tab% %%!_arg_idx! %%A & set /a _arg_idx+=1
 echo:
 
 cd %MUPEN64PLUS_HOME%
 
 rem [SOURCE] %MUPEN64PLUS_HOME%\README - UI Console Usage
-mupen64plus-ui-console.exe %* --set Core[SaveSRAMPath]="%N64_SAVES_HOME%" --gfx %GFX_VIDEO_PLUGIN% --resolution %RESOLUTION% --emumode %EMULATION_MODE_IDX% --sshotdir "%N64_SCREENSHOTS_HOME%" %ALL_PARTS% "%N64_ROMS_HOME%\%N64_ROM%"
+mupen64plus-ui-console.exe %* --set Core[SaveSRAMPath]="%N64_SAVES_HOME%" --gfx %_gfx_video_plugin% --resolution %_resolution% --emumode %_emulation_mode_idx% --sshotdir "%N64_SCREENSHOTS_HOME%" %ALL_PARTS% "%N64_ROMS_HOME%\%_n64_rom%"
 
 goto :eof
 

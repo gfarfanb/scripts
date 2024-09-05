@@ -7,7 +7,7 @@ rem is enabled. That setup removes '!' to the save filenames.
 rem
 rem In this case we need to define (somewhere) a variable using this code:
 rem     for /f "delims=" %%a in ('sha256sum "<save-file-without-exclamation-marks>"') do (
-rem         set "profile_save_file[%%a]=<original-save-file>"
+rem         set "_profile_save_files[%%a]=<original-save-file>"
 rem     )
 
 setlocal enableDelayedExpansion
@@ -114,7 +114,7 @@ for /L %%i in (1,1,%_ext_count%) do (
         for /f "skip=%_number_to_keep% eol=: delims=" %%F in ('dir /b /o-e /a-d "%_snapshots_home%!_save_file!*"') do @del "%_snapshots_home%%%F"
     ) else (
         set /a _profile_count+=1
-        echo set "_profile_save_file[!_profile_count!]=!_save_file!" >> %_profile_tmp%
+        echo set "_profile_save[!_profile_count!]=!_save_file!" >> %_profile_tmp%
     )
 )
 
@@ -135,10 +135,10 @@ call "%_profile_tmp%"
 del "%_profile_tmp%"
 
 for /L %%i in (1,1,%_profile_count%) do (
-    set "_save_file=!_profile_save_file[%%i]!"
+    set "_save_file=!_profile_save[%%i]!"
 
     for /f "delims=" %%a in ('sha256sum "!_save_file!"') do (
-        set "_save_file=!profile_save_file[%%a]!"
+        set "_save_file=!_profile_save_files[%%a]!"
 
         if not "!_save_file!"=="" (
             set "_snapshot_file=!_save_file!.%_year%%_month%%_day%-%_hour%%_mins%%_secs%"

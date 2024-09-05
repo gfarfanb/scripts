@@ -1,0 +1,203 @@
+#! /usr/bin/env bash
+
+# ######################### Required variables
+# MUPEN64PLUS_HOME=...
+# N64_ROMS_HOME=...
+# N64_SAVES_HOME=...
+# GB_GBC_ROMS_HOME=...
+# GB_GBC_SAVES_HOME=...
+
+
+# ######################### Profile definition
+# _pak_game_profile_<game-index>=<pak-value>
+# _gfx_game_profile_<game-index>=<gfx-value>
+# _emumode_game_profile_<game-index>=<emumode-value>
+# _params_game_profile_<game-index>=<params-value>
+
+
+# ######################### Controller definition
+# _joystick_names[<controller-index>]=<controller-name>
+# _joystick_config[<controller-index>]=<controller-connection>
+
+# N64_CONFIGURED_JOYSTICK_DEFAULT=<controller-index-default>
+
+
+# ######################### Default values
+_controller_names=(
+    Input-SDL-Control1
+    Input-SDL-Control2
+    Input-SDL-Control3
+    Input-SDL-Control4
+)
+
+_controllers_default=1
+
+_expansion_paks=(
+    "1|None"
+    "2|Mem pak"
+    "4|Transfer pak"
+    "5|Rumble pak"
+)
+_expansion_pak_default=5
+
+_gfx_video_plugin=(
+    "mupen64plus-video-glide64mk2"
+    "mupen64plus-video-rice"
+)
+_gfx_video_plugin_default=0
+
+_resolution_default=1024x768
+
+_emulation_modes=(
+    "Pure Interpreter"
+    "Cached Interpreter"
+    "Dynamic Recompiler"
+)
+_emulation_mode_default=2
+
+
+# ######################### Setup functions
+
+_get_expansion_pak_name() {
+    local _expansion_pak=${1:-}
+    local _expansion_pak_name=""
+
+    for _idx in "${!_expansion_paks[@]}"; do
+        local _pak_opt=$( cut -d \| -f 1 <<< "${_expansion_paks[$_idx]}" )
+
+        if [ "$_pak_opt" = "$_expansion_pak" ]; then
+            _expansion_pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$_idx]}" )
+        fi
+    done
+
+    echo "$_expansion_pak_name"
+}
+
+_select_expansion_pak() {
+    local _controller_idx=${1:-}
+    local _game_idx=${2:-}
+    local _pak_game_profile_expansion_pak=$( eval "echo \$_pak_game_profile_$_game_idx" )
+
+    if [ -n "_pak_game_profile_expansion_pak" ]; then
+        _expansion_pak_default=$_pak_game_profile_expansion_pak
+    fi
+
+    echo ;
+    echo "Choose the Expansion pak for Controller-$((_controller_idx+1)):" >&2
+    for _idx in "${!_expansion_paks[@]}"; do
+        local _pak_opt=$( cut -d \| -f 1 <<< "${_expansion_paks[$_idx]}" )
+        local _pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$_idx]}" )
+
+        if [ "$_pak_opt" = "$_expansion_pak_default" ]; then
+            echo "$_pak_opt) $_pak_name <default>" >&2
+        else
+            echo "$_pak_opt) $_pak_name" >&2
+        fi
+    done
+    read -p "expansion-pak> " _expansion_pak_idx
+
+    if [ -z "$_expansion_pak_idx" ]; then
+        _expansion_pak_idx=$_expansion_pak_default
+    fi
+
+    echo $_expansion_pak_idx
+}
+
+_select_joystick() {
+    echo ;
+    echo "Choose a configured joystick number for Controller-$((_controller_idx+1)):" >&2
+    for _idx in "${!N64_CONFIGURED_JOYSTICK_NAMES[@]}"; do
+        local _joystick_name="${N64_CONFIGURED_JOYSTICK_NAMES[$_idx]}"
+
+        if [ "$_idx" = "$N64_CONFIGURED_JOYSTICK_DEFAULT" ]; then
+            echo "$((_idx+1))) $_joystick_name <default>" >&2
+        else
+            echo "$((_idx+1))) $_joystick_name" >&2
+        fi
+    done
+    read -p "joystick-config> " _joystick_config_id
+
+    if [ -z "$_joystick_config" ]; then
+        _joystick_config_id=$N64_CONFIGURED_JOYSTICK_DEFAULT
+    else
+        _joystick_config_id=$((_joystick_config_id-1))
+    fi
+
+    echo $_joystick_config_id
+}
+
+_setup_transfer_pak() {
+    echo "Setting up transfer pak" >&2
+}
+
+
+# /********** N64 Roms menu **********/
+_n64_files=()
+_n64_idx=1
+
+for _n64_file in "$N64_ROMS_HOME"/*.n64; do
+    _n64_files+=( "$_n64_file" )
+    _n64_name=$( basename "$_n64_file" )
+
+    echo "$_n64_idx) $_n64_name"
+
+    _n64_idx=$((_n64_idx+1))
+done
+read -p "n64-index> " _n64_rom_idx
+
+if [ -z "$_n64_rom_idx" ]; then
+    echo "No ROM file selected"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+_n64_rom="${_n64_files[$((_n64_rom_idx-1))]}"
+_n64_name=$( basename "$_n64_rom" )
+_n64_game_idx=$( _game_index "$_n64_name" )
+
+if [ -z "$_n64_rom" ]; then
+    echo "No ROM file selected"
+    echo "[Process stopped]"
+    exit 0
+fi
+
+echo "Enter the number of controllers [1-4] (default [$_controllers_default]):"
+read -p "num-controllers> " _controllers
+
+if [ -z "$_controllers" ]; then
+    _controllers=$_controllers_default
+fi
+
+_configuration_option_part=""
+_plugged_option_part=""
+_joystick_option_part=""
+_expansion_pak_option_part=""
+_expansion_pak_loaded=""
+
+for (( _controller_idx=0 ; _controller_idx<= $_controllers-1 ; _controller_idx++ )); do
+    _controller_name="${_controller_names[$_controller_idx]}"
+
+    if [ -z "$_controller_name" ]; then
+        continue
+    fi
+
+    _expansion_pak=$( _select_expansion_pak $_controller_idx $_n64_game_idx )
+    _joystick_config_idx=$( _select_joystick $_controller_idx )
+    _joystick_config="${N64_CONFIGURED_JOYSTICK_CONFIGS[$_joystick_config_idx]}"
+
+    _configuration_option_part="$_configuration_option_part --set $_controller_name[mode]=1"
+    _plugged_option_part="$_plugged_option_part --set $_controller_name[plugged]=True"
+    _joystick_option_part="$_joystick_option_part --set $_controller_name[name]=\"$_joystick_config\""
+    _expansion_pak_option_part="$_expansion_pak_option_part --set $_controller_name[plugin]=$_expansion_pak"
+    _expansion_pak_loaded="$_expansion_pak_loaded Controller-$((_controller_idx+1))='$( _get_expansion_pak_name $_expansion_pak )'"
+
+    if [ $_expansion_pak -eq 4 ]; then
+        _setup_transfer_pak $_controller_idx
+    fi
+done
+
+echo $_configuration_option_part
+echo $_plugged_option_part
+echo $_joystick_option_part
+echo $_expansion_pak_option_part
+echo $_expansion_pak_loaded

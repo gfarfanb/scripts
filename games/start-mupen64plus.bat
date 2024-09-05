@@ -164,8 +164,8 @@ set "_transfer_pak_loaded=%_transfer_pak_loaded% Controller-%_controller_id%='%_
 rem /********** Extracting GB/GBC game name **********/
 for /F "tokens=1 delims=." %%F in ("%_gb_gbc_rom%") do set "_gb_gbc_name=%%F"
 
-set "_transfer_pak_part=%_transfer_pak_part% --gb-rom-%_controller_id% ^"%GB_GBC_ROMS_HOME%\%_gb_gbc_rom%^" --gb-ram-%_controller_id% ^"%GB_GBC_SAVES_HOME%\%_gb_gbc_name%.sav^""
-set _transfer_pak_part=%_transfer_pak_part:^^=%
+set "_transfer_pak_option_part=%_transfer_pak_option_part% --gb-rom-%_controller_id% ^"%GB_GBC_ROMS_HOME%\%_gb_gbc_rom%^" --gb-ram-%_controller_id% ^"%GB_GBC_SAVES_HOME%\%_gb_gbc_name%.sav^""
+set _transfer_pak_option_part=%_transfer_pak_option_part:^^=%
 
 set /a _controller_id+=1
 
@@ -205,7 +205,7 @@ echo:
 set _emumode_game_profile_emulation_mode=!_emumode_game_profiles[%_n64_rom_hash%]!
 if not "%_emumode_game_profile_emulation_mode%"=="" set _emulation_mode_default=%_emumode_game_profile_emulation_mode%
 
-set /P _emulation_mode_idx="Enter the emulation mode [0=Pure Interpreter 1=Cached Interpreter 2=Dynamic Recompiler] (default [%_emulation_mode_default%]): "
+set /P _emulation_mode_idx="Choose the emulation mode [0=Pure Interpreter 1=Cached Interpreter 2=Dynamic Recompiler] (default [%_emulation_mode_default%]): "
 if "%_emulation_mode_idx%"=="" set _emulation_mode_idx=%_emulation_mode_default%
 
 set _emulation_mode=!_emulation_modes[%_emulation_mode_idx%]!
@@ -213,7 +213,7 @@ set _emulation_mode=!_emulation_modes[%_emulation_mode_idx%]!
 
 rem /********** Merge all options **********/
 set _params_game_profile_parameters=!_params_game_profiles[%_n64_rom_hash%]!
-set "ALL_PARTS=%_params_game_profile_parameters% %_configuration_option_part% %_plugged_option_part% %_joystick_option_part% %_expansion_pak_option_part% %_transfer_pak_part%"
+set "_all_parts=%_params_game_profile_parameters% %_configuration_option_part% %_plugged_option_part% %_joystick_option_part% %_expansion_pak_option_part% %_transfer_pak_option_part%"
 
 
 rem /********** Launching Mupen64Plus **********/
@@ -237,7 +237,7 @@ echo:
 cd %MUPEN64PLUS_HOME%
 
 rem [SOURCE] %MUPEN64PLUS_HOME%\README - UI Console Usage
-mupen64plus-ui-console.exe %* --set Core[SaveSRAMPath]="%N64_SAVES_HOME%" --gfx %_gfx_video_plugin% --resolution %_resolution% --emumode %_emulation_mode_idx% --sshotdir "%N64_SCREENSHOTS_HOME%" %ALL_PARTS% "%N64_ROMS_HOME%\%_n64_rom%"
+mupen64plus-ui-console.exe %* --set Core[SaveSRAMPath]="%N64_SAVES_HOME%" --gfx %_gfx_video_plugin% --resolution %_resolution% --emumode %_emulation_mode_idx% --sshotdir "%N64_SCREENSHOTS_HOME%" %_all_parts% "%N64_ROMS_HOME%\%_n64_rom%"
 
 goto :eof
 

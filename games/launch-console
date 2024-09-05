@@ -62,7 +62,7 @@ _launch_zelda64() {
 
     cd $ZELDA64RECOMPILED_HOME
 
-    ./Zelda64Recompiled
+    ./Zelda64Recompiled "$@"
 
     rsync -cvrP $ZELDA64RECOMPILED_SAVES_HOME $ZELDA64RECOMPILED_BACKUP_HOME
 }
@@ -77,7 +77,7 @@ _launch_perfectdark() {
 
     cd $PERFECTDARK_HOME
 
-    ./pd --rom-file "$PERFECTDARK_ROM"
+    ./pd --rom-file "$PERFECTDARK_ROM" "$@"
 
     rsync -cvrPa $PERFECTDARK_SAVES_HOME/eeprom.bin $PERFECTDARK_BACKUP_HOME
 }
@@ -91,35 +91,39 @@ _launch_1964gepd() {
 
     cd $GEPD_1964_HOME
 
-    wine 1964.exe
+    wine 1964.exe "$@"
 
     rsync -cvrP $GEPD_1964_SAVES_HOME $GEPD_1964_BACKUP_HOME
 }
 
 _launch_dolphin() {
-    flatpak run org.DolphinEmu.dolphin-emu
+    flatpak run org.DolphinEmu.dolphin-emu "$@"
 }
 
 _launch_mupen64plus() {
     _require_var N64_ROMS_HOME
+    _require_var N64_SAVES_HOME
+    _require_var GB_GBC_ROMS_HOME
+    _require_var GB_GBC_SAVES_HOME
     _require_var N64_CONFIGURED_JOYSTICK_NAMES
     _require_var N64_CONFIGURED_JOYSTICK_CONFIGS
     _require_var N64_CONFIGURED_JOYSTICK_DEFAULT
 
     . ./n64-profiles
-    . ./start-mupen64plus
+    . ./start-mupen64plus "$@"
 }
 
 _launch_mgba() {
-    flatpak run io.mgba.mGBA
+    flatpak run io.mgba.mGBA "$@"
 }
 
 _launch_snes9x() {
-    flatpak run com.snes9x.Snes9x
+    flatpak run com.snes9x.Snes9x "$@"
 }
 
+echo >&2
 echo "Launching '$_console_name'"
-eval "_launch_$_emu"
+eval "_launch_$_emu \"\$@\""
 
 _back
 

@@ -27,8 +27,8 @@ _game_index() {
 # GFX=mupen64plus-video-rice
 # enumode=Dynamic Recompiler
 _game_idx=$( _game_index "Banjo-Kazooie.n64" )
-declare _pak_game_profile_$_game_idx=""
-declare _gfx_game_profile_$_game_idx=2
+declare _pak_game_profile_$_game_idx=5
+declare _gfx_game_profile_$_game_idx=1
 declare _emumode_game_profile_$_game_idx=2
 declare _params_game_profile_$_game_idx=""
 
@@ -39,8 +39,8 @@ declare _params_game_profile_$_game_idx=""
 # GFX=mupen64plus-video-rice
 # enumode=Pure Interpreter
 _game_idx=$( _game_index "Banjo-Tooie.n64" )
-declare _pak_game_profile_$_game_idx=""
-declare _gfx_game_profile_$_game_idx=2
+declare _pak_game_profile_$_game_idx=5
+declare _gfx_game_profile_$_game_idx=1
 declare _emumode_game_profile_$_game_idx=0
 declare _params_game_profile_$_game_idx=""
 
@@ -52,6 +52,6 @@ declare _params_game_profile_$_game_idx=""
 # enumode=Dynamic Recompiler
 _game_idx=$( _game_index "Pokemon Stadium.n64" )
 declare _pak_game_profile_$_game_idx=4
-declare _gfx_game_profile_$_game_idx=""
-declare _emumode_game_profile_$_game_idx=""
+declare _gfx_game_profile_$_game_idx=0
+declare _emumode_game_profile_$_game_idx=2
 declare _params_game_profile_$_game_idx=""

@@ -28,9 +28,6 @@ set _controller_names[2]=Input-SDL-Control2
 set _controller_names[3]=Input-SDL-Control3
 set _controller_names[4]=Input-SDL-Control4
 
-IF "%N64_CONFIGURED_JOYSTICK_LENGTH%"=="" set N64_CONFIGURED_JOYSTICK_LENGTH=0
-IF "%N64_CONFIGURED_JOYSTICK_DEFAULT%"=="" set N64_CONFIGURED_JOYSTICK_DEFAULT=1
-
 set _controllers_default=1
 
 rem 1=None

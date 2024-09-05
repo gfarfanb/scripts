@@ -7,19 +7,17 @@
 # GB_GBC_ROMS_HOME=...
 # GB_GBC_SAVES_HOME=...
 
+# N64_JOYSTICK_NAMES=( <joystick-name> )
+# N64_JOYSTICK_CONFIGS=( <joystick-connection> )
+
+# N64_CONFIGURED_JOYSTICK_DEFAULT=<joystick-index-default>
+
 
 # ######################### Profile definition
 # _pak_game_profile_<game-index>=<pak-value>
 # _gfx_game_profile_<game-index>=<gfx-value>
 # _emumode_game_profile_<game-index>=<emumode-value>
 # _params_game_profile_<game-index>=<params-value>
-
-
-# ######################### Controller definition
-# _joystick_names[<controller-index>]=<controller-name>
-# _joystick_config[<controller-index>]=<controller-connection>
-
-# N64_CONFIGURED_JOYSTICK_DEFAULT=<controller-index-default>
 
 
 # ######################### Default values

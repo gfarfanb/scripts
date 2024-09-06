@@ -1,0 +1,28 @@
+#! /usr/bin/env bash
+
+_saves_home="$1/"
+_snapshots_home="${_saves_home}snapshots/"
+
+if [ -n "$SNAPSHOTS_TO_KEEP" ]; then
+    _number_to_keep=$SNAPSHOTS_TO_KEEP
+else
+    _number_to_keep=10
+fi
+
+_save_exts=()
+_arg_idx=1
+
+for _arg in "$@"; do
+    if [ $_arg_idx -gt 1 ]; then
+        _save_exts+=( "$_arg" )
+    fi
+    _arg_idx=$((_arg_idx+1))
+done
+
+for _ext in "${_save_exts[@]}"; do
+    for _save_file_name in "$_saves_home"/*.$_ext; do
+        
+    done
+done
+
+echo "${_save_exts[@]}" 

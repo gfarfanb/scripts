@@ -5,6 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./env-vars
 
 _require_var EXECS_HOME
+_require_var EXECUTABLE_COMMANDS
 
 _usage() {
     echo "Launches an AppImage file."
@@ -31,13 +32,11 @@ fi
 
 _app_paths=( $( find "$EXECS_HOME" -type f -name "*.AppImage" ) )
 
-if [[ -z ${_app_paths[@]} ]]; then
-    echo "AppImage files not found in: $EXECS_HOME"
-    echo "[Process stopped]"
-    exit 0
-fi
+for _bin in "${EXECUTABLE_COMMANDS[@]}"; do
+    _app_paths+=( "$_bin" )
+done
 
-echo "Select an AppImage:"
+echo "Select an AppImage/Executable:"
 for _idx in "${!_app_paths[@]}"; do
     _app_path="${_app_paths[$_idx]}"
 
@@ -46,7 +45,7 @@ done
 read -p "app-index> " _app_index
 
 if [ -z "$_app_index" ]; then
-    echo "Invalid console index"
+    echo "Invalid app index"
     echo "[Process stopped]"
     exit 0
 fi
@@ -54,10 +53,12 @@ fi
 _app_path="${_app_paths[$((_app_index-1))]}"
 
 if [ -z "$_app_path" ]; then
-    echo "Invalid console index"
+    echo "Invalid app index"
     echo "[Process stopped]"
     exit 0
 fi
+
+cd $EXECS_HOME
 
 $_app_path
 

@@ -84,7 +84,7 @@ for /L %%i in (1,1,%_save_count%) do (
 set /a _default_save_file=%_save_count%+1
 echo [%_default_save_file%] "<skip snapshot>"
 
-set /P _save_file_idx="Choose a save file to create snapshot (default [%_default_save_file%]): "
+set /P _save_file_idx="Choose a save file to create a snapshot (default [%_default_save_file%]): "
 if "%_save_file_idx%"=="" set _save_file_idx=%_default_save_file%
 
 set _save_selected=!_save_ids[%_save_file_idx%]!
@@ -104,8 +104,8 @@ for /L %%i in (1,1,%_ext_count%) do (
     set "_save_ext=!_save_exts[%%i]!"
     set "_save_file=%_save_selected%.!_save_ext!"
     set "_snapshot_file=!_save_file!.%_year%%_month%%_day%-%_hour%%_mins%%_secs%"
-    set "_snapshot_file_path=%_snapshots_home%!_snapshot_file!"
     set "_save_file_path=%_saves_home%!_save_file!"
+    set "_snapshot_file_path=%_snapshots_home%!_snapshot_file!"
 
     if exist "!_save_file_path!" (
         echo Creating snapshot: "!_snapshot_file_path!"

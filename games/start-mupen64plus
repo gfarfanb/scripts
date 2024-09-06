@@ -106,7 +106,7 @@ _select_expansion_pak() {
         local _pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$_idx]}" )
 
         if [ "$_pak_opt" = "$_pak_default" ]; then
-            echo "$_pak_opt) $_pak_name <default>" >&2
+            echo "$_pak_opt) (default) $_pak_name" >&2
         else
             echo "$_pak_opt) $_pak_name" >&2
         fi
@@ -144,7 +144,7 @@ _select_joystick() {
         local _joystick_name="${N64_CONFIGURED_JOYSTICK_NAMES[$_idx]}"
 
         if [ "$_idx" = "$N64_CONFIGURED_JOYSTICK_DEFAULT" ]; then
-            echo "$((_idx+1))) $_joystick_name <default>" >&2
+            echo "$((_idx+1))) (default) $_joystick_name" >&2
         else
             echo "$((_idx+1))) $_joystick_name" >&2
         fi
@@ -208,7 +208,7 @@ _select_video_plugin() {
         local _gfx_name="${_gfx_video_plugins[$_idx]}"
 
         if [ "$_idx" = "$_gfx_default" ]; then
-            echo "$((_idx+1))) $_gfx_name <default>" >&2
+            echo "$((_idx+1))) (default) $_gfx_name" >&2
         else
             echo "$((_idx+1))) $_gfx_name" >&2
         fi
@@ -249,7 +249,7 @@ _select_emulation_mode() {
         local _emumode_name="${_emulation_modes[$_idx]}"
 
         if [ "$_idx" = "$_emumode_default" ]; then
-            echo "$_idx) $_emumode_name <default>" >&2
+            echo "$_idx) (default) $_emumode_name" >&2
         else
             echo "$_idx) $_emumode_name" >&2
         fi

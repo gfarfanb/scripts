@@ -65,6 +65,8 @@ _launch_zelda64() {
     ./Zelda64Recompiled "$@"
 
     rsync -cvrP $ZELDA64RECOMPILED_SAVES_HOME $ZELDA64RECOMPILED_BACKUP_HOME
+
+    ./take-snapshot "$ZELDA64RECOMPILED_BACKUP_HOME" bin
 }
 
 _launch_perfectdark() {
@@ -80,6 +82,8 @@ _launch_perfectdark() {
     ./pd --rom-file "$PERFECTDARK_ROM" "$@"
 
     rsync -cvrPa $PERFECTDARK_SAVES_HOME/eeprom.bin $PERFECTDARK_BACKUP_HOME
+
+    ./take-snapshot "$PERFECTDARK_BACKUP_HOME" bin
 }
 
 _launch_1964gepd() {
@@ -94,10 +98,14 @@ _launch_1964gepd() {
     wine 1964.exe "$@"
 
     rsync -cvrP $GEPD_1964_SAVES_HOME $GEPD_1964_BACKUP_HOME
+
+    ./take-snapshot "$GEPD_1964_BACKUP_HOME" eep
 }
 
 _launch_dolphin() {
     flatpak run org.DolphinEmu.dolphin-emu "$@"
+
+    ./take-snapshot "$DOLPHIN_BACKUP_HOME" gci
 }
 
 _launch_mupen64plus() {
@@ -111,14 +119,20 @@ _launch_mupen64plus() {
 
     . ./n64-profiles
     . ./start-mupen64plus "$@"
+
+    ./take-snapshot "$N64_SAVES_HOME" eep mpk fla
 }
 
 _launch_mgba() {
     flatpak run io.mgba.mGBA "$@"
+
+    ./take-snapshot "$MGBA_BACKUP_HOME" sav ss1
 }
 
 _launch_snes9x() {
     flatpak run com.snes9x.Snes9x "$@"
+
+    ./take-snapshot "$SNES9X_BACKUP_HOME" 000 0A.frz srm oops
 }
 
 echo >&2

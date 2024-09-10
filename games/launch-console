@@ -21,39 +21,10 @@ while getopts "h" opt; do
     esac
 done
 
-_consoles=(
-    "zelda64|Zelda 64: Recompiled"
-    "perfectdark|Perfect Dark port"
-    "1964gepd|1964 GEPD Edition"
-    "dolphin|GameCube/Wii"
-    "mupen64plus|Nintendo 64"
-    "mgba|GBA/GBC/GB"
-    "snes9x|SNES"
-)
-echo "Select a console:"
-for _idx in "${!_consoles[@]}"; do
-    _console_opt=$( cut -d \| -f 2 <<< "${_consoles[$_idx]}" )
-
-    echo "$((_idx+1))) $_console_opt"
-done
-read -p "console-index> " _console_index
-
-if [ -z "$_console_index" ]; then
-    echo "Invalid console index"
-    echo "[Process stopped]"
-    exit 0
-fi
-
-_emu=$( cut -d \| -f 1 <<< "${_consoles[$((_console_index-1))]}" )
-_console_name=$( cut -d \| -f 2 <<< "${_consoles[$((_console_index-1))]}" )
-
-if [ -z "$_emu" ]; then
-    echo "Invalid console index"
-    echo "[Process stopped]"
-    exit 0
-fi
-
 _launch_zelda64() {
+    echo >&2
+    echo "Launching 'Zelda 64: Recompiled'" >&2
+
     _require_var ZELDA64RECOMPILED_HOME
     _require_var ZELDA64RECOMPILED_SAVES_HOME
     _require_var ZELDA64RECOMPILED_BACKUP_HOME
@@ -70,6 +41,9 @@ _launch_zelda64() {
 }
 
 _launch_perfectdark() {
+    echo >&2
+    echo "Launching 'perfect_dark'" >&2
+
     _require_var PERFECTDARK_HOME
     _require_var PERFECTDARK_ROM
     _require_var PERFECTDARK_SAVES_HOME
@@ -87,6 +61,9 @@ _launch_perfectdark() {
 }
 
 _launch_1964gepd() {
+    echo >&2
+    echo "Launching '1964 GEPD Edition'" >&2
+
     _require_var GEPD_1964_HOME
     _require_var GEPD_1964_SAVES_HOME
     _require_var GEPD_1964_BACKUP_HOME
@@ -103,12 +80,18 @@ _launch_1964gepd() {
 }
 
 _launch_dolphin() {
+    echo >&2
+    echo "Launching 'Dolphin'" >&2
+
     flatpak run org.DolphinEmu.dolphin-emu "$@"
 
     ./take-snapshot "$DOLPHIN_BACKUP_HOME" gci
 }
 
 _launch_mupen64plus() {
+    echo >&2
+    echo "Launching 'Mupen64Plus'" >&2
+
     _require_var N64_ROMS_HOME
     _require_var N64_SAVES_HOME
     _require_var GB_GBC_ROMS_HOME
@@ -124,20 +107,61 @@ _launch_mupen64plus() {
 }
 
 _launch_mgba() {
+    echo >&2
+    echo "Launching 'mGBA'" >&2
+
     flatpak run io.mgba.mGBA "$@"
 
     ./take-snapshot "$MGBA_BACKUP_HOME" sav ss1
 }
 
 _launch_snes9x() {
+    echo >&2
+    echo Launching 'Snes9x' >&2
+
     flatpak run com.snes9x.Snes9x "$@"
 
     ./take-snapshot "$SNES9X_BACKUP_HOME" 000 0A.frz srm oops
 }
 
-echo >&2
-echo "Launching '$_console_name'"
-eval "_launch_$_emu \"\$@\""
+echo "Select a console:"
+echo "1) Zelda 64: Recompiled"
+echo "2) Perfect Dark port"
+echo "3) 1964 GEPD Edition"
+echo "4) GameCube/Wii"
+echo "5) Nintendo 64"
+echo "6) GBA/GBC/GB"
+echo "7) SNES"
+read -p "console-index> " _console_index
+
+case "$_console_index" in
+    1)
+        _launch_zelda64 "$@"
+        ;;
+    2)
+        _launch_perfectdark "$@"
+        ;;
+    3)
+        _launch_1964gepd "$@"
+        ;;
+    4)
+        _launch_dolphin "$@"
+        ;;
+    5)
+        _launch_mupen64plus "$@"
+        ;;
+    6)
+        _launch_mgba "$@"
+        ;;
+    7)
+        _launch_snes9x "$@"
+        ;;
+    *)
+        echo "Invalid console index"
+        echo "[Process stopped]"
+        exit 0
+        ;;
+esac
 
 _back
 

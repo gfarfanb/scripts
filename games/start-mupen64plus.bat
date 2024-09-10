@@ -300,7 +300,7 @@ echo:
 cd %MUPEN64PLUS_HOME%
 
 rem [SOURCE] %MUPEN64PLUS_HOME%\README - UI Console Usage
-echo mupen64plus-ui-console.exe %* --set Core[SaveSRAMPath]="%N64_SAVES_HOME%" --gfx %_gfx_video_plugin% --resolution %_resolution% --emumode %_emulation_mode_idx% --sshotdir "%N64_SCREENSHOTS_HOME%" %_all_parts% "%N64_ROMS_HOME%\%_n64_rom%"
+mupen64plus-ui-console.exe %* --set Core[SaveSRAMPath]="%N64_SAVES_HOME%" --gfx %_gfx_video_plugin% --resolution %_resolution% --emumode %_emulation_mode_idx% --sshotdir "%N64_SCREENSHOTS_HOME%" %_all_parts% "%N64_ROMS_HOME%\%_n64_rom%"
 
 goto :eof
 

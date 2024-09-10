@@ -12,15 +12,11 @@ if not exist "%ENV_VARS_FILE%" (
     goto :eof
 )
 
-set __timestamp=%date%-%time%
-set __timestamp=%__timestamp:/=-%
-set __timestamp=%__timestamp::=_%
-set __timestamp=%__timestamp: =_%
-set __timestamp=%__timestamp:.=_%
+setlocal
 
-set __env_vars_bat="%TEMP%\env-vars-%__timestamp%.bat"
+set __env_vars_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME::=%-%RANDOM%
+set __env_vars_bat="%TEMP%\env-vars-%__env_vars_tag%.bat"
 
 more "%ENV_VARS_FILE%" > "%__env_vars_bat%"
 
-call "%__env_vars_bat%"
-del "%__env_vars_bat%"
+endlocal & call "%__env_vars_bat%" & del "%__env_vars_bat%"

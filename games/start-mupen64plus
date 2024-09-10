@@ -37,22 +37,22 @@ _expansion_paks=(
     "4|Transfer pak"
     "5|Rumble pak"
 )
-_expansion_pak_default=5
+_expansion_pak_default="Rumble pak"
 
 _gfx_video_plugins=(
     "mupen64plus-video-glide64mk2"
     "mupen64plus-video-rice"
 )
-_gfx_video_plugin_default=0
+_gfx_video_plugin_default="mupen64plus-video-glide64mk2"
 
 _resolution_default=1024x768
 
 _emulation_modes=(
-    "Pure Interpreter"
-    "Cached Interpreter"
-    "Dynamic Recompiler"
+    "0|Pure Interpreter"
+    "1|Cached Interpreter"
+    "2|Dynamic Recompiler"
 )
-_emulation_mode_default=2
+_emulation_mode_default="Dynamic Recompiler"
 
 
 # ######################### Setup functions
@@ -89,11 +89,29 @@ _select_rom() {
     echo "$_n64_rom"
 }
 
+_get_expansion_pak_id() {
+    local _expansion_pak_name=${1:-}
+    local _expansion_pak_id=-1
+
+    for _idx in "${!_expansion_paks[@]}"; do
+        local _pak_opt=$( cut -d \| -f 1 <<< "${_expansion_paks[$_idx]}" )
+        local _pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$_idx]}" )
+
+        echo $_expansion_pak_name $_pak_name $_pak_opt >&2
+        if [ "$_expansion_pak_name" = "$_pak_name" ]; then
+            _expansion_pak_id=$_pak_opt
+        fi
+    done
+
+    echo $_expansion_pak_id
+}
+
 _select_expansion_pak() {
     local _controller_id=${1:-}
     local _game_idx=${2:-}
     local _pak_game_profile_expansion_pak=$( eval "echo \$_pak_game_profile_$_game_idx" )
     local _pak_default=$_expansion_pak_default
+    local _expansion_pak_name=""
 
     if [ -n "$_pak_game_profile_expansion_pak" ]; then
         _pak_default=$_pak_game_profile_expansion_pak
@@ -102,37 +120,23 @@ _select_expansion_pak() {
     echo >&2
     echo "Choose the Expansion pak for Controller-$_controller_id:" >&2
     for _idx in "${!_expansion_paks[@]}"; do
-        local _pak_opt=$( cut -d \| -f 1 <<< "${_expansion_paks[$_idx]}" )
         local _pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$_idx]}" )
 
-        if [ "$_pak_opt" = "$_pak_default" ]; then
-            echo "$_pak_opt) (default) $_pak_name" >&2
+        if [ "$_pak_default" = "$_pak_name" ]; then
+            echo "$((_idx+1))) (default) $_pak_name" >&2
         else
-            echo "$_pak_opt) $_pak_name" >&2
+            echo "$((_idx+1))) $_pak_name" >&2
         fi
     done
     read -p "expansion-pak-num> " _expansion_pak_idx
 
     if [ -z "$_expansion_pak_idx" ]; then
-        _expansion_pak_idx=$_pak_default
+        _expansion_pak_name=$_pak_default
+    else
+        _expansion_pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$((_expansion_pak_idx-1))]}" )
     fi
 
-    echo $_expansion_pak_idx
-}
-
-_get_expansion_pak_name() {
-    local _expansion_pak=${1:-}
-    local _expansion_pak_name=""
-
-    for _idx in "${!_expansion_paks[@]}"; do
-        local _pak_opt=$( cut -d \| -f 1 <<< "${_expansion_paks[$_idx]}" )
-
-        if [ "$_pak_opt" = "$_expansion_pak" ]; then
-            _expansion_pak_name=$( cut -d \| -f 2 <<< "${_expansion_paks[$_idx]}" )
-        fi
-    done
-
-    echo "$_expansion_pak_name"
+    echo $_expansion_pak_name
 }
 
 _select_joystick() {
@@ -143,7 +147,7 @@ _select_joystick() {
     for _idx in "${!N64_CONFIGURED_JOYSTICK_NAMES[@]}"; do
         local _joystick_name="${N64_CONFIGURED_JOYSTICK_NAMES[$_idx]}"
 
-        if [ "$_idx" = "$N64_CONFIGURED_JOYSTICK_DEFAULT" ]; then
+        if [ "$N64_CONFIGURED_JOYSTICK_DEFAULT" = "$_idx" ]; then
             echo "$((_idx+1))) (default) $_joystick_name" >&2
         else
             echo "$((_idx+1))) $_joystick_name" >&2
@@ -196,10 +200,10 @@ _setup_transfer_pak() {
 _select_video_plugin() {
     local _game_idx=${1:-}
     local _gfx_game_profile_video_plugin=$( eval "echo \$_gfx_game_profile_$_game_idx" )
-    local _gfx_default=$((_gfx_video_plugin_default+1))
+    local _gfx_default=$_gfx_video_plugin_default
 
     if [ -n "$_gfx_game_profile_video_plugin" ]; then
-        _gfx_default=$((_gfx_game_profile_video_plugin+1))
+        _gfx_default=$_gfx_game_profile_video_plugin
     fi
 
     echo >&2
@@ -207,7 +211,7 @@ _select_video_plugin() {
     for _idx in "${!_gfx_video_plugins[@]}"; do
         local _gfx_name="${_gfx_video_plugins[$_idx]}"
 
-        if [ "$_idx" = "$_gfx_default" ]; then
+        if [ "$_gfx_default" = "$_gfx_name" ]; then
             echo "$((_idx+1))) (default) $_gfx_name" >&2
         else
             echo "$((_idx+1))) $_gfx_name" >&2
@@ -216,15 +220,17 @@ _select_video_plugin() {
     read -p "gfx-video-index> " _gfx_video_idx
 
     if [ -z "$_gfx_video_idx" ]; then
-        _gfx_video_idx=$_gfx_default
+        _gfx_video=$_gfx_default
+    else
+        _gfx_video="${_gfx_video_plugins[$((_gfx_video_idx-1))]}"
     fi
 
-    echo "${_gfx_video_plugins[$((_gfx_video_idx-1))]}"
+    echo "$_gfx_video"
 }
 
 _select_resolution() {
     echo >&2
-    echo "Enter the display resolution [640x480, 800x600, 1024x768, etc.] (default [$_resolution_default]):" >&2
+    echo "Enter the display resolution [640x480, 800x600, etc.] (default [$_resolution_default]):" >&2
     read -p "resolution> " _resolution
 
     if [ -z "$_resolution" ]; then
@@ -234,10 +240,27 @@ _select_resolution() {
     echo "$_resolution"
 }
 
+_get_emulation_mode_id() {
+    local _emulation_mode_name=${1:-}
+    local _emumode_id=-1
+
+    for _idx in "${!_emulation_modes[@]}"; do
+        local _emumode_opt=$( cut -d \| -f 1 <<< "${_emulation_modes[$_idx]}" )
+        local _emumode_name=$( cut -d \| -f 2 <<< "${_emulation_modes[$_idx]}" )
+
+        if [ "$_emulation_mode_name" = "$_emumode_name" ]; then
+            _emumode_id=$_emumode_opt
+        fi
+    done
+
+    echo $_emumode_id
+}
+
 _select_emulation_mode() {
     local _game_idx=${1:-}
     local _emumode_game_profile_emulation_mode=$( eval "echo \$_emumode_game_profile_$_game_idx" )
     local _emumode_default=$_emulation_mode_default
+    local _emulation_mode_name=""
 
     if [ -n "$_emumode_game_profile_emulation_mode" ]; then
         _emumode_default=$_emumode_game_profile_emulation_mode
@@ -246,21 +269,23 @@ _select_emulation_mode() {
     echo >&2
     echo "Choose the emulation mode:" >&2
     for _idx in "${!_emulation_modes[@]}"; do
-        local _emumode_name="${_emulation_modes[$_idx]}"
+        local _emumode_name=$( cut -d \| -f 2 <<< "${_emulation_modes[$_idx]}" )
 
-        if [ "$_idx" = "$_emumode_default" ]; then
-            echo "$_idx) (default) $_emumode_name" >&2
+        if [ "$_emumode_default" = "$_emumode_name" ]; then
+            echo "$((_idx+1))) (default) $_emumode_name" >&2
         else
-            echo "$_idx) $_emumode_name" >&2
+            echo "$((_idx+1))) $_emumode_name" >&2
         fi
     done
     read -p "emumode-index> " _emumode_idx
 
     if [ -z "$_emumode_idx" ]; then
-        _emumode_idx=$_emumode_default
+        _emulation_mode_name=$_emumode_default
+    else
+        _emulation_mode_name=$( cut -d \| -f 2 <<< "${_emulation_modes[$((_emumode_idx-1))]}" )
     fi
 
-    echo $_emumode_idx
+    echo $_emulation_mode_name
 }
 
 
@@ -294,11 +319,13 @@ for (( _controller_idx=0 ; _controller_idx<= $_controllers-1 ; _controller_idx++
         continue
     fi
 
-    _expansion_pak=$( _select_expansion_pak $_controller_id $_n64_game_idx )
+    _expansion_pak="$( _select_expansion_pak $_controller_id $_n64_game_idx )"
+    _expansion_pak_id=$( _get_expansion_pak_id "$_expansion_pak" )
+    echo $_expansion_pak_id
     _joystick_config_idx=$( _select_joystick $_controller_id )
     _joystick_config="${N64_CONFIGURED_JOYSTICK_CONFIGS[$_joystick_config_idx]}"
 
-    if [ $_expansion_pak -eq 4 ]; then
+    if [ $_expansion_pak_id -eq 4 ]; then
         _gb_gbc_rom=$( _setup_transfer_pak $_controller_id )
         _gb_gbc_name=$( basename "$_gb_gbc_rom" )
         _gb_gbc_save="$( echo $_gb_gbc_name | cut -f 1 -d '.' ).sav"
@@ -310,13 +337,14 @@ for (( _controller_idx=0 ; _controller_idx<= $_controllers-1 ; _controller_idx++
     _configuration_option_part="$_configuration_option_part --set $_controller_name[mode]=1"
     _plugged_option_part="$_plugged_option_part --set $_controller_name[plugged]=True"
     _joystick_option_part="$_joystick_option_part --set $_controller_name[name]=\"$_joystick_config\""
-    _expansion_pak_option_part="$_expansion_pak_option_part --set $_controller_name[plugin]=$_expansion_pak"
-    _expansion_pak_loaded="$_expansion_pak_loaded Controller-$_controller_id='$( _get_expansion_pak_name $_expansion_pak )'"
+    _expansion_pak_option_part="$_expansion_pak_option_part --set $_controller_name[plugin]=$_expansion_pak_id"
+    _expansion_pak_loaded="$_expansion_pak_loaded Controller-$_controller_id='$_expansion_pak'"
 done
 
 _gfx_video_plugin="$( _select_video_plugin $_n64_game_idx )"
 _resolution="$( _select_resolution )"
-_emulation_mode_idx="$( _select_emulation_mode $_n64_game_idx )"
+_emulation_mode="$( _select_emulation_mode $_n64_game_idx )"
+_emulation_mode_id=$( _get_emulation_mode_id "$_emulation_mode" )
 
 _params_game_profile_parameters=$( eval "echo \$_params_game_profile_$_game_idx" )
 _all_parts="$_params_game_profile_parameters $_configuration_option_part $_plugged_option_part $_joystick_option_part $_expansion_pak_option_part $_transfer_pak_option_part"
@@ -328,7 +356,7 @@ echo "Expansion-pak:$_expansion_pak_loaded"
 echo "Transfer-pak:$_transfer_pak_loaded"
 echo "Video-plugin='$_gfx_video_plugin'"
 echo "Resolution='$_resolution'"
-echo "Emulation-mode='${_emulation_modes[$_emulation_mode_idx]}'"
+echo "Emulation-mode='$_emulation_mode'"
 echo "Parameters='$_params_game_profile_parameters'"
 
 echo "Additional-options="
@@ -339,4 +367,4 @@ done
 echo >&2
 
 # [SOURCE] https://mupen64plus.org/wiki/index.php?title=UIConsoleUsage
-mupen64plus "$@" --set Core[SaveSRAMPath]="$N64_SAVES_HOME" --gfx $_gfx_video_plugin --resolution $_resolution --emumode $_emulation_mode_idx --sshotdir "$N64_SCREENSHOTS_HOME" $_all_parts "$_n64_rom"
+echo mupen64plus "$@" --set Core[SaveSRAMPath]="$N64_SAVES_HOME" --gfx $_gfx_video_plugin --resolution $_resolution --emumode $_emulation_mode_id --sshotdir "$N64_SCREENSHOTS_HOME" $_all_parts "$_n64_rom"

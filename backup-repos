@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./libs
+. ./.libs/funcs
 . ./env-vars
 
 _require_var REPOS_HOME

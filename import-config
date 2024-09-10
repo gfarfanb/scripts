@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./libs
+. ./.libs/funcs
 
 _usage() {
     echo "Imports configuration from a cloud provider."

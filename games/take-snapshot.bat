@@ -15,8 +15,11 @@ setlocal enableDelayedExpansion
 set "_saves_home=%~1\"
 set "_snapshots_home=%_saves_home%snapshots\"
 
-if "%SNAPSHOTS_TO_KEEP%"=="" set SNAPSHOTS_TO_KEEP=10
-set /a _number_to_keep=%SNAPSHOTS_TO_KEEP%
+if "%SNAPSHOTS_TO_KEEP%"=="" (
+    set /a _number_to_keep=10
+) else (
+    set /a _number_to_keep=%SNAPSHOTS_TO_KEEP%
+)
 
 
 rem Collecting extensions from args
@@ -31,21 +34,6 @@ for %%x in (%*) do (
     )
     set /a _arg_idx+=1
 )
-
-
-rem Date-time variables
-set _year=%date:~-4%
-set _month=%date:~4,2%
-if "%_month:~0,1%" == " " set _month=0%_month:~1,1%
-set _day=%date:~7,2%
-if "%_day:~0,1%" == " " set _day=0%_day:~1,1%
-
-set _hour=%time:~0,2%
-if "%_hour:~0,1%" == " " set _hour=0%_hour:~1,1%
-set _mins=%time:~3,2%
-if "%_mins:~0,1%" == " " set _mins=0%_mins:~1,1%
-set _secs=%time:~6,2%
-if "%_secs:~0,1%" == " " set _secs=0%_secs:~1,1%
 
 
 rem Grouping save files per name (without extension)
@@ -77,14 +65,15 @@ goto selectsave
 :selectsave
 
 echo:
+echo Choose a save file to create a snapshot:
 for /L %%i in (1,1,%_save_count%) do (
-    echo [%%i] "!_save_ids[%%i]!"
+    echo %%i^) !_save_ids[%%i]!
 )
 
 set /a _default_save_file=%_save_count%+1
-echo [%_default_save_file%] "<skip snapshot>"
+echo %_default_save_file%^) ^(default^) ^<skip snapshot^>
 
-set /P _save_file_idx="Choose a save file to create a snapshot (default [%_default_save_file%]): "
+set /P _save_file_idx="save-index> "
 if "%_save_file_idx%"=="" set _save_file_idx=%_default_save_file%
 
 set _save_selected=!_save_ids[%_save_file_idx%]!
@@ -98,12 +87,14 @@ goto createsnapshot
 if exist "%_snapshots_home%" ( echo: ) else ( mkdir "%_snapshots_home%" )
 
 set /a _profile_count=0
-set _profile_tmp="%TEMP%\profile-temp-%_year%%_month%%_day%%_hour%%_mins%%_secs%.bat"
+set _tmp_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME::=%-%RANDOM%
+set _profile_tmp="%TEMP%\profile-temp-%_tmp_tag%.bat"
 
 for /L %%i in (1,1,%_ext_count%) do (
     set "_save_ext=!_save_exts[%%i]!"
     set "_save_file=%_save_selected%.!_save_ext!"
-    set "_snapshot_file=!_save_file!.%_year%%_month%%_day%-%_hour%%_mins%%_secs%"
+    set _snapshot_ext=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME:~0,2%%TIME:~3,2%%TIME:~6,2%
+    set "_snapshot_file=!_save_file!.!_snapshot_ext!"
     set "_save_file_path=%_saves_home%!_save_file!"
     set "_snapshot_file_path=%_snapshots_home%!_snapshot_file!"
 
@@ -141,7 +132,8 @@ for /L %%i in (1,1,%_profile_count%) do (
         set "_save_file=!_profile_save_files[%%a]!"
 
         if not "!_save_file!"=="" (
-            set "_snapshot_file=!_save_file!.%_year%%_month%%_day%-%_hour%%_mins%%_secs%"
+            set _snapshot_ext=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME:~0,2%%TIME:~3,2%%TIME:~6,2%
+            set "_snapshot_file=!_save_file!.!_snapshot_ext!"
             set "_snapshot_file_path=%_snapshots_home%!_snapshot_file!"
             set "_save_file_path=%_saves_home%!_save_file!"
 

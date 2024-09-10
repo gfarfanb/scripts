@@ -3,6 +3,22 @@
 # [SOURCE] Core Parameters: https://mupen64plus.org/wiki/index.php?title=Mupen64Plus_Core_Parameters
 # [SOURCE] Plugin Parameters: https://mupen64plus.org/wiki/index.php?title=Mupen64Plus_Plugin_Parameters
 
+# _pak_game_profiles_$_game_idx:
+# - None
+# - Mem pak
+# - Transfer pak
+# - Rumble pak
+
+# _gfx_game_profiles_$_game_idx:
+# - mupen64plus-video-glide64mk2
+# - mupen64plus-video-rice
+
+# _emumode_game_profiles_$_game_idx:
+# - Pure Interpreter
+# - Cached Interpreter
+# - Dynamic Recompiler
+
+
 _games=(
     "Banjo-Kazooie.n64"
     "Banjo-Tooie.n64"
@@ -23,35 +39,26 @@ _game_index() {
 
 # /********** Banjo-Kazooie **********/
 # [Mupen64 Options]
-# Pak=Rumble pak
-# GFX=mupen64plus-video-rice
-# enumode=Dynamic Recompiler
 _game_idx=$( _game_index "Banjo-Kazooie.n64" )
-declare _pak_game_profile_$_game_idx=5
-declare _gfx_game_profile_$_game_idx=1
-declare _emumode_game_profile_$_game_idx=2
+declare _pak_game_profile_$_game_idx="Rumble pak"
+declare _gfx_game_profile_$_game_idx="mupen64plus-video-rice"
+declare _emumode_game_profile_$_game_idx="Dynamic Recompiler"
 declare _params_game_profile_$_game_idx=""
 
 
 # /********** Banjo-Tooie **********/
 # [Mupen64 Options]
-# Pak=Rumble pak
-# GFX=mupen64plus-video-rice
-# enumode=Pure Interpreter
 _game_idx=$( _game_index "Banjo-Tooie.n64" )
-declare _pak_game_profile_$_game_idx=5
-declare _gfx_game_profile_$_game_idx=1
-declare _emumode_game_profile_$_game_idx=0
+declare _pak_game_profile_$_game_idx="Rumble pak"
+declare _gfx_game_profile_$_game_idx="mupen64plus-video-rice"
+declare _emumode_game_profile_$_game_idx="Pure Interpreter"
 declare _params_game_profile_$_game_idx=""
 
 
 # /********** Pokémon Stadium **********/
 # [Mupen64 Options]
-# Pak=Transfer pak
-# GFX=mupen64plus-video-glide64mk2
-# enumode=Dynamic Recompiler
 _game_idx=$( _game_index "Pokemon Stadium.n64" )
-declare _pak_game_profile_$_game_idx=4
-declare _gfx_game_profile_$_game_idx=0
-declare _emumode_game_profile_$_game_idx=2
+declare _pak_game_profile_$_game_idx="Transfer pak"
+declare _gfx_game_profile_$_game_idx="mupen64plus-video-glide64mk2"
+declare _emumode_game_profile_$_game_idx="Dynamic Recompiler"
 declare _params_game_profile_$_game_idx=""

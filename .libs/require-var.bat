@@ -1,12 +1,9 @@
 @echo OFF
 
-set __timestamp=%date%-%time%
-set __timestamp=%__timestamp:/=-%
-set __timestamp=%__timestamp::=_%
-set __timestamp=%__timestamp: =_%
-set __timestamp=%__timestamp:.=_%
+setlocal
 
-set __require_var_bat="%TEMP%\require-var-%__timestamp%.bat"
+set __require_var_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME::=%-%RANDOM%
+set __require_var_bat="%TEMP%\require-var-%__require_var_tag%.bat"
 set __require_var_flag=0
 
 echo if "%%%1%%"=="" ( >> "%__require_var_bat%"
@@ -17,4 +14,4 @@ echo ) >> "%__require_var_bat%"
 call "%__require_var_bat%"
 del "%__require_var_bat%"
 
-if "%__require_var_flag%"=="1" cmd /k
+endlocal & if "%__require_var_flag%"=="1" exit /B 0

@@ -4,6 +4,8 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ../.libs/funcs
 . ../env-vars
 
+_require_var GAMES_HOME
+
 _usage() {
     echo "Launches a game console."
     echo ;
@@ -37,6 +39,7 @@ _launch_zelda64() {
 
     rsync -cvrP $ZELDA64RECOMPILED_SAVES_HOME $ZELDA64RECOMPILED_BACKUP_HOME
 
+    cd $GAMES_HOME
     ./take-snapshot "$ZELDA64RECOMPILED_BACKUP_HOME" bin
 }
 
@@ -57,6 +60,7 @@ _launch_perfectdark() {
 
     rsync -cvrPa $PERFECTDARK_SAVES_HOME/eeprom.bin $PERFECTDARK_BACKUP_HOME
 
+    cd $GAMES_HOME
     ./take-snapshot "$PERFECTDARK_BACKUP_HOME" bin
 }
 
@@ -76,6 +80,7 @@ _launch_1964gepd() {
 
     rsync -cvrP $GEPD_1964_SAVES_HOME $GEPD_1964_BACKUP_HOME
 
+    cd $GAMES_HOME
     ./take-snapshot "$GEPD_1964_BACKUP_HOME" eep
 }
 
@@ -85,6 +90,7 @@ _launch_dolphin() {
 
     flatpak run org.DolphinEmu.dolphin-emu "$@"
 
+    cd $GAMES_HOME
     ./take-snapshot "$DOLPHIN_BACKUP_HOME" gci
 }
 
@@ -103,6 +109,7 @@ _launch_mupen64plus() {
     . ./n64-profiles
     . ./start-mupen64plus "$@"
 
+    cd $GAMES_HOME
     ./take-snapshot "$N64_SAVES_HOME" eep mpk fla
 }
 
@@ -112,6 +119,7 @@ _launch_mgba() {
 
     flatpak run io.mgba.mGBA "$@"
 
+    cd $GAMES_HOME
     ./take-snapshot "$MGBA_BACKUP_HOME" sav ss1
 }
 
@@ -121,6 +129,7 @@ _launch_snes9x() {
 
     flatpak run com.snes9x.Snes9x "$@"
 
+    cd $GAMES_HOME
     ./take-snapshot "$SNES9X_BACKUP_HOME" 000 0A.frz srm oops
 }
 

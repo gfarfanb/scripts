@@ -3,12 +3,12 @@
 set PWD=%cd%
 
 if "%ENV_VARS_FILE%"=="" (
-    echo "Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...'"
+    echo Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...'
     goto :eof
 )
 
 if not exist "%ENV_VARS_FILE%" (
-    echo "Environment variables file not found at: '%ENV_VARS_FILE%'"
+    echo Environment variables file not found at: '%ENV_VARS_FILE%'
     goto :eof
 )
 

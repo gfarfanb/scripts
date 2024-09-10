@@ -21,7 +21,7 @@ while getopts "lh" opt; do
     esac
 done
 
-_all_props=( $( cat $ENV_VARS_FILE | grep '^.*=.*' | cut -d "=" -f 1 ) )
+_all_props=( $( cat $ENV_VARS_FILE | grep '^.*=.*' | grep -v '^#.*' | cut -d "=" -f 1 ) )
 
 echo "Select an environment variable:"
 for _idx in "${!_all_props[@]}"; do

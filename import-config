@@ -81,7 +81,7 @@ if [ -z "$( ls -A $BACKUP_HOME )" ]; then
     echo "Imported source: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
     echo "Destination: $BACKUP_HOME"
 
-    _append_env_vars
+    _append_env_vars "$BACKUP_HOME"
 else
     rclone sync -P $RCLONE_CONFIG:$BACKUP_DIRECTORY $BACKUP_HOME
 
@@ -89,7 +89,7 @@ else
     echo "Synchronized source: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
     echo "Destination: $BACKUP_HOME"
 
-    _append_env_vars
+    _append_env_vars "$BACKUP_HOME"
 fi
 
 echo "[Completed]"

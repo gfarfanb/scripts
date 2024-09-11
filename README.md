@@ -22,7 +22,7 @@ Edit the environment variables
 > \** *games* and *pkb* sub-directories are optional
 
 
-## Debian-based setup
+## Linux setup
 
 Add the required environment variable to *~/.bashrc* file
 ```sh

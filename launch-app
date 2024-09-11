@@ -5,7 +5,6 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./env-vars
 
 _require_var EXECS_HOME
-_require_var EXECUTABLE_COMMANDS
 
 _usage() {
     echo "Launches an AppImage/executable file."

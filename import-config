@@ -14,16 +14,19 @@ _usage() {
 }
 
 _init() {
-    mkdir -p ~/execs
-    mkdir -p ~/storage
-    mkdir -p ~/workspace
+    echo "Creating directories"
 
-    mkdir -p ~/storage/cloud
-    mkdir -p ~/storage/media
-    mkdir -p ~/storage/repos
+    mkdir -vp ~/execs
+    mkdir -vp ~/storage
+    mkdir -vp ~/workspace
 
-    mkdir -p ~/storage/media/roms
-    mkdir -p ~/storage/media/dlp
+    mkdir -vp ~/storage/cloud
+    mkdir -vp ~/storage/media
+    mkdir -vp ~/storage/repos
+
+    mkdir -vp ~/storage/media/roms
+    mkdir -vp ~/storage/media/dlp
+    exit 0
 }
 
 _append_env_vars() {

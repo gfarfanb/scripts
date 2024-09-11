@@ -16,16 +16,17 @@ _usage() {
 _init() {
     echo "Creating directories"
 
-    mkdir -vp ~/execs
-    mkdir -vp ~/storage
-    mkdir -vp ~/workspace
+    mkdir -vp $HOME/execs
+    mkdir -vp $HOME/media/music
+    mkdir -vp $HOME/storage/cloud
+    mkdir -vp $HOME/storage/dist
+    mkdir -vp $HOME/storage/iso
+    mkdir -vp $HOME/storage/media/dlp
+    mkdir -vp $HOME/storage/media/roms
+    mkdir -vp $HOME/storage/models
+    mkdir -vp $HOME/storage/repos
+    mkdir -vp $HOME/workspace
 
-    mkdir -vp ~/storage/cloud
-    mkdir -vp ~/storage/media
-    mkdir -vp ~/storage/repos
-
-    mkdir -vp ~/storage/media/roms
-    mkdir -vp ~/storage/media/dlp
     exit 0
 }
 

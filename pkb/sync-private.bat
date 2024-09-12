@@ -1,4 +1,5 @@
 @echo OFF
+set PWD=%cd%
 
 call env-vars.bat
 call require-var SYNC_FOLDER_PRIVATE_DIR
@@ -57,4 +58,4 @@ goto back
 
 
 :back
-cd %PWD%
+cd /d %PWD%

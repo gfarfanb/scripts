@@ -1,4 +1,5 @@
 @echo OFF
+set PWD=%cd%
 
 call env-vars.bat
 
@@ -75,4 +76,4 @@ goto back
 
 
 :back
-cd %PWD%
+cd /d %PWD%

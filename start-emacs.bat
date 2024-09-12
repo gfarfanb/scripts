@@ -1,4 +1,5 @@
 @echo OFF
+set PWD=%cd%
 
 call env-vars.bat
 call require-var EMACS_HOME
@@ -42,4 +43,4 @@ goto back
 
 
 :back
-cd %PWD%
+cd /d %PWD%

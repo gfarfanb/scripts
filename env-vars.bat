@@ -1,7 +1,5 @@
 @echo OFF
 
-set PWD=%cd%
-
 if "%ENV_VARS_FILE%"=="" (
     echo Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...'
     goto :eof

@@ -1,4 +1,5 @@
 @echo OFF
+set PWD=%cd%
 
 call env-vars.bat
 call require-var EXECS_HOME
@@ -48,4 +49,4 @@ goto back
 endlocal
 
 :back
-cd %PWD%
+cd /d %PWD%

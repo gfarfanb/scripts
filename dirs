@@ -1,0 +1,41 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./.libs/funcs
+. ./env-vars
+
+_usage() {
+    echo "Creates directories based on 'env-vars' file."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "lh" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
+
+echo "Creating directories"
+
+if [ -n "$EXECS_HOME" ]; then mkdir -vp "$EXECS_HOME"; fi
+if [ -n "$WORKSPACE_HOME" ]; then mkdir -vp "$WORKSPACE_HOME"; fi
+if [ -n "$STORAGE_HOME" ]; then
+    mkdir -vp "$STORAGE_HOME/dist"
+    mkdir -vp "$STORAGE_HOME/iso"
+    mkdir -vp "$STORAGE_HOME/models"
+fi
+if [ -n "$CLOUD_HOME" ]; then mkdir -vp "$CLOUD_HOME"; fi
+if [ -n "$REPOS_HOME" ]; then mkdir -vp "$REPOS_HOME"; fi
+if [ -n "$MEDIA_HOME" ]; then
+    mkdir -vp "$MEDIA_HOME/dlp"
+    mkdir -vp "$MEDIA_HOME/music"
+fi
+if [ -n "$ROMS_HOME" ]; then mkdir -vp "$ROMS_HOME"; fi
+
+echo "[Completed]"

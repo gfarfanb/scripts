@@ -8,25 +8,7 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
-    echo "    -i: Creates main directories"
     echo "    -h: Displays this help message"
-    exit 0
-}
-
-_init() {
-    echo "Creating directories"
-
-    mkdir -vp $HOME/execs
-    mkdir -vp $HOME/media/music
-    mkdir -vp $HOME/storage/cloud
-    mkdir -vp $HOME/storage/dist
-    mkdir -vp $HOME/storage/iso
-    mkdir -vp $HOME/storage/media/dlp
-    mkdir -vp $HOME/storage/media/roms
-    mkdir -vp $HOME/storage/models
-    mkdir -vp $HOME/storage/repos
-    mkdir -vp $HOME/workspace
-
     exit 0
 }
 
@@ -41,11 +23,8 @@ _append_env_vars() {
     fi
 }
 
-while getopts "ih" opt; do
+while getopts "h" opt; do
     case "$opt" in
-        i)
-            _init
-            ;;
         h)
             _usage
             ;;

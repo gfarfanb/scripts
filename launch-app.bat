@@ -28,7 +28,8 @@ if not exist "%EXECS_HOME%" (
 
 echo Select an executable:
 for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (
-    for /f "delims=" %%j in ("!EXECUTABLE_COMMANDS[%%i]!") do @echo %%i^) %%~nxj
+    set "_app_name=!EXECUTABLE_NAMES[%%i]!"
+    for /f "delims=" %%j in ("!EXECUTABLE_COMMANDS[%%i]!") do @echo %%i^) !_app_name! [%%~nxj]
 )
 
 set /P _app_index="app-index> "

@@ -35,7 +35,11 @@ for _idx in "${!_app_paths[@]}"; do
     _app_name=$( cut -d : -f 1 <<< "$_app" ) 
     _app_path=$( cut -d : -f 2 <<< "$_app" )
 
-    echo "$((_idx+1))) $_app_name [$( echo $_app_path | sed -r 's/^.+\///' )]"
+    if [ -n "$( type -t $_app_path )" ]; then
+        echo "$((_idx+1))) $_app_name [$( echo $_app_path | sed -r 's/^.+\///' )]"
+    else
+        echo "$((_idx+1))) (not found) $_app_name"
+    fi
 done
 read -p "app-index> " _app_index
 
@@ -54,7 +58,15 @@ if [ -z "$_app_path" ]; then
     exit 0
 fi
 
-$_app_path
+if [ -n "$( type -t $_app_path )" ]; then
+    $_app_path
+else
+    _app_name=$( cut -d : -f 1 <<< "$_app" )
+
+    echo "'$_app_name' executable not found"
+    echo "[Process stopped]"
+    exit 0
+fi
 
 _back
 

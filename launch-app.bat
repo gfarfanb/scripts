@@ -27,7 +27,14 @@ setlocal enableDelayedExpansion
 echo Select an executable:
 for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (
     set "_app_name=!EXECUTABLE_NAMES[%%i]!"
-    for /f "delims=" %%j in ("!EXECUTABLE_COMMANDS[%%i]!") do @echo %%i^) !_app_name! [%%~nxj]
+
+    for /f "delims=" %%j in ("!EXECUTABLE_COMMANDS[%%i]!") do (
+        if exist %%j (
+            echo %%i^) !_app_name! [%%~nxj]
+        ) else (
+            echo %%i^) ^(not found^) !_app_name!
+        )
+    )
 )
 
 set /P _app_index="app-index> "
@@ -40,7 +47,13 @@ if "%_app_path%"=="" (
     goto back
 )
 
-call "%_app_path%"
+if exist "%_app_path%" (
+    call "%_app_path%"
+) else (
+    echo '!EXECUTABLE_NAMES[%_app_index%]!' executable not found
+    echo [Process stopped]
+    goto back
+)
 
 echo [Completed]
 goto back

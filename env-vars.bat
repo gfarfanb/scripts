@@ -12,7 +12,7 @@ if not exist "%ENV_VARS_FILE%" (
 
 setlocal
 
-set __env_vars_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME::=%-%RANDOM%
+set __env_vars_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
 set __env_vars_bat="%TEMP%\env-vars-%__env_vars_tag%.bat"
 
 more "%ENV_VARS_FILE%" > "%__env_vars_bat%"

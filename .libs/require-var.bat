@@ -2,7 +2,7 @@
 
 setlocal
 
-set __require_var_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME::=%-%RANDOM%
+set __require_var_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
 set __require_var_bat="%TEMP%\require-var-%__require_var_tag%.bat"
 set __require_var_flag=0
 

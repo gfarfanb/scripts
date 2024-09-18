@@ -87,7 +87,7 @@ goto createsnapshot
 if exist "%_snapshots_home%" ( echo: ) else ( mkdir "%_snapshots_home%" )
 
 set /a _profile_count=0
-set _tmp_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME::=%-%RANDOM%
+set _tmp_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
 set _profile_tmp="%TEMP%\profile-temp-%_tmp_tag%.bat"
 
 for /L %%i in (1,1,%_ext_count%) do (

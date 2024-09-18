@@ -116,6 +116,11 @@ call require-var GB_GBC_SAVES_HOME
 call require-var N64_CONFIGURED_JOYSTICK_LENGTH
 call require-var N64_CONFIGURED_JOYSTICK_DEFAULT
 
+for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
+    call require-var N64_JOYSTICK_NAMES[%%i]
+    call require-var N64_JOYSTICK_CONFIGS[%%i]
+)
+
 call n64-profiles.bat
 call start-mupen64plus.bat %*
 call take-snapshot "%N64_SAVES_HOME%" eep mpk fla

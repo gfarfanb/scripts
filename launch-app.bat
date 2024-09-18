@@ -4,6 +4,11 @@ set PWD=%cd%
 call env-vars.bat
 call require-var EXECUTABLE_COMMANDS_LENGTH
 
+for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (
+    call require-var EXECUTABLE_NAMES[%%i]
+    call require-var EXECUTABLE_COMMANDS[%%i]
+)
+
 goto main
 
 :usage

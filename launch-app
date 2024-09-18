@@ -4,6 +4,8 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./.libs/funcs
 . ./env-vars
 
+_require_var EXECUTABLE_COMMANDS
+
 _usage() {
     echo "Launches an executable file."
     echo ;

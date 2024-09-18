@@ -2,7 +2,6 @@
 set PWD=%cd%
 
 call env-vars.bat
-call require-var EXECS_HOME
 call require-var EXECUTABLE_COMMANDS_LENGTH
 
 goto main
@@ -19,12 +18,6 @@ goto back
 if /i "%1"=="-h" goto usage
 
 setlocal enableDelayedExpansion
-
-if not exist "%EXECS_HOME%" (
-    echo Directory not found: '%EXECS_HOME%'
-    echo [Process stopped]
-    goto back
-)
 
 echo Select an executable:
 for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (

@@ -4,10 +4,8 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./.libs/funcs
 . ./env-vars
 
-_require_var EXECS_HOME
-
 _usage() {
-    echo "Launches an AppImage/executable file."
+    echo "Launches an executable file."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
@@ -23,23 +21,19 @@ while getopts "h" opt; do
     esac
 done
 
-if [ ! -d "$EXECS_HOME" ]; then
-    echo "Directory not found: $EXECS_HOME"
-    echo "[Process stopped]"
-    exit 0
-fi
-
-_app_paths=( $( find "$EXECS_HOME" -type f -name "*.AppImage" ) )
+_app_paths=()
 
 for _bin in "${EXECUTABLE_COMMANDS[@]}"; do
     _app_paths+=( "$_bin" )
 done
 
-echo "Select an AppImage/executable:"
+echo "Select an executable:"
 for _idx in "${!_app_paths[@]}"; do
-    _app_path="${_app_paths[$_idx]}"
+    _app="${_app_paths[$_idx]}"
+    _app_name=$( cut -d : -f 1 <<< "$_app" ) 
+    _app_path=$( cut -d : -f 2 <<< "$_app" )
 
-    echo "$((_idx+1))) $( echo $_app_path | sed -r 's/^.+\///' )"
+    echo "$((_idx+1))) $_app_name [$( echo $_app_path | sed -r 's/^.+\///' )]"
 done
 read -p "app-index> " _app_index
 
@@ -49,7 +43,8 @@ if [ -z "$_app_index" ]; then
     exit 0
 fi
 
-_app_path="${_app_paths[$((_app_index-1))]}"
+_app="${_app_paths[$((_app_index-1))]}"
+_app_path=$( cut -d : -f 2 <<< "$_app" )
 
 if [ -z "$_app_path" ]; then
     echo "Invalid app index"

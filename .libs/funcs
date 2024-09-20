@@ -54,7 +54,7 @@ _validate_dir() {
                 mkdir -p "$_dir"
             ;;
             * )
-                echo "[Process stopped]"
+                echo "[Process stopped]: $(basename $0)"
                 exit 0
             ;;
         esac

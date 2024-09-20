@@ -12,6 +12,8 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -f: Pull data from cloud"
+    echo "    -p: Push data to cloud"
     echo "    -s: Apply Rclone sync"
     echo "    -t: Test run"
     echo "    -h: Displays this help message"
@@ -23,8 +25,14 @@ _sync_flag=0
 _push_flag=0
 _options="-P"
 
-while getopts "sth" opt; do
+while getopts "fpsth" opt; do
     case "$opt" in
+        f)
+            _sync_op="Pull"
+            ;;
+        p)
+            _sync_op="Push"
+            ;;
         s)
             _sync_flag=1
             ;;
@@ -39,21 +47,23 @@ done
 
 _sync_ops=( "Pull" "Push" )
 
-echo "Select an operation:"
-for _idx in "${!_sync_ops[@]}"; do
-    _op="${_sync_ops[$_idx]}"
+if [ -z "$_sync_op" ]; then
+    echo "Select an operation:"
+    for _idx in "${!_sync_ops[@]}"; do
+        _op="${_sync_ops[$_idx]}"
 
-    echo "$((_idx+1))) $_op"
-done
-read -p "operation-index> " _op_index
+        echo "$((_idx+1))) $_op"
+    done
+    read -p "operation-index> " _op_index
 
-if [ -z "$_op_index" ]; then
-    echo "Invalid operation index"
-    echo "[Process stopped]"
-    exit 0
+    if [ -z "$_op_index" ]; then
+        echo "Invalid operation index"
+        echo "[Process stopped]: $(basename $0)"
+        exit 0
+    fi
+
+    _sync_op="${_sync_ops[$((_op_index-1))]}"
 fi
-
-_sync_op="${_sync_ops[$((_op_index-1))]}"
 
 if [ "$_sync_op" = "Push" ]; then
     _push_flag=1
@@ -81,4 +91,4 @@ for _src in "${CLOUD_REMOTE_SOURCES[@]}"; do
     fi
 done
 
-echo "[Completed]"
+echo "[Completed]: $(basename $0)"

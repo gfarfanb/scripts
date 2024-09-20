@@ -23,10 +23,21 @@ while getopts "h" opt; do
     esac
 done
 
+
+
 echo "Updating packages:"
 echo -e "$( hostnamectl | grep 'Operating System:' )"
 
 if [ -n "$( type -t apt )" ]; then
+
+    sudo -l 1>/dev/null
+    if [ $? -ne 0 ] || ! [ "$( sudo whoami )" = "root" ]; then
+        echo "Execute:"
+        echo "> su \$USER"
+        echo "[Process stopped]: $(basename $0)"
+        exit 0
+    fi
+
     echo ;
     echo "Updating 'apt' packages"
 

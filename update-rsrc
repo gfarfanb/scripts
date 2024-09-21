@@ -70,14 +70,12 @@ fi
 if [ -d "$WORKSPACE_HOME/scripts" ]; then
     cd $WORKSPACE_HOME/scripts
 
-    if ! [ -h "$WORKSPACE_HOME/scripts" ]; then
+    if ! [ -h "$WORKSPACE_HOME/scripts" ] && [ -n "$( type -t git )" ]; then
         echo ;
         echo "Updating scripts"
 
-        if [ -n "$( type -t git )" ]; then
-            git checkout main
-            git pull origin main
-        fi
+        git checkout main
+        git pull origin main
     fi
 
     echo ;

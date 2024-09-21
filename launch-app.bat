@@ -2,11 +2,11 @@
 set PWD=%cd%
 
 call env-vars.bat
-call require-var EXECUTABLE_COMMANDS_LENGTH
+call require-var EXECUTABLE_EXECS_LENGTH
 
-for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (
+for /l %%i in (1,1,%EXECUTABLE_EXECS_LENGTH%) do (
     call require-var EXECUTABLE_NAMES[%%i]
-    call require-var EXECUTABLE_COMMANDS[%%i]
+    call require-var EXECUTABLE_EXECS[%%i]
 )
 
 goto main
@@ -25,12 +25,12 @@ if /i "%1"=="-h" goto usage
 setlocal enableDelayedExpansion
 
 echo Select an executable:
-for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (
+for /l %%i in (1,1,%EXECUTABLE_EXECS_LENGTH%) do (
     set "_app_name=!EXECUTABLE_NAMES[%%i]!"
 
-    for /f "delims=" %%j in ("!EXECUTABLE_COMMANDS[%%i]!") do (
+    for /f "delims=" %%j in ("!EXECUTABLE_EXECS[%%i]!") do (
         if exist %%j (
-            echo %%i^) !_app_name! [%%~nxj]
+            echo %%i^) !_app_name! [%%j]
         ) else (
             echo %%i^) ^(not found^) !_app_name!
         )
@@ -39,20 +39,23 @@ for /l %%i in (1,1,%EXECUTABLE_COMMANDS_LENGTH%) do (
 
 set /P _app_index="app-index> "
 
-set "_app_path=!EXECUTABLE_COMMANDS[%_app_index%]!"
+set "_app_exec=!EXECUTABLE_EXECS[%_app_index%]!"
 
-if "%_app_path%"=="" (
+if "%_app_exec%"=="" (
     echo Invalid app index
     echo [Process stopped]: %0
     goto back
 )
 
-if exist "%_app_path%" (
-    call "%_app_path%"
-) else (
+if not exist "%_app_exec%" (
     echo '!EXECUTABLE_NAMES[%_app_index%]!' executable not found
     echo [Process stopped]: %0
     goto back
+)
+
+for /f "delims=" %%j in ("%_app_exec%") do (
+    cd "%%~dpj"
+    "%%~nxj"
 )
 
 echo [Completed]: %0

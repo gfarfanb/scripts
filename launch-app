@@ -23,20 +23,20 @@ while getopts "h" opt; do
     esac
 done
 
-_app_paths=()
+_app_cmds=()
 
-for _bin in "${EXECUTABLE_COMMANDS[@]}"; do
-    _app_paths+=( "$_bin" )
+for _cmd in "${EXECUTABLE_COMMANDS[@]}"; do
+    _app_cmds+=( "$_cmd" )
 done
 
 echo "Select an executable:"
-for _idx in "${!_app_paths[@]}"; do
-    _app="${_app_paths[$_idx]}"
+for _idx in "${!_app_cmds[@]}"; do
+    _app="${_app_cmds[$_idx]}"
     _app_name=$( cut -d : -f 1 <<< "$_app" ) 
-    _app_path=$( cut -d : -f 2 <<< "$_app" )
+    _app_cmd=$( cut -d : -f 2 <<< "$_app" )
 
-    if [ -n "$( type -t $_app_path )" ]; then
-        echo "$((_idx+1))) $_app_name [$( echo $_app_path | sed -r 's/^.+\///' )]"
+    if [ -n "$( type -t $_app_cmd )" ]; then
+        echo "$((_idx+1))) $_app_name [$_app_cmd]"
     else
         echo "$((_idx+1))) (not found) $_app_name"
     fi
@@ -49,17 +49,17 @@ if [ -z "$_app_index" ]; then
     exit 0
 fi
 
-_app="${_app_paths[$((_app_index-1))]}"
-_app_path=$( cut -d : -f 2 <<< "$_app" )
+_app="${_app_cmds[$((_app_index-1))]}"
+_app_cmd=$( cut -d : -f 2 <<< "$_app" )
 
-if [ -z "$_app_path" ]; then
+if [ -z "$_app_cmd" ]; then
     echo "Invalid app index"
     echo "[Process stopped]: $0"
     exit 0
 fi
 
-if [ -n "$( type -t $_app_path )" ]; then
-    $_app_path
+if [ -n "$( type -t $_app_cmd )" ]; then
+    $_app_cmd
 else
     _app_name=$( cut -d : -f 1 <<< "$_app" )
 

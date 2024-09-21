@@ -43,7 +43,7 @@ set "_app_path=!EXECUTABLE_COMMANDS[%_app_index%]!"
 
 if "%_app_path%"=="" (
     echo Invalid app index
-    echo [Process stopped]
+    echo [Process stopped]: %0
     goto back
 )
 
@@ -51,11 +51,11 @@ if exist "%_app_path%" (
     call "%_app_path%"
 ) else (
     echo '!EXECUTABLE_NAMES[%_app_index%]!' executable not found
-    echo [Process stopped]
+    echo [Process stopped]: %0
     goto back
 )
 
-echo [Completed]
+echo [Completed]: %0
 goto back
 
 endlocal

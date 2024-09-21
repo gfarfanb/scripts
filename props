@@ -38,7 +38,7 @@ read -p "env-index> " _prop_index
 
 if [ -z "$_prop_index" ]; then
     echo "Invalid environment variable index"
-    echo "[Process stopped]: $(basename $0)"
+    echo "[Process stopped]: $0"
     exit 0
 fi
 
@@ -46,7 +46,7 @@ _prop_name="${_all_props[$((_prop_index-1))]}"
 
 if [ -z "$_prop_name" ]; then
     echo "Invalid environment variable index"
-    echo "[Process stopped]: $(basename $0)"
+    echo "[Process stopped]: $0"
     exit 0
 fi
 
@@ -61,4 +61,4 @@ else
 fi
 
 echo ;
-echo "[Completed]: $(basename $0)"
+echo "[Completed]: $0"

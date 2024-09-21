@@ -48,12 +48,12 @@ goto completd
 
 :invalid
 echo Invalid operation index
-echo [Process stopped]
+echo [Process stopped]: %0
 goto back
 
 
 :completed
-echo [Completed]
+echo [Completed]: %0
 goto back
 
 

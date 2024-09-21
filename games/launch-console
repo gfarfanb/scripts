@@ -167,11 +167,11 @@ case "$_console_index" in
         ;;
     *)
         echo "Invalid console index"
-        echo "[Process stopped]: $(basename $0)"
+        echo "[Process stopped]: $0"
         exit 0
         ;;
 esac
 
 _back
 
-echo "[Completed]: $(basename $0)"
+echo "[Completed]: $0"

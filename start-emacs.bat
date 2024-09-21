@@ -38,7 +38,7 @@ goto completed
 
 
 :completed
-echo [Completed]
+echo [Completed]: %0
 goto back
 
 

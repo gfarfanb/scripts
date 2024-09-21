@@ -39,4 +39,4 @@ done < $REPOS_LIST_FILE
 
 _back
 
-echo "[Completed]: $(basename $0)"
+echo "[Completed]: $0"

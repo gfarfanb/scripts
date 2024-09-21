@@ -38,4 +38,4 @@ if [ -n "$MEDIA_HOME" ]; then
 fi
 if [ -n "$ROMS_HOME" ]; then sudo mkdir -vp "$ROMS_HOME"; fi
 
-echo "[Completed]: $(basename $0)"
+echo "[Completed]: $0"

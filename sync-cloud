@@ -58,7 +58,7 @@ if [ -z "$_sync_op" ]; then
 
     if [ -z "$_op_index" ]; then
         echo "Invalid operation index"
-        echo "[Process stopped]: $(basename $0)"
+        echo "[Process stopped]: $0"
         exit 0
     fi
 
@@ -91,4 +91,4 @@ for _src in "${CLOUD_REMOTE_SOURCES[@]}"; do
     fi
 done
 
-echo "[Completed]: $(basename $0)"
+echo "[Completed]: $0"

@@ -72,7 +72,7 @@ if not "%ROMS_HOME%" == "" (
     )
 )
 
-echo [Completed]
+echo [Completed]: %0
 goto back
 
 endlocal

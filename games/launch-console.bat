@@ -155,12 +155,12 @@ goto completed
 
 :invalid
 echo Invalid console index
-echo [Process invalid]
+echo [Process invalid]: %0
 goto back
 
 
 :completed
-echo [Completed]
+echo [Completed]: %0
 goto back
 
 :back

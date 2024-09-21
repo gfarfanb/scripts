@@ -7,7 +7,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var WORKSPACE_HOME
 
 _usage() {
-    echo "Upload installed packages, scripts and synchronized files."
+    echo "Update installed packages, scripts and synchronized files."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
@@ -68,18 +68,20 @@ if [ -n "$( type -t rclone )" ]; then
 fi
 
 if [ -d "$WORKSPACE_HOME/scripts" ]; then
-    echo ;
-    echo "Updating scripts"
-
     cd $WORKSPACE_HOME/scripts
 
-    if [ -n "$( type -t git )" ]; then
-        git checkout main
-        git pull origin main
+    if ! [ -h "$WORKSPACE_HOME/scripts" ]; then
+        echo ;
+        echo "Updating scripts"
+
+        if [ -n "$( type -t git )" ]; then
+            git checkout main
+            git pull origin main
+        fi
     fi
 
     echo ;
-    echo "Synchronizing cloud"
+    echo "Synchronizing backed up files"
     ./sync-cloud -f
 fi
 

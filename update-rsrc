@@ -60,6 +60,21 @@ if [ -n "$( type -t flatpak )" ]; then
     sudo flatpak update -y
 fi
 
+if [ -n "$( type -t pyenv )" ]; then
+    echo ;
+    echo "Updating 'pyenv' package"
+
+    sudo pyenv update
+fi
+
+if [ -n "$( type -t poetry )" ]; then
+    echo ;
+    echo "Updating 'poetry' package"
+
+    sudo poetry self update
+fi
+
+
 if [ -n "$( type -t rclone )" ]; then
     echo ;
     echo "Updating 'rclone' package"

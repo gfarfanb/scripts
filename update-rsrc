@@ -5,6 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./env-vars
 
 _require_var WORKSPACE_HOME
+_require_var UPDATE_COMMANDS
 
 _usage() {
     echo "Update installed packages, scripts and synchronized files."
@@ -53,34 +54,22 @@ if [ -n "$( type -t dnf )" ]; then
     sudo dnf upgrade -y
 fi
 
-if [ -n "$( type -t flatpak )" ]; then
-    echo ;
-    echo "Updating 'flatpak' packages"
+for _cmd in "${UPDATE_COMMANDS[@]}"; do
+    _name=$( cut -d : -f 1 <<< "$_cmd" ) 
+    _sudo=$( cut -d : -f 2 <<< "$_cmd" )
+    _args=$( cut -d : -f 3 <<< "$_cmd" )
 
-    sudo flatpak update -y
-fi
+    if [ -n "$( type -t $_name )" ]; then
+        echo ;
+        echo "Updating '$_name' package"
 
-if [ -n "$( type -t pyenv )" ]; then
-    echo ;
-    echo "Updating 'pyenv' package"
-
-    sudo pyenv update
-fi
-
-if [ -n "$( type -t poetry )" ]; then
-    echo ;
-    echo "Updating 'poetry' package"
-
-    sudo poetry self update
-fi
-
-
-if [ -n "$( type -t rclone )" ]; then
-    echo ;
-    echo "Updating 'rclone' package"
-
-    sudo rclone selfupdate
-fi
+        if [ "$_sudo" = "s" ]; then
+            echo sudo $_name $_args
+        else
+            echo $_name $_args
+        fi
+    fi
+done
 
 if [ -d "$WORKSPACE_HOME/scripts" ]; then
     cd $WORKSPACE_HOME/scripts

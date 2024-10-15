@@ -64,9 +64,9 @@ for _cmd in "${UPDATE_COMMANDS[@]}"; do
         echo "Updating '$_name' package"
 
         if [ "$_sudo" = "s" ]; then
-            echo sudo $_name $_args
+            sudo $_name $_args
         else
-            echo $_name $_args
+            $_name $_args
         fi
     fi
 done

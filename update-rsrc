@@ -112,7 +112,7 @@ fi
 
 if [ ${#_print_cmds[*]} -gt 0 ]; then
     echo ;
-    echo "Execute manually these update commands:"
+    echo "Execute these update commands if needed:"
 
     for _cmd in "${_print_cmds[@]}"; do
         echo "> $_cmd"

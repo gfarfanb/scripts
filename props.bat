@@ -59,7 +59,17 @@ if "%_prop_name%"=="" (
 )
 
 echo:
-call eval echo %_prop_name%=%%%%%_prop_name%%%%%
+call eval set "_prop_value=%%%_prop_name%%%"
+
+if "!_prop_value!"=="" (
+    echo !_prop_name!=^<empty^>
+) else (
+    echo !_prop_name!=!_prop_value!
+)
+
+echo !_prop_value! | clip
+echo Copied^^!^^!
+
 goto completed
 
 :getvar
@@ -67,7 +77,6 @@ for %%A in (%~1) do set %2=%%A
 goto :eof
 
 endlocal
-
 
 :completed
 echo:

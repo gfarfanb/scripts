@@ -54,20 +54,43 @@ if [ -n "$( type -t dnf )" ]; then
     sudo dnf upgrade -y
 fi
 
+_print_cmds=()
+
 for _cmd in "${UPDATE_COMMANDS[@]}"; do
     _name=$( cut -d : -f 1 <<< "$_cmd" ) 
-    _sudo=$( cut -d : -f 2 <<< "$_cmd" )
-    _args=$( cut -d : -f 3 <<< "$_cmd" )
+    _opt=$( cut -d : -f 2 <<< "$_cmd" )
+    _exe=$( cut -d : -f 3 <<< "$_cmd" )
+    _args=$( cut -d : -f 4 <<< "$_cmd" )
 
     if [ -n "$( type -t $_name )" ]; then
         echo ;
         echo "Updating '$_name' package"
 
-        if [ "$_sudo" = "s" ]; then
-            sudo $_name $_args
-        else
-            $_name $_args
-        fi
+        case "$_opt" in
+            s)
+                if [ "$_exe" = "e" ]; then
+                    sudo $_name $_args
+                else
+                    _print_cmds+=( "sudo $_name $_args" )
+                fi
+                ;;
+            v)
+                eval "__update_with_var=\"\$$_args\""
+
+                if [ "$_exe" = "e" ]; then
+                    eval "$__update_with_var"
+                else
+                    _print_cmds+=( "$__update_with_var" )
+                fi
+                ;;
+            *)
+                if [ "$_exe" = "e" ]; then
+                    $_name $_args
+                else
+                    _print_cmds+=( "$_name $_args" )
+                fi
+                ;;
+        esac
     fi
 done
 
@@ -85,6 +108,15 @@ if [ -d "$WORKSPACE_HOME/scripts" ]; then
     echo ;
     echo "Synchronizing backed up files"
     ./sync-cloud -f
+fi
+
+if [ ${#_print_cmds[*]} -gt 0 ]; then
+    echo ;
+    echo "Execute manually these update commands:"
+
+    for _cmd in "${_print_cmds[@]}"; do
+        echo "> $_cmd"
+    done
 fi
 
 _back

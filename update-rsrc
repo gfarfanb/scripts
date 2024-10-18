@@ -54,10 +54,43 @@ if [ -n "$( type -t dnf )" ]; then
     sudo dnf upgrade -y
 fi
 
+_print_repos=()
+
+if [ -n "$( type -t git )" ]; then
+    for _repo in "${UPDATE_REPOS[@]}"; do
+        _branch=$( cut -d : -f 1 <<< "$_repo" )
+        _exe=$( cut -d : -f 2 <<< "$_repo" )
+        _loc=$( cut -d : -f 3 <<< "$_repo" )
+
+        if ! [ -d "$_loc" ]; then
+            echo ;
+            echo "'$_loc' is not a directory"
+            continue
+        fi
+        if [ -h "$_loc" ]; then
+            echo ;
+            echo "'$_loc' is a symlink"
+            continue
+        fi
+
+        cd "$_loc"
+
+        if [ "$_exe" = "e" ]; then
+            echo ;
+            echo "Updating $(basename $loc)"
+
+            git checkout $_branch
+            git pull origin $_branch
+        else
+            _print_repos+=( "$_loc" )
+        fi
+    done
+fi
+
 _print_cmds=()
 
 for _cmd in "${UPDATE_COMMANDS[@]}"; do
-    _name=$( cut -d : -f 1 <<< "$_cmd" ) 
+    _name=$( cut -d : -f 1 <<< "$_cmd" )
     _opt=$( cut -d : -f 2 <<< "$_cmd" )
     _exe=$( cut -d : -f 3 <<< "$_cmd" )
     _args=$( cut -d : -f 4 <<< "$_cmd" )
@@ -94,20 +127,13 @@ for _cmd in "${UPDATE_COMMANDS[@]}"; do
     fi
 done
 
-if [ -d "$WORKSPACE_HOME/scripts" ]; then
-    cd $WORKSPACE_HOME/scripts
-
-    if ! [ -h "$WORKSPACE_HOME/scripts" ] && [ -n "$( type -t git )" ]; then
-        echo ;
-        echo "Updating scripts"
-
-        git checkout main
-        git pull origin main
-    fi
-
+if [ ${#_print_repos[*]} -gt 0 ]; then
     echo ;
-    echo "Synchronizing backed up files"
-    ./sync-cloud -f
+    echo "Update these repos if needed:"
+
+    for _repo in "${_print_repos[@]}"; do
+        echo "> $_repo"
+    done
 fi
 
 if [ ${#_print_cmds[*]} -gt 0 ]; then

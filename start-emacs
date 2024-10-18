@@ -29,7 +29,7 @@ while getopts "th" opt; do
     esac
 done
 
-_emacs_pid=$( pidof -x  emacs )
+_emacs_pid=$( pidof -x emacs )
 
 if [ -z "$_emacs_pid" ]; then
     echo "Launching 'Emacs Server'"

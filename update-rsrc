@@ -94,10 +94,15 @@ for _cmd in "${UPDATE_COMMANDS[@]}"; do
     _opt=$( cut -d : -f 2 <<< "$_cmd" )
     _exe=$( cut -d : -f 3 <<< "$_cmd" )
     _args=$( cut -d : -f 4 <<< "$_cmd" )
+    _location=$( cut -d : -f 5 <<< "$_cmd" )
 
     if [ -n "$( type -t $_name )" ]; then
         echo ;
         echo "Updating '$_name' package"
+
+        if [ -n "$_location" ]; then
+            cd "$_location"
+        fi
 
         case "$_opt" in
             s)

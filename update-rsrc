@@ -77,7 +77,7 @@ if [ -n "$( type -t git )" ]; then
 
         if [ "$_exe" = "e" ]; then
             echo ;
-            echo "Updating $(basename $loc)"
+            echo "Updating $(basename $_loc)"
 
             git checkout $_branch
             git pull origin $_branch
@@ -98,7 +98,10 @@ for _cmd in "${UPDATE_COMMANDS[@]}"; do
 
     if [ -n "$( type -t $_name )" ]; then
         echo ;
-        echo "Updating '$_name' package"
+
+        if [ "$_exe" = "e" ]; then
+            echo "Updating '$_name' package"
+        fi
 
         if [ -n "$_location" ]; then
             cd "$_location"

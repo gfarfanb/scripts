@@ -12,30 +12,84 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -h: Makes a backup for all repos"
     echo "    -h: Displays this help message"
     exit 0
 }
 
-while getopts "h" opt; do
+_download_all_repos() {
+    cd "$REPOS_HOME"
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        line=$( echo "${line//[$'\t\r\n']}" )
+        _repo_zip=$( echo "$line" | cut -d ' ' -f 1 | sed 's/\\/\//g' )
+        _repo_url=$( echo "$line" | cut -d ' ' -f 2 )
+
+        _download_repo "$_repo_zip" "$_repo_url"
+    done < $REPOS_LIST_FILE
+}
+
+_select_repo() {
+    cd "$REPOS_HOME"
+
+    echo "Choose a repo to backup:"
+    _repo_idx=1
+    while IFS= read -r line || [ -n "$line" ]; do
+        line=$( echo "${line//[$'\t\r\n']}" )
+        _repo_zip=$( echo "$line" | cut -d ' ' -f 1 | sed 's/\\/\//g' )
+
+        echo "$_repo_idx) $_repo_zip"
+
+        _repo_idx=$((_repo_idx+1))
+    done < $REPOS_LIST_FILE
+    read -p "repo-index> " _selected_index
+
+    _repo_idx=1
+    _repo_flag=false
+    while IFS= read -r line || [ -n "$line" ]; do
+        if [ "$_selected_index" = "$_repo_idx" ]; then
+            line=$( echo "${line//[$'\t\r\n']}" )
+            _repo_zip=$( echo "$line" | cut -d ' ' -f 1 | sed 's/\\/\//g' )
+            _repo_url=$( echo "$line" | cut -d ' ' -f 2 )
+
+            _download_repo "$_repo_zip" "$_repo_url"
+
+            _repo_flag=true
+        fi
+
+        _repo_idx=$((_repo_idx+1))
+    done < $REPOS_LIST_FILE
+
+    if [ "$_repo_flag" = "false" ]; then
+        echo "Invalid repo index"
+        echo "[Process stopped]: $0"
+        _back
+        exit 0
+    fi
+}
+
+_download_repo() {
+    local _repo_zip=${1:-}
+    local _repo_url=${2:-}
+
+    echo ;
+    echo "Output: $_repo_zip"
+    echo "URL: $_repo_url"
+    curl -L --create-dirs -o "${_repo_zip}.zip" "$_repo_url"
+}
+
+while getopts "ah" opt; do
     case "$opt" in
+        a)
+            _download_all_repos
+            ;;
         h)
             _usage
             ;;
     esac
 done
 
-cd "$REPOS_HOME"
-
-while IFS= read -r line || [ -n "$line" ]; do
-    line=$( echo "${line//[$'\t\r\n']}" )
-    _repo_zip=$( echo "$line" | cut -d ' ' -f 1 | sed 's/\\/\//g' )
-    _repo_url=$( echo "$line" | cut -d ' ' -f 2 )
-
-    echo ;
-    echo "Output: $_repo_zip"
-    echo "URL: $_repo_url"
-    curl -L --create-dirs -o "${_repo_zip}.zip" "$_repo_url"
-done < $REPOS_LIST_FILE
+_select_repo
 
 _back
 

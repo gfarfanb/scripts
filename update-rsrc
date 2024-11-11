@@ -54,39 +54,6 @@ if [ -n "$( type -t dnf )" ]; then
     sudo dnf upgrade -y
 fi
 
-_print_repos=()
-
-if [ -n "$( type -t git )" ]; then
-    for _repo in "${UPDATE_REPOS[@]}"; do
-        _branch=$( cut -d : -f 1 <<< "$_repo" )
-        _exe=$( cut -d : -f 2 <<< "$_repo" )
-        _loc=$( cut -d : -f 3 <<< "$_repo" )
-
-        if ! [ -d "$_loc" ]; then
-            echo ;
-            echo "'$_loc' is not a directory"
-            continue
-        fi
-        if [ -h "$_loc" ]; then
-            echo ;
-            echo "'$_loc' is a symlink"
-            continue
-        fi
-
-        cd "$_loc"
-
-        if [ "$_exe" = "e" ]; then
-            echo ;
-            echo "Updating $(basename $_loc)"
-
-            git checkout $_branch
-            git pull origin $_branch
-        else
-            _print_repos+=( "$_loc" )
-        fi
-    done
-fi
-
 _print_cmds=()
 
 for _cmd in "${UPDATE_COMMANDS[@]}"; do
@@ -134,6 +101,39 @@ for _cmd in "${UPDATE_COMMANDS[@]}"; do
         esac
     fi
 done
+
+_print_repos=()
+
+if [ -n "$( type -t git )" ]; then
+    for _repo in "${UPDATE_REPOS[@]}"; do
+        _branch=$( cut -d : -f 1 <<< "$_repo" )
+        _exe=$( cut -d : -f 2 <<< "$_repo" )
+        _loc=$( cut -d : -f 3 <<< "$_repo" )
+
+        if ! [ -d "$_loc" ]; then
+            echo ;
+            echo "'$_loc' is not a directory"
+            continue
+        fi
+        if [ -h "$_loc" ]; then
+            echo ;
+            echo "'$_loc' is a symlink"
+            continue
+        fi
+
+        cd "$_loc"
+
+        if [ "$_exe" = "e" ]; then
+            echo ;
+            echo "Updating $(basename $_loc)"
+
+            git checkout $_branch
+            git pull origin $_branch
+        else
+            _print_repos+=( "$_loc" )
+        fi
+    done
+fi
 
 if [ ${#_print_repos[*]} -gt 0 ]; then
     echo ;

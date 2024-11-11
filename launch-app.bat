@@ -58,10 +58,13 @@ for /f "delims=" %%j in ("%_app_exec%") do (
     "%%~nxj"
 )
 
+endlocal
+
+
+:completed
 echo [Completed]: %0
 goto back
 
-endlocal
 
 :back
 cd /d %PWD%

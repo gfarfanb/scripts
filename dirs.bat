@@ -72,10 +72,13 @@ if not "%ROMS_HOME%" == "" (
     )
 )
 
+endlocal
+
+
+:completed
 echo [Completed]: %0
 goto back
 
-endlocal
 
 :back
 cd /d %PWD%

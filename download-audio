@@ -21,7 +21,7 @@ _usage() {
 }
 
 _move_outputs() {
-    if [ -n "$(ls -A $OUTPUT_AUDIO_FOLDER | grep *.zip)" ]; then
+    if [ -n "$(find $OUTPUT_AUDIO_FOLDER -name '*.zip')" ]; then
         rsync -av --remove-source-files $OUTPUT_AUDIO_FOLDER/*.zip "$DOWNLOADS_HOME"
         echo "ZIP files moved to: $DOWNLOADS_HOME"
     else
@@ -86,7 +86,7 @@ else
     rm -f $_list_file
 fi
 
-if [ -n "$(ls -A . | grep *.mp3)" ]; then
+if [ -n "$(find . -name '*.mp3')" ]; then
     _last_zip_file="$(ls | grep .*\\.zip | sort -V | tail -1)"
     _audio_part="audio"
     _extension_part=".zip"

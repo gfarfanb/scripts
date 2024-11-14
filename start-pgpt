@@ -4,6 +4,8 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./.libs/funcs
 . ./env-vars
 
+_require_var PRIVATE_GPT_HOME
+
 _usage() {
     echo "Starts LLM Server."
     echo ;
@@ -24,5 +26,7 @@ done
 if ! [ "$( systemctl is-active ollama )" = "active" ]; then
     ollama serve
 fi
+
+cd $PRIVATE_GPT_HOME
 
 PGPT_PROFILES=ollama make run

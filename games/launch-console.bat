@@ -19,12 +19,12 @@ if /i "%1"=="-h" goto usage
 
 echo Select a console:
 echo 1^) Zelda 64: Recompiled
-echo 2^) Perfect Dark port
-echo 3^) 1964 GEPD Edition
-echo 4^) GameCube/Wii
-echo 5^) Nintendo 64
-echo 6^) GBA/GBC/GB
-echo 7^) SNES
+echo 2^) 1964 GEPD Edition
+echo 3^) GameCube/Wii
+echo 4^) Nintendo 64
+echo 5^) GBA/GBC/GB
+echo 6^) SNES
+rem echo 7^) Perfect Dark port
 set /P _console_index="console-index> "
 
 if "%_console_index%"=="" (
@@ -32,12 +32,12 @@ if "%_console_index%"=="" (
 )
 
 if /i "%_console_index%"=="1" goto launchzelda64
-if /i "%_console_index%"=="2" goto launchperfectdark
-if /i "%_console_index%"=="3" goto launch1964gepd
-if /i "%_console_index%"=="4" goto launchdolphin
-if /i "%_console_index%"=="5" goto launchmupen64plus
-if /i "%_console_index%"=="6" goto launchmgba
-if /i "%_console_index%"=="7" goto launchsnes9x
+if /i "%_console_index%"=="2" goto launch1964gepd
+if /i "%_console_index%"=="3" goto launchdolphin
+if /i "%_console_index%"=="4" goto launchmupen64plus
+if /i "%_console_index%"=="5" goto launchmgba
+if /i "%_console_index%"=="6" goto launchsnes9x
+rem if /i "%_console_index%"=="7" goto launchperfectdark
 goto invalid
 
 

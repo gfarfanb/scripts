@@ -135,12 +135,12 @@ _launch_snes9x() {
 
 echo "Select a console:"
 echo "1) Zelda 64: Recompiled"
-echo "2) Perfect Dark port"
-echo "3) 1964 GEPD Edition"
-echo "4) GameCube/Wii"
-echo "5) Nintendo 64"
-echo "6) GBA/GBC/GB"
-echo "7) SNES"
+echo "2) 1964 GEPD Edition"
+echo "3) GameCube/Wii"
+echo "4) Nintendo 64"
+echo "5) GBA/GBC/GB"
+echo "6) SNES"
+# echo "7) Perfect Dark port"
 read -p "console-index> " _console_index
 
 case "$_console_index" in
@@ -148,23 +148,23 @@ case "$_console_index" in
         _launch_zelda64 "$@"
         ;;
     2)
-        _launch_perfectdark "$@"
-        ;;
-    3)
         _launch_1964gepd "$@"
         ;;
-    4)
+    3)
         _launch_dolphin "$@"
         ;;
-    5)
+    4)
         _launch_mupen64plus "$@"
         ;;
-    6)
+    5)
         _launch_mgba "$@"
         ;;
-    7)
+    6)
         _launch_snes9x "$@"
         ;;
+    # 7)
+    #     _launch_perfectdark "$@"
+    #     ;;
     *)
         echo "Invalid console index"
         echo "[Process stopped]: $0"

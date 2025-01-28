@@ -23,6 +23,7 @@ if /i "%1"=="-h" goto usage
 echo Select an operation:
 echo 1^) Pull
 echo 2^) Push
+set "_op_index="
 set /P _op_index="operation-index> "
 
 if "%_op_index%"=="" (

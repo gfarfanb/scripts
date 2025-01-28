@@ -42,6 +42,7 @@ echo Select an environment variable:
 for /L %%i in (1,1,%_loaded_var_count%) do (
     echo %%i^) !_vars[%%i]!
 )
+set "_prop_index="
 set /P _prop_index="env-index> "
 
 if "%_prop_index%"=="" (

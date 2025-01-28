@@ -49,6 +49,7 @@ for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
     echo !_repo_idx!^) %%i
     set /a _repo_idx+=1
 )
+set "_selected_idx="
 set /P _selected_idx="repo-index> "
 
 set /a _repo_idx=1

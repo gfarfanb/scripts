@@ -25,6 +25,7 @@ echo 4^) Nintendo 64
 echo 5^) GBA/GBC/GB
 echo 6^) SNES
 rem echo 7^) Perfect Dark port
+set "_console_index="
 set /P _console_index="console-index> "
 
 if "%_console_index%"=="" (

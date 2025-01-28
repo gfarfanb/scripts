@@ -70,6 +70,7 @@ for /L %%i in (1,1,%_loaded_n64_count%) do (
     echo %%i^) !_n64_filenames[%%i]!
 )
 
+set "_n64_rom_idx="
 set /P _n64_rom_idx="n64-index> "
 set "_n64_rom=!_n64_filenames[%_n64_rom_idx%]!"
 
@@ -86,6 +87,7 @@ for /f "delims=" %%a in ('sha256sum "%_n64_rom%"') do @set _n64_rom_hash=%%a
 rem /********** Number of controls menu **********/
 echo:
 echo Enter the number of controls [1-4] (default [%_controllers_default%]):
+set "_controllers="
 set /P _controllers="num-controllers> "
 if "%_controllers%"=="" set _controllers=%_controllers_default%
 
@@ -114,6 +116,7 @@ for /L %%i in (1,1,%_expansion_paks_length%) do (
     )
 )
 
+set "_expansion_pak_idx="
 set /P _expansion_pak_idx="expansion-pak-num> "
 
 if "%_expansion_pak_idx%"=="" (
@@ -146,6 +149,7 @@ for /L %%l in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
     )
 )
 
+set "_configured_joystick_idx="
 set /P _configured_joystick_idx="joystick-config-index> "
 if "%_configured_joystick_idx%"=="" set _configured_joystick_idx=%N64_CONFIGURED_JOYSTICK_DEFAULT%
 
@@ -187,6 +191,7 @@ for /L %%j in (1,1,%_loaded_gb_gbc_count%) do (
     echo %%j^) !gb_gbc_filename[%%j]!
 )
 
+set "_gb_gbc_rom_idx="
 set /P _gb_gbc_rom_idx="gc-gbc-index> "
 set _gb_gbc_rom=!gb_gbc_filename[%_gb_gbc_rom_idx%]!
 
@@ -224,6 +229,7 @@ for /L %%k in (1,1,%_gfx_video_plugin_length%) do (
     )
 )
 
+set "_gfx_video_plugin_idx="
 set /P _gfx_video_plugin_idx="gfx-video-index> "
 if "%_gfx_video_plugin_idx%"=="" (
     set _gfx_video_plugin=%_gfx_video_plugin_default%
@@ -235,6 +241,7 @@ if "%_gfx_video_plugin_idx%"=="" (
 rem /********** Resolution menu **********/
 echo:
 echo Enter the display resolution [640x480, 800x600, etc.] (default [%_resolution_default%]):
+set "_resolution="
 set /P _resolution="resolution> "
 if "%_resolution%"=="" set _resolution=%_resolution_default%
 
@@ -255,6 +262,7 @@ for /L %%i in (1,1,%_emulation_modes_length%) do (
     )
 )
 
+set "_emumode_idx="
 set /P _emumode_idx="emumode-index> "
 
 if "%_emumode_idx%"=="" (

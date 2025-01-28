@@ -73,6 +73,7 @@ for /L %%i in (1,1,%_save_count%) do (
 set /a _default_save_file=%_save_count%+1
 echo %_default_save_file%^) ^(default^) ^<skip snapshot^>
 
+set "_save_file_idx="
 set /P _save_file_idx="save-index> "
 if "%_save_file_idx%"=="" set _save_file_idx=%_default_save_file%
 

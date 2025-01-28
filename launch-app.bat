@@ -37,6 +37,7 @@ for /l %%i in (1,1,%EXECUTABLE_EXECS_LENGTH%) do (
     )
 )
 
+set "_app_index="
 set /P _app_index="app-index> "
 
 set "_app_exec=!EXECUTABLE_EXECS[%_app_index%]!"

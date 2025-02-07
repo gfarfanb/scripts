@@ -12,7 +12,7 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
-    echo "    -h: Makes a backup for all repos"
+    echo "    -a: Makes a backup for all repos"
     echo "    -h: Displays this help message"
     exit 0
 }

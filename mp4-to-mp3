@@ -1,0 +1,66 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ./.libs/funcs
+. ./env-vars
+
+_require_var DOWNLOADS_HOME
+
+_usage() {
+    echo "Converts MP4 files to MP3."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -i: Sets the MP4 location/file"
+    echo "    -o: Sets the MP3 output location. Default: DOWNLOADS_HOME"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+_mp4_location=""
+_mp3_output="$DOWNLOADS_HOME"
+
+while getopts "i:o:h" opt; do
+    case "$opt" in
+        i)
+            _mp4_location="$OPTARG"
+            ;;
+        o)
+            _mp3_output="$OPTARG"
+            ;;
+        h)
+            _usage
+            ;;
+    esac
+done
+
+_convert() {
+    local _mp4=${1:-}
+    local _filename=$(basename -- "$_mp4")
+    local _name="${_filename%.*}"
+    local _output="$_mp3_output/$_name.mp3"
+
+    ffmpeg -y -loglevel warning -i "$_mp4" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "$_output"
+
+    echo "Input: $_mp4"
+    echo "Output: $_output"
+    echo ;
+}
+
+if [ -d "$_mp4_location" ]; then
+    echo "Reading: $_mp4_location"
+    echo ;
+
+    for _mp4 in "$_mp4_location"/*.mp4 ; do
+        _convert "$_mp4"
+    done
+elif [ -f "$_mp4_location" ]; then
+    _convert "$_mp4_location"
+else
+    echo "Invalid MP4 location/file: $_mp4_location"
+    echo "[Process stopped]: $0"
+    _back
+    exit 0
+fi
+
+echo "[Completed]: $0"

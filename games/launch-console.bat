@@ -87,7 +87,7 @@ robocopy "%GEPD_1964_BACKUP_HOME%" "%GEPD_1964_SAVES_HOME%" /z
 cd %GEPD_1964_HOME%
 1964.exe
 robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
-call take-snapshot "%GEPD_1964_BACKUP_HOME%" eep
+call take-snapshot "%GEPD_1964_BACKUP_HOME%" eep m0 m1 m2 m3 m4
 goto completed
 
 

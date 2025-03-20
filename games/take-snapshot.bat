@@ -31,7 +31,7 @@ set /a _save_count=0
 set /a _ext_count=0
 
 for /f "delims=" %%N in ('dir %_saves_home%* /b') do (
-    
+
     if exist "%_saves_home%%%~N"\ (
         rem
     ) else if exist "%_saves_home%%%~N" (
@@ -43,8 +43,6 @@ for /f "delims=" %%N in ('dir %_saves_home%* /b') do (
                     set _save_names[%%a]=1
                     set /a _save_count+=1
                     set _save_ids[!_save_count!]=!_save_name!
-
-                    echo save: !_save_name!
                 )
             )
         )
@@ -57,8 +55,6 @@ for /f "delims=" %%N in ('dir %_saves_home%* /b') do (
                     set _save_exts[%%a]=1
                     set /a _ext_count+=1
                     set _ext_ids[!_ext_count!]=!_save_ext!
-
-                    echo save: !_save_ext!
                 )
             )
         )

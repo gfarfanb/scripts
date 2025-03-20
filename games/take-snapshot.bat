@@ -16,43 +16,50 @@ set "_saves_home=%~1\"
 set "_snapshots_home=%_saves_home%snapshots\"
 
 if "%SNAPSHOTS_TO_KEEP%"=="" (
-    set /a _number_to_keep=10
+    set /a _number_to_keep=3
 ) else (
     set /a _number_to_keep=%SNAPSHOTS_TO_KEEP%
 )
 
-
-rem Collecting extensions from args
-rem _save_exts[<idx>]=<ext>
-set /a _arg_idx=1
-set /a _ext_count=0
-
-for %%x in (%*) do (
-    if !_arg_idx! gtr 1 (
-        set /a _ext_count+=1
-        set "_save_exts[!_ext_count!]=%%~x"
-    )
-    set /a _arg_idx+=1
-)
-
-
-rem Grouping save files per name (without extension)
+rem Group save files per name (without extension)
+rem and collect extensions from files
 rem _save_names[<name-hash>]=1
 rem _save_ids[<idx>]=<save-name>
+rem _save_exts[<ext-hash>]=1
+rem _ext_ids[<idx>]=<save-ext>
 set /a _save_count=0
+set /a _ext_count=0
 
-for /L %%i in (1,1,%_ext_count%) do (
-    set "_save_ext=!_save_exts[%%i]!"
+for /f "delims=" %%N in ('dir %_saves_home%* /b') do (
+    
+    if exist "%_saves_home%%%~N"\ (
+        rem
+    ) else if exist "%_saves_home%%%~N" (
+        for %%f in ("%%~N") do set "_save_name=%%~nf"
 
-    for /f "delims=" %%N in ('dir %_saves_home%*.!_save_ext! /b') do (
-        set "_save_file_name=%%~N"
-        call eval set "_save_name=^!_save_file_name:.!_save_ext!=^!"
+        if not "!_save_name!" == "" (
+            for /f "delims=" %%a in ('sha256sum "!_save_name!"') do (
+                if "!_save_names[%%a]!"=="" (
+                    set _save_names[%%a]=1
+                    set /a _save_count+=1
+                    set _save_ids[!_save_count!]=!_save_name!
 
-        for /f "delims=" %%a in ('sha256sum "!_save_name!"') do (
-            if "!_save_names[%%a]!"=="" (
-                set _save_names[%%a]=1
-                set /a _save_count+=1
-                set _save_ids[!_save_count!]=!_save_name!
+                    echo save: !_save_name!
+                )
+            )
+        )
+
+        for %%e in ("%%~N") do set "_save_ext=%%~xe"
+
+        if not "!_save_ext!" == "" (
+            for /f "delims=" %%a in ('sha256sum "!_save_ext!"') do (
+                if "!_save_exts[%%a]!"=="" (
+                    set _save_exts[%%a]=1
+                    set /a _ext_count+=1
+                    set _ext_ids[!_ext_count!]=!_save_ext!
+
+                    echo save: !_save_ext!
+                )
             )
         )
     )
@@ -92,8 +99,8 @@ set _tmp_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
 set _profile_tmp="%TEMP%\profile-temp-%_tmp_tag%.bat"
 
 for /L %%i in (1,1,%_ext_count%) do (
-    set "_save_ext=!_save_exts[%%i]!"
-    set "_save_file=%_save_selected%.!_save_ext!"
+    set "_save_ext=!_ext_ids[%%i]!"
+    set "_save_file=%_save_selected%!_save_ext!"
     set _snapshot_ext=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%TIME:~0,2%%TIME:~3,2%%TIME:~6,2%
     set "_snapshot_file=!_save_file!.!_snapshot_ext!"
     set "_save_file_path=%_saves_home%!_save_file!"

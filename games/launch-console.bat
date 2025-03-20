@@ -54,7 +54,7 @@ robocopy "%ZELDA64RECOMPILED_BACKUP_HOME%" "%ZELDA64RECOMPILED_SAVES_HOME%" /z
 cd %ZELDA64RECOMPILED_HOME%
 Zelda64Recompiled.exe
 robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
-call take-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%" bin
+call take-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%"
 goto completed
 
 
@@ -71,7 +71,7 @@ robocopy "%PERFECTDARK_BACKUP_HOME%" "%PERFECTDARK_SAVES_HOME%" /z
 cd %PERFECTDARK_HOME%
 pd.exe --rom-file "%PERFECTDARK_ROM%"
 robocopy "%PERFECTDARK_SAVES_HOME%" "%PERFECTDARK_BACKUP_HOME%" eeprom.bin /z
-call take-snapshot "%PERFECTDARK_BACKUP_HOME%" bin
+call take-snapshot "%PERFECTDARK_BACKUP_HOME%"
 goto completed
 
 
@@ -87,7 +87,7 @@ robocopy "%GEPD_1964_BACKUP_HOME%" "%GEPD_1964_SAVES_HOME%" /z
 cd %GEPD_1964_HOME%
 1964.exe
 robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
-call take-snapshot "%GEPD_1964_BACKUP_HOME%" eep m0 m1 m2 m3 m4
+call take-snapshot "%GEPD_1964_BACKUP_HOME%"
 goto completed
 
 
@@ -100,7 +100,7 @@ call require-var DOLPHIN_BACKUP_HOME
 
 cd %DOLPHIN_HOME%
 Dolphin.exe
-call take-snapshot "%DOLPHIN_BACKUP_HOME%" gci
+call take-snapshot "%DOLPHIN_BACKUP_HOME%"
 goto completed
 
 
@@ -124,7 +124,7 @@ for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
 
 call n64-profiles.bat
 call start-mupen64plus.bat %*
-call take-snapshot "%N64_SAVES_HOME%" eep mpk fla
+call take-snapshot "%N64_SAVES_HOME%"
 goto completed
 
 
@@ -137,7 +137,7 @@ call require-var MGBA_BACKUP_HOME
 
 cd %MGBA_HOME%
 mGBA.exe
-call take-snapshot "%MGBA_BACKUP_HOME%" sav ss1
+call take-snapshot "%MGBA_BACKUP_HOME%"
 goto completed
 
 
@@ -150,7 +150,7 @@ call require-var SNES9X_BACKUP_HOME
 
 cd %SNES9X_HOME%
 snes9x-x64.exe
-call take-snapshot "%SNES9X_BACKUP_HOME%" 000 0A.frz srm oops
+call take-snapshot "%SNES9X_BACKUP_HOME%"
 goto completed
 
 

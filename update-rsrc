@@ -44,6 +44,12 @@ if [ -n "$( type -t apt )" ]; then
 
     sudo apt update
     sudo apt upgrade -y
+
+    echo "Cleaning up 'apt' packages"
+
+    sudo apt clean all -y
+    sudo apt autoclean -y
+    sudo apt autoremove --purge -y
 fi
 
 if [ -n "$( type -t dnf )" ]; then

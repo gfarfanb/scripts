@@ -24,7 +24,6 @@ echo 3^) GameCube/Wii
 echo 4^) Nintendo 64
 echo 5^) GBA/GBC/GB
 echo 6^) SNES
-rem echo 7^) Perfect Dark port
 set "_console_index="
 set /P _console_index="console-index> "
 
@@ -38,7 +37,6 @@ if /i "%_console_index%"=="3" goto launchdolphin
 if /i "%_console_index%"=="4" goto launchmupen64plus
 if /i "%_console_index%"=="5" goto launchmgba
 if /i "%_console_index%"=="6" goto launchsnes9x
-rem if /i "%_console_index%"=="7" goto launchperfectdark
 goto invalid
 
 
@@ -55,23 +53,6 @@ cd %ZELDA64RECOMPILED_HOME%
 Zelda64Recompiled.exe
 robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 call take-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%"
-goto completed
-
-
-:launchperfectdark
-echo:
-echo Launching 'perfect_dark' at "%PERFECTDARK_HOME%"
-
-call require-var PERFECTDARK_HOME
-call require-var PERFECTDARK_ROM
-call require-var PERFECTDARK_SAVES_HOME
-call require-var PERFECTDARK_BACKUP_HOME
-
-robocopy "%PERFECTDARK_BACKUP_HOME%" "%PERFECTDARK_SAVES_HOME%" /z
-cd %PERFECTDARK_HOME%
-pd.exe --rom-file "%PERFECTDARK_ROM%"
-robocopy "%PERFECTDARK_SAVES_HOME%" "%PERFECTDARK_BACKUP_HOME%" eeprom.bin /z
-call take-snapshot "%PERFECTDARK_BACKUP_HOME%"
 goto completed
 
 

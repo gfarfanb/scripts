@@ -67,7 +67,15 @@ _launch_dolphin() {
     echo >&2
     echo "Launching 'Dolphin'" >&2
 
+    _require_var DOLPHIN_HOME
+    _require_var DOLPHIN_SAVES_HOME
+    _require_var DOLPHIN_BACKUP_HOME
+
+    rsync -cvrP $DOLPHIN_BACKUP_HOME/ $DOLPHIN_SAVES_HOME/
+
     flatpak run org.DolphinEmu.dolphin-emu "$@"
+
+    rsync -cvrP $DOLPHIN_SAVES_HOME/ $DOLPHIN_BACKUP_HOME/
 
     cd $GAMES_HOME
     ./take-snapshot "$DOLPHIN_BACKUP_HOME"
@@ -96,6 +104,9 @@ _launch_mgba() {
     echo >&2
     echo "Launching 'mGBA'" >&2
 
+    _require_var MGBA_HOME
+    _require_var MGBA_BACKUP_HOME
+
     flatpak run io.mgba.mGBA "$@"
 
     cd $GAMES_HOME
@@ -105,6 +116,9 @@ _launch_mgba() {
 _launch_snes9x() {
     echo >&2
     echo Launching 'Snes9x' >&2
+
+    _require_var SNES9X_HOME
+    _require_var SNES9X_BACKUP_HOME
 
     flatpak run com.snes9x.Snes9x "$@"
 

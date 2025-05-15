@@ -77,10 +77,13 @@ echo:
 echo Launching 'Dolphin' at "%DOLPHIN_HOME%"
 
 call require-var DOLPHIN_HOME
+call require-var DOLPHIN_SAVES_HOME
 call require-var DOLPHIN_BACKUP_HOME
 
+robocopy "%DOLPHIN_BACKUP_HOME%" "%DOLPHIN_SAVES_HOME%" /z
 cd %DOLPHIN_HOME%
 Dolphin.exe
+robocopy "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 call take-snapshot "%DOLPHIN_BACKUP_HOME%"
 goto completed
 

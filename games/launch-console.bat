@@ -10,13 +10,20 @@ echo Launches a game console.
 echo ;
 echo Usage: %0 [^<option^>]*
 echo Option:
+echo     -s: Goes to save snapshot without run the console
 echo     -h: Displays this help message
 goto back
 
 
 :main
+set /a _execute_console=1
+if /i "%1"=="-s" (
+    set /a _execute_console=0
+    goto select
+)
 if /i "%1"=="-h" goto usage
 
+:select
 echo Select a console:
 echo 1^) Zelda 64: Recompiled
 echo 2^) 1964 GEPD Edition
@@ -48,10 +55,13 @@ call require-var ZELDA64RECOMPILED_HOME
 call require-var ZELDA64RECOMPILED_SAVES_HOME
 call require-var ZELDA64RECOMPILED_BACKUP_HOME
 
-robocopy "%ZELDA64RECOMPILED_BACKUP_HOME%" "%ZELDA64RECOMPILED_SAVES_HOME%" /z
-cd %ZELDA64RECOMPILED_HOME%
-Zelda64Recompiled.exe
-robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
+if %_execute_console% equ 1 (
+    robocopy "%ZELDA64RECOMPILED_BACKUP_HOME%" "%ZELDA64RECOMPILED_SAVES_HOME%" /z
+    cd %ZELDA64RECOMPILED_HOME%
+    Zelda64Recompiled.exe
+    robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
+)
+
 call take-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%"
 goto completed
 
@@ -64,10 +74,13 @@ call require-var GEPD_1964_HOME
 call require-var GEPD_1964_SAVES_HOME
 call require-var GEPD_1964_BACKUP_HOME
 
-robocopy "%GEPD_1964_BACKUP_HOME%" "%GEPD_1964_SAVES_HOME%" /z
-cd %GEPD_1964_HOME%
-1964.exe
-robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
+if %_execute_console% equ 1 (
+    robocopy "%GEPD_1964_BACKUP_HOME%" "%GEPD_1964_SAVES_HOME%" /z
+    cd %GEPD_1964_HOME%
+    1964.exe
+    robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
+)
+
 call take-snapshot "%GEPD_1964_BACKUP_HOME%"
 goto completed
 
@@ -80,10 +93,13 @@ call require-var DOLPHIN_HOME
 call require-var DOLPHIN_SAVES_HOME
 call require-var DOLPHIN_BACKUP_HOME
 
-robocopy "%DOLPHIN_BACKUP_HOME%" "%DOLPHIN_SAVES_HOME%" /z
-cd %DOLPHIN_HOME%
-Dolphin.exe
-robocopy "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
+if %_execute_console% equ 1 (
+    robocopy "%DOLPHIN_BACKUP_HOME%" "%DOLPHIN_SAVES_HOME%" /z
+    cd %DOLPHIN_HOME%
+    Dolphin.exe
+    robocopy "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
+)
+
 call take-snapshot "%DOLPHIN_BACKUP_HOME%"
 goto completed
 
@@ -106,8 +122,11 @@ for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
     call require-var N64_JOYSTICK_CONFIGS[%%i]
 )
 
-call n64-profiles.bat
-call start-mupen64plus.bat %*
+if %_execute_console% equ 1 (
+    call n64-profiles.bat
+    call start-mupen64plus.bat %*
+)
+
 call take-snapshot "%N64_SAVES_HOME%"
 goto completed
 
@@ -119,8 +138,11 @@ echo Launching 'mGBA' at "%MGBA_HOME%"
 call require-var MGBA_HOME
 call require-var MGBA_BACKUP_HOME
 
-cd %MGBA_HOME%
-mGBA.exe
+if %_execute_console% equ 1 (
+    cd %MGBA_HOME%
+    mGBA.exe
+)
+
 call take-snapshot "%MGBA_BACKUP_HOME%"
 goto completed
 
@@ -132,8 +154,11 @@ echo Launching 'Snes9x' at "%SNES9X_HOME%"
 call require-var SNES9X_HOME
 call require-var SNES9X_BACKUP_HOME
 
-cd %SNES9X_HOME%
-snes9x-x64.exe
+if %_execute_console% equ 1 (
+    cd %SNES9X_HOME%
+    snes9x-x64.exe
+)
+
 call take-snapshot "%SNES9X_BACKUP_HOME%"
 goto completed
 

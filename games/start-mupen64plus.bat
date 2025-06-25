@@ -1,18 +1,36 @@
 @echo OFF
+set PWD=%cd%
 
-rem ######################### Required variables
-rem set MUPEN64PLUS_HOME=...
-rem set N64_ROMS_HOME=...
-rem set N64_SAVES_HOME=...
-rem set N64_SCREENSHOTS_HOME=...
-rem set GB_GBC_ROMS_HOME=...
-rem set GB_GBC_SAVES_HOME=...
+call env-vars.bat
+call require-var MUPEN64PLUS_HOME
+call require-var N64_ROMS_HOME
+call require-var N64_SAVES_HOME
+call require-var N64_SCREENSHOTS_HOME
+call require-var GB_GBC_ROMS_HOME
+call require-var GB_GBC_SAVES_HOME
+call require-var N64_CONFIGURED_JOYSTICK_LENGTH
+call require-var N64_CONFIGURED_JOYSTICK_DEFAULT
 
 rem set "N64_JOYSTICK_NAMES[<joystick-index>]=<joystick-name>"
 rem set "N64_JOYSTICK_CONFIGS[<joystick-index>]=<joystick-connection>"
+for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
+    call require-var N64_JOYSTICK_NAMES[%%i]
+    call require-var N64_JOYSTICK_CONFIGS[%%i]
+)
 
-rem set N64_CONFIGURED_JOYSTICK_LENGTH=<total-joystick-configs>
-rem set N64_CONFIGURED_JOYSTICK_DEFAULT=<joystick-index-default>
+
+goto main
+
+:usage
+echo Launches Mupen64Plus emulator.
+echo ;
+echo Usage: %0 [^<option^>]*
+echo Option:
+echo     -h: Displays this help message
+goto back
+
+:main
+if /i "%1"=="-h" goto usage
 
 
 rem ######################### Profile definition
@@ -319,3 +337,6 @@ echo No ROM file selected
 goto :eof
 
 endlocal
+
+:back
+cd /d %PWD%

@@ -1,17 +1,34 @@
 #! /usr/bin/env bash
-set -e
+BASEDIR=$(dirname $0); cd $BASEDIR
 
-# ######################### Required variables
-# N64_ROMS_HOME=...
-# N64_SAVES_HOME=...
-# N64_SCREENSHOTS_HOME=...
-# GB_GBC_ROMS_HOME=...
-# GB_GBC_SAVES_HOME=...
+. ../.libs/funcs
+. ../env-vars
 
-# N64_JOYSTICK_NAMES=( <joystick-name> )
-# N64_JOYSTICK_CONFIGS=( <joystick-connection> )
+_require_var N64_ROMS_HOME
+_require_var N64_SAVES_HOME
+_require_var N64_SCREENSHOTS_HOME
+_require_var GB_GBC_ROMS_HOME
+_require_var GB_GBC_SAVES_HOME
+_require_var N64_CONFIGURED_JOYSTICK_NAMES
+_require_var N64_CONFIGURED_JOYSTICK_CONFIGS
+_require_var N64_CONFIGURED_JOYSTICK_DEFAULT
 
-# N64_CONFIGURED_JOYSTICK_DEFAULT=<joystick-index-default>
+_usage() {
+    echo "Launches Mupen64Plus emulator."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
 
 
 # ######################### Profile definition

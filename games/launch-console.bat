@@ -49,117 +49,109 @@ goto invalid
 
 :launchzelda64
 echo:
-echo Launching 'Zelda 64: Recompiled' at "%ZELDA64RECOMPILED_HOME%"
 
 call require-var ZELDA64RECOMPILED_HOME
 call require-var ZELDA64RECOMPILED_SAVES_HOME
 call require-var ZELDA64RECOMPILED_BACKUP_HOME
 
 if %_execute_console% equ 1 (
+    echo Launching 'Zelda 64: Recompiled' at "%ZELDA64RECOMPILED_HOME%"
+
     robocopy "%ZELDA64RECOMPILED_BACKUP_HOME%" "%ZELDA64RECOMPILED_SAVES_HOME%" /z
     cd %ZELDA64RECOMPILED_HOME%
     Zelda64Recompiled.exe
     robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 )
 
-call take-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%"
+call save-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%"
 goto completed
 
 
 :launch1964gepd
 echo:
-echo Launching '1964 GEPD Edition' at "%GEPD_1964_HOME%"
 
 call require-var GEPD_1964_HOME
 call require-var GEPD_1964_SAVES_HOME
 call require-var GEPD_1964_BACKUP_HOME
 
 if %_execute_console% equ 1 (
+    echo Launching '1964 GEPD Edition' at "%GEPD_1964_HOME%"
+
     robocopy "%GEPD_1964_BACKUP_HOME%" "%GEPD_1964_SAVES_HOME%" /z
     cd %GEPD_1964_HOME%
     1964.exe
     robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
 )
 
-call take-snapshot "%GEPD_1964_BACKUP_HOME%"
+call save-snapshot "%GEPD_1964_BACKUP_HOME%"
 goto completed
 
 
 :launchdolphin
 echo:
-echo Launching 'Dolphin' at "%DOLPHIN_HOME%"
 
 call require-var DOLPHIN_HOME
 call require-var DOLPHIN_SAVES_HOME
 call require-var DOLPHIN_BACKUP_HOME
 
 if %_execute_console% equ 1 (
+    echo Launching 'Dolphin' at "%DOLPHIN_HOME%"
+
     robocopy "%DOLPHIN_BACKUP_HOME%" "%DOLPHIN_SAVES_HOME%" /z
     cd %DOLPHIN_HOME%
     Dolphin.exe
     robocopy "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 )
 
-call take-snapshot "%DOLPHIN_BACKUP_HOME%"
+call save-snapshot "%DOLPHIN_BACKUP_HOME%"
 goto completed
 
 
 :launchmupen64plus
 echo:
-echo Launching 'Mupen64Plus' at "%MUPEN64PLUS_HOME%"
-
-call require-var MUPEN64PLUS_HOME
-call require-var N64_ROMS_HOME
-call require-var N64_SAVES_HOME
-call require-var N64_SCREENSHOTS_HOME
-call require-var GB_GBC_ROMS_HOME
-call require-var GB_GBC_SAVES_HOME
-call require-var N64_CONFIGURED_JOYSTICK_LENGTH
-call require-var N64_CONFIGURED_JOYSTICK_DEFAULT
-
-for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
-    call require-var N64_JOYSTICK_NAMES[%%i]
-    call require-var N64_JOYSTICK_CONFIGS[%%i]
-)
 
 if %_execute_console% equ 1 (
+    echo Launching 'Mupen64Plus' at "%MUPEN64PLUS_HOME%"
+
     call n64-profiles.bat
     call start-mupen64plus.bat %*
 )
 
-call take-snapshot "%N64_SAVES_HOME%"
+call save-snapshot "%N64_SAVES_HOME%"
 goto completed
 
 
 :launchmgba
 echo:
-echo Launching 'mGBA' at "%MGBA_HOME%"
 
 call require-var MGBA_HOME
 call require-var MGBA_BACKUP_HOME
 
 if %_execute_console% equ 1 (
+    echo Launching 'mGBA' at "%MGBA_HOME%"
+
     cd %MGBA_HOME%
     mGBA.exe
 )
 
-call take-snapshot "%MGBA_BACKUP_HOME%"
+call save-snapshot "%MGBA_BACKUP_HOME%"
 goto completed
 
 
 :launchsnes9x
 echo:
-echo Launching 'Snes9x' at "%SNES9X_HOME%"
 
 call require-var SNES9X_HOME
 call require-var SNES9X_BACKUP_HOME
 
 if %_execute_console% equ 1 (
+    echo Launching 'Snes9x' at "%SNES9X_HOME%"
+
     cd %SNES9X_HOME%
     snes9x-x64.exe
 )
 
-call take-snapshot "%SNES9X_BACKUP_HOME%"
+call save-snapshot "%SNES9X_BACKUP_HOME%"
 goto completed
 
 

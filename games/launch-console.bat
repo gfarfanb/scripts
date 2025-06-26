@@ -11,12 +11,20 @@ echo ;
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -s: Goes to save snapshot without run the console
+echo     -r: Goes to recover snapshot without run the console
 echo     -h: Displays this help message
 goto back
 
 
 :main
+set "_execute_recover="
 set /a _execute_console=1
+
+if /i "%1"=="-r" (
+    set "_execute_recover=-r"
+    set /a _execute_console=0
+    goto select
+)
 if /i "%1"=="-s" (
     set /a _execute_console=0
     goto select
@@ -63,7 +71,7 @@ if %_execute_console% equ 1 (
     robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 )
 
-call save-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%"
+call save-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
 goto completed
 
 
@@ -83,7 +91,7 @@ if %_execute_console% equ 1 (
     robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
 )
 
-call save-snapshot "%GEPD_1964_BACKUP_HOME%"
+call save-snapshot "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
 goto completed
 
 
@@ -102,8 +110,7 @@ if %_execute_console% equ 1 (
     Dolphin.exe
     robocopy "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 )
-
-call save-snapshot "%DOLPHIN_BACKUP_HOME%"
+call save-snapshot "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
 goto completed
 
 
@@ -117,7 +124,7 @@ if %_execute_console% equ 1 (
     call start-mupen64plus.bat %*
 )
 
-call save-snapshot "%N64_SAVES_HOME%"
+call save-snapshot "%N64_SAVES_HOME%" %_execute_recover%
 goto completed
 
 
@@ -134,7 +141,8 @@ if %_execute_console% equ 1 (
     mGBA.exe
 )
 
-call save-snapshot "%MGBA_BACKUP_HOME%"
+echo call save-snapshot "%MGBA_BACKUP_HOME%" %_execute_recover%
+call save-snapshot "%MGBA_BACKUP_HOME%" %_execute_recover%
 goto completed
 
 
@@ -151,7 +159,7 @@ if %_execute_console% equ 1 (
     snes9x-x64.exe
 )
 
-call save-snapshot "%SNES9X_BACKUP_HOME%"
+call save-snapshot "%SNES9X_BACKUP_HOME%" %_execute_recover%
 goto completed
 
 

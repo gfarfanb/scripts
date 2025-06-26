@@ -1,5 +1,4 @@
 #! /usr/bin/env bash
-BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../.libs/funcs
 . ../env-vars
@@ -12,12 +11,18 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -r: Recovers save from snapshots"
     echo "    -h: Displays this help message"
     exit 0
 }
 
-while getopts "h" opt; do
+_recover_flag=""
+
+while getopts "rh" opt; do
     case "$opt" in
+        r)
+            _recover_flag="--recover"
+            ;;
         h)
             _usage
             ;;
@@ -26,9 +31,7 @@ done
 
 _saves_home="$1"
 
-python "$SCRIPTS_LIBS_HOME/file-snapshot.py" "$_saves_home" $SNAPSHOTS_TO_KEEP
-
-_back
+python "$SCRIPTS_LIBS_HOME/file-snapshot.py" "$_saves_home" "$_recover_flag"
 
 echo ;
 echo "[Completed]: $0"

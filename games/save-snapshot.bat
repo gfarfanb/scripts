@@ -1,5 +1,4 @@
 @echo OFF
-set PWD=%cd%
 
 call env-vars.bat
 call require-var SNAPSHOTS_TO_KEEP
@@ -10,23 +9,23 @@ goto main
 :usage
 echo Create snapshots of save files.
 echo ;
-echo Usage: %0 [^<option^>]*
+echo Usage: %0 <save-home> [^<option^>]*
 echo Option:
+echo     -r: Recovers save from snapshots
 echo     -h: Displays this help message
-goto back
+goto :eof
 
 :main
+set "_recover_flag="
 if /i "%1"=="-h" goto usage
+if /i "%2"=="-r" set "_recover_flag=--recover"
 
 set "_saves_home=%~1"
 
-python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" "%_saves_home%" %SNAPSHOTS_TO_KEEP%
+python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" "%_saves_home%" "%_recover_flag%"
 goto completed
 
 :completed
 echo:
 echo [Completed]: %0
-goto back
-
-:back
-cd /d %PWD%
+goto :eof

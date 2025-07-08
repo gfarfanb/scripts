@@ -18,11 +18,11 @@ goto :eof
 :main
 set "_recover_flag="
 if /i "%1"=="-h" goto usage
-if /i "%2"=="-r" set "_recover_flag=--recover"
+if /i "%2"=="-r" set "_recover_flag= --recover"
 
 set "_saves_home=%~1"
 
-python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" "%_saves_home%" "%_recover_flag%"
+python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" -d "%_saves_home%"%_recover_flag%
 goto completed
 
 :completed

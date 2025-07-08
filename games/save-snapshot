@@ -21,7 +21,7 @@ _recover_flag=""
 while getopts "rh" opt; do
     case "$opt" in
         r)
-            _recover_flag="--recover"
+            _recover_flag=" --recover"
             ;;
         h)
             _usage
@@ -31,7 +31,7 @@ done
 
 _saves_home="$1"
 
-python "$SCRIPTS_LIBS_HOME/file-snapshot.py" "$_saves_home" "$_recover_flag"
+python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -d "$_saves_home"$_recover_flag
 
 echo ;
 echo "[Completed]: $0"

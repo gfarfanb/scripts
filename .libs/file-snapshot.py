@@ -6,17 +6,7 @@ from sys import argv, exit
 from shutil import copyfile
 
 import datetime
-
-
-def arg_value(idx, name):
-    try:
-        return argv[idx]
-    except IndexError:
-        args = ""
-        for i in range(idx - 1) : args += "<arg-" + str(i + 1) + "> "
-        args += "<" + name + ">"
-
-        raise ValueError("Missing args: {scr} {args}".format(scr=basename(__file__), args=args))
+import argparse
 
 
 def env_value(name):
@@ -24,10 +14,6 @@ def env_value(name):
         return environ[name]
     except KeyError:
         raise ValueError("Missing env-variable: {n}".format(n=name))
-
-
-def is_recover(v):
-    return v.lower() in ['-r', '--recover']
 
 
 def names_without_ext(files_path):
@@ -212,16 +198,15 @@ def execute_recover(files_home):
 
 
 def main():
-    try:
-        files_home=arg_value(1, "files-directory")
-        recover_flag=is_recover(arg_value(2, "recover-flag"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--directory", help="Location of the files")
+    parser.add_argument("-r", "--recover", action="store_true", help="Enables recover snapshot files")
+    args = parser.parse_args()
 
-        if recover_flag:
-            execute_recover(files_home)
-        else:
-            execute_snapshot(files_home)
-    except ValueError as err:
-        print(err.args[0])
+    if args.recover:
+        execute_recover(args.directory)
+    else:
+        execute_snapshot(args.directory)
 
     return 0
 

@@ -198,15 +198,18 @@ def execute_recover(files_home):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--directory", help="Location of the files")
-    parser.add_argument("-r", "--recover", action="store_true", help="Enables recover snapshot files")
-    args = parser.parse_args()
+    try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-d", "--directory", help="Location of the files")
+        parser.add_argument("-r", "--recover", action="store_true", help="Enables recover snapshot files")
+        args = parser.parse_args()
 
-    if args.recover:
-        execute_recover(args.directory)
-    else:
-        execute_snapshot(args.directory)
+        if args.recover:
+            execute_recover(args.directory)
+        else:
+            execute_snapshot(args.directory)
+    except ValueError as err:
+        print(err.args[0])
 
     return 0
 

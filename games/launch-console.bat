@@ -42,10 +42,10 @@ if /i "%1"=="-h" goto usage
 echo Select a console:
 echo 1^) Zelda 64: Recompiled
 echo 2^) 1964 GEPD Edition
-echo 3^) GameCube/Wii
-echo 4^) Nintendo 64
-echo 5^) GBA/GBC/GB
-echo 6^) SNES
+echo 3^) GameCube/Wii [Dolphin]
+echo 4^) Nintendo 64 [Mupen64Plus]
+echo 5^) GBA/GBC/GB [mGBA]
+echo 6^) SNES [Snes9x]
 set "_console_index="
 set /P _console_index="console-index> "
 

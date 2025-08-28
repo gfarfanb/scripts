@@ -121,10 +121,10 @@ _launch_snes9x() {
 echo "Select a console:"
 echo "1) Zelda 64: Recompiled"
 echo "2) 1964 GEPD Edition"
-echo "3) GameCube/Wii"
-echo "4) Nintendo 64"
-echo "5) GBA/GBC/GB"
-echo "6) SNES"
+echo "3) GameCube/Wii [Dolphin]"
+echo "4) Nintendo 64 [Mupen64Plus]"
+echo "5) GBA/GBC/GB [mGBA]"
+echo "6) SNES [Snes9x]"
 read -p "console-index> " _console_index
 
 case "$_console_index" in

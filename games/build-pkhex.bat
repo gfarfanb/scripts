@@ -18,7 +18,7 @@ if /i "%1"=="-h" goto usage
 
 cd "%PKHEX_HOME%"
 
-dotnet publish -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true
+dotnet publish PKHeX.sln -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true
 goto completed
 
 :completed

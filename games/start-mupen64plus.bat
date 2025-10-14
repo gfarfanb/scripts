@@ -3,6 +3,7 @@ set PWD=%cd%
 
 call env-vars.bat
 call require-var MUPEN64PLUS_HOME
+call require-var N64_PROFILES_FILE
 call require-var N64_ROMS_HOME
 call require-var N64_SAVES_HOME
 call require-var N64_SCREENSHOTS_HOME
@@ -17,6 +18,8 @@ for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
     call require-var N64_JOYSTICK_NAMES[%%i]
     call require-var N64_JOYSTICK_CONFIGS[%%i]
 )
+
+call source-file "%N64_PROFILES_FILE%"
 
 
 goto main
@@ -159,8 +162,12 @@ set _controller_name=!_controller_names[%_controller_id%]!
 rem /********** Configured joysticks menu **********/
 echo:
 echo Choose a configured joystick number for Controller-%_controller_id%:
+
+set _n64_configured_joystick=!_n64_configured_joystick_profiles[%_n64_rom_hash%]!
+if "%_n64_configured_joystick%"=="" set _n64_configured_joystick=%N64_CONFIGURED_JOYSTICK_DEFAULT%
+
 for /L %%l in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
-    if "%N64_CONFIGURED_JOYSTICK_DEFAULT%"=="%%l" (
+    if "%_n64_configured_joystick%"=="%%l" (
         echo %%l^) ^(default^) !N64_JOYSTICK_NAMES[%%l]!
     ) else (
         echo %%l^) !N64_JOYSTICK_NAMES[%%l]!
@@ -169,7 +176,7 @@ for /L %%l in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
 
 set "_configured_joystick_idx="
 set /P _configured_joystick_idx="joystick-config-index> "
-if "%_configured_joystick_idx%"=="" set _configured_joystick_idx=%N64_CONFIGURED_JOYSTICK_DEFAULT%
+if "%_configured_joystick_idx%"=="" set _configured_joystick_idx=%_n64_configured_joystick%
 
 set _n64_joystick_config=!N64_JOYSTICK_CONFIGS[%_configured_joystick_idx%]!
 
@@ -205,12 +212,23 @@ set /a _loaded_gb_gbc_count=%_gb_gbc_id%-1
 
 echo:
 echo Choose a GB/GBC game number for Controller-%_controller_id%:
+
+set _gb_gbc_game=!_gb_gbc_game_profiles[%_n64_rom_hash%]!
+set "_gb_gbc_default_idx="
+
 for /L %%j in (1,1,%_loaded_gb_gbc_count%) do (
-    echo %%j^) !gb_gbc_filename[%%j]!
+    if "%_gb_gbc_game%"=="!gb_gbc_filename[%%j]!" (
+        echo %%j^) ^(default^) !gb_gbc_filename[%%j]!
+        set _gb_gbc_default_idx=%%j
+    ) else (
+        echo %%j^) !gb_gbc_filename[%%j]!
+    )
 )
 
 set "_gb_gbc_rom_idx="
 set /P _gb_gbc_rom_idx="gc-gbc-index> "
+if "%_gb_gbc_rom_idx%"=="" set _gb_gbc_rom_idx=%_gb_gbc_default_idx%
+
 set _gb_gbc_rom=!gb_gbc_filename[%_gb_gbc_rom_idx%]!
 
 set "_transfer_pak_loaded=%_transfer_pak_loaded% Controller-%_controller_id%='%_gb_gbc_rom%'"

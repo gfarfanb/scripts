@@ -161,7 +161,6 @@ if %_recover_backup% equ 1 (
 if %_execute_console% equ 1 (
     echo Launching 'Mupen64Plus' at "%MUPEN64PLUS_HOME%"
 
-    call n64-profiles.bat
     call start-mupen64plus.bat %*
 )
 

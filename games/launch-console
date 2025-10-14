@@ -85,7 +85,6 @@ _launch_mupen64plus() {
     echo >&2
     echo "Launching 'Mupen64Plus'" >&2
 
-    . ./n64-profiles
     . ./start-mupen64plus "$@"
 
     cd $GAMES_HOME

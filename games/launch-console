@@ -55,6 +55,9 @@ _launch_1964gepd() {
 
     cd $GEPD_1964_HOME
 
+    echo "Full screen mode press: 'Alt+Enter'" >&2
+    echo "Enable/disable mouse press: '4'" >&2
+
     wine 1964.exe "$@"
 
     rsync -cvrP $GEPD_1964_SAVES_HOME/ $GEPD_1964_BACKUP_HOME/

@@ -83,6 +83,7 @@ if %_execute_console% equ 1 (
 
     cd %ZELDA64RECOMPILED_HOME%
     Zelda64Recompiled.exe
+
     robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 )
 
@@ -111,7 +112,13 @@ if %_execute_console% equ 1 (
     echo Launching '1964 GEPD Edition' at "%GEPD_1964_HOME%"
 
     cd %GEPD_1964_HOME%
+
+    echo:
+    echo Full screen mode press: 'Alt+Enter'
+    echo Enable/disable mouse press: '4'
+
     1964.exe
+
     robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
 )
 
@@ -141,6 +148,7 @@ if %_execute_console% equ 1 (
 
     cd %DOLPHIN_HOME%
     Dolphin.exe
+
     robocopy *.gci "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 )
 

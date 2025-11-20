@@ -120,6 +120,26 @@ _launch_snes9x() {
     ./save-snapshot "$SNES9X_BACKUP_HOME"
 }
 
+_launch_celeste64() {
+    echo >&2
+    echo "Launching 'Celeste 64'" >&2
+
+    _require_var CELESTE_64_HOME
+    _require_var CELESTE_64_SAVES_HOME
+    _require_var CELESTE_64_BACKUP_HOME
+
+    rsync -cvrP $CELESTE_64_BACKUP_HOME/ $CELESTE_64_SAVES_HOME/
+
+    cd $CELESTE_64_HOME
+
+    ./Celeste64 "$@"
+
+    rsync -cvrP $CELESTE_64_SAVES_HOME/ $CELESTE_64_BACKUP_HOME/
+
+    cd $GAMES_HOME
+    ./save-snapshot "$CELESTE_64_BACKUP_HOME"
+}
+
 echo "Select a console:"
 echo "1) Zelda 64: Recompiled"
 echo "2) 1964 GEPD Edition"
@@ -127,6 +147,7 @@ echo "3) GameCube/Wii [Dolphin]"
 echo "4) Nintendo 64 [Mupen64Plus]"
 echo "5) GBA/GBC/GB [mGBA]"
 echo "6) SNES [Snes9x]"
+echo "7) Celeste 64: Fragments of the Mountain"
 read -p "console-index> " _console_index
 
 case "$_console_index" in
@@ -147,6 +168,9 @@ case "$_console_index" in
         ;;
     6)
         _launch_snes9x "$@"
+        ;;
+    7)
+        _launch_celeste64 "$@"
         ;;
     *)
         echo "Invalid console index"

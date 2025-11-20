@@ -46,6 +46,7 @@ echo 3^) GameCube/Wii [Dolphin]
 echo 4^) Nintendo 64 [Mupen64Plus]
 echo 5^) GBA/GBC/GB [mGBA]
 echo 6^) SNES [Snes9x]
+echo 7^) Celeste 64: Fragments of the Mountain
 set "_console_index="
 set /P _console_index="console-index> "
 
@@ -59,6 +60,7 @@ if /i "%_console_index%"=="3" goto launchdolphin
 if /i "%_console_index%"=="4" goto launchmupen64plus
 if /i "%_console_index%"=="5" goto launchmgba
 if /i "%_console_index%"=="6" goto launchsnes9x
+if /i "%_console_index%"=="7" goto launchceleste64
 goto invalid
 
 
@@ -221,6 +223,36 @@ if %_execute_console% equ 1 (
 )
 
 call save-snapshot "%SNES9X_BACKUP_HOME%" %_execute_recover%
+
+goto completed
+
+
+:launchceleste64
+echo:
+
+call require-var CELESTE_64_HOME
+call require-var CELESTE_64_SAVES_HOME
+call require-var CELESTE_64_BACKUP_HOME
+
+if %_recover_backup% equ 1 (
+    echo Getting 'Celeste 64' backup from "%CELESTE_64_BACKUP_HOME%"
+
+    del /q "%CELESTE_64_SAVES_HOME%\*"
+    robocopy "%CELESTE_64_BACKUP_HOME%" "%CELESTE_64_SAVES_HOME%" /z
+
+    goto completed
+)
+
+if %_execute_console% equ 1 (
+    echo Launching 'Celeste 64' at "%CELESTE_64_HOME%"
+
+    cd %CELESTE_64_HOME%
+    Celeste64.exe
+
+    robocopy "%CELESTE_64_SAVES_HOME%" "%CELESTE_64_BACKUP_HOME%" /z
+)
+
+call save-snapshot "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 

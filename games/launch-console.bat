@@ -45,8 +45,9 @@ echo 2^) 1964 GEPD Edition
 echo 3^) GameCube/Wii [Dolphin]
 echo 4^) Nintendo 64 [Mupen64Plus]
 echo 5^) GBA/GBC/GB [mGBA]
-echo 6^) SNES [Snes9x]
-echo 7^) Celeste 64: Fragments of the Mountain
+echo 6^) 3DS [Azahar]
+echo 7^) SNES [Snes9x]
+echo 8^) Celeste 64: Fragments of the Mountain
 set "_console_index="
 set /P _console_index="console-index> "
 
@@ -59,8 +60,9 @@ if /i "%_console_index%"=="2" goto launch1964gepd
 if /i "%_console_index%"=="3" goto launchdolphin
 if /i "%_console_index%"=="4" goto launchmupen64plus
 if /i "%_console_index%"=="5" goto launchmgba
-if /i "%_console_index%"=="6" goto launchsnes9x
-if /i "%_console_index%"=="7" goto launchceleste64
+if /i "%_console_index%"=="6" goto launchazahar
+if /i "%_console_index%"=="7" goto launchsnes9x
+if /i "%_console_index%"=="8" goto launchceleste64
 goto invalid
 
 
@@ -199,6 +201,30 @@ if %_execute_console% equ 1 (
 )
 
 call save-snapshot "%MGBA_BACKUP_HOME%" %_execute_recover%
+
+goto completed
+
+
+:launchazahar
+echo:
+
+call require-var AZAHAR_HOME
+call require-var AZAHAR_BACKUP_HOME
+
+if %_recover_backup% equ 1 (
+    echo Save files already synchronized for 'Azahar'
+
+    goto completed
+)
+
+if %_execute_console% equ 1 (
+    echo Launching 'Azahar' at "%AZAHAR_HOME%"
+
+    cd %AZAHAR_HOME%
+    azahar.exe
+)
+
+call save-snapshot "%AZAHAR_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 

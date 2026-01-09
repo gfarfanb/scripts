@@ -84,7 +84,7 @@ _select_rom() {
 
     echo >&2
     echo "Choose an N64 game:" >&2
-    for _n64_file in "$N64_ROMS_HOME"/*.n64; do
+    for _n64_file in "$N64_ROMS_HOME"/*.?64; do
         _n64_files+=( "$_n64_file" )
         _n64_name=$( basename "$_n64_file" )
 

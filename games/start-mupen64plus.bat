@@ -78,7 +78,7 @@ setlocal enableDelayedExpansion
 rem /********** N64 Roms menu **********/
 set /a _n64_idx=1
 
-for /f "delims=" %%N in ('dir %N64_ROMS_HOME%\*.n64 /b') do (
+for /f "delims=" %%N in ('dir %N64_ROMS_HOME%\*.?64 /b') do (
     set _n64_filenames[!_n64_idx!]=%%~N
     set /a _n64_idx+=1
 )

@@ -8,6 +8,25 @@ call source-file "%JDK_HOMES_FILE%"
 
 setlocal enableDelayedExpansion
 
+set "_JDK_INDEX="
+
+if [%1]==[] goto selectjdk
+goto searchjdk
+
+:searchjdk
+set "_REQUIRED_JDK=%1"
+set "_REQUIRED_JDK=%_REQUIRED_JDK:"=%"
+
+for /l %%i in (1,1,%JDK_HOMES_LENGTH%) do (
+    set "_JDK_NAME=!JDK_NAMES[%%i]!"
+
+    if /i "!_JDK_NAME!"=="%_REQUIRED_JDK%" (
+        set _JDK_INDEX=%%i
+    )
+)
+goto jdkindex
+
+:selectjdk
 echo Select a JDK:
 for /l %%i in (1,1,%JDK_HOMES_LENGTH%) do (
     set "_JDK_NAME=!JDK_NAMES[%%i]!"
@@ -20,10 +39,13 @@ for /l %%i in (1,1,%JDK_HOMES_LENGTH%) do (
         )
     )
 )
+goto jdkindex
 
-set "_JDK_INDEX="
-set /P _JDK_INDEX="JDK-index> "
-if "%_JDK_INDEX%"=="" set _JDK_INDEX=%JDK_DEFAULT_INDEX%
+:jdkindex
+if "%_JDK_INDEX%"=="" (
+    set /P _JDK_INDEX="JDK-index> "
+    if "!_JDK_INDEX!"=="" set _JDK_INDEX=%JDK_DEFAULT_INDEX%
+)
 
 set "_JDK_NAME=!JDK_NAMES[%_JDK_INDEX%]!"
 

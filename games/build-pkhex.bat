@@ -14,7 +14,7 @@ echo     -h: Displays this help message
 goto :eof
 
 :main
-if /i "%1"=="-h" goto usage
+if /i "%~1"=="-h" goto usage
 
 cd "%PKHEX_HOME%"
 

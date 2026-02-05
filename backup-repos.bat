@@ -17,7 +17,7 @@ echo     -h: Displays this help message
 goto back
 
 :main
-if /i "%1"=="-h" goto usage
+if /i "%~1"=="-h" goto usage
 
 echo Backing up repos at "%REPOS_HOME%"
 
@@ -25,7 +25,7 @@ setlocal enableDelayedExpansion
 
 cd /d %REPOS_HOME%
 
-if /i "%1"=="-a" goto allrepos
+if /i "%~1"=="-a" goto allrepos
 goto selectrepo
 
 :allrepos

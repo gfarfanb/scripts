@@ -1,6 +1,6 @@
 @echo OFF
 
-set "__file=%1"
+set "__file=%~1"
 
 if not exist "%__file%" (
     echo Source file not found at: '%__file%'

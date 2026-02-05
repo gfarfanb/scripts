@@ -22,21 +22,21 @@ set /a _recover_backup=0
 set /a _execute_console=1
 set "_execute_recover="
 
-if /i "%1"=="-b" (
+if /i "%~1"=="-b" (
     set /a _recover_backup=1
     set /a _execute_console=0
     goto select
 )
-if /i "%1"=="-r" (
+if /i "%~1"=="-r" (
     set "_execute_recover=-r"
     set /a _execute_console=0
     goto select
 )
-if /i "%1"=="-s" (
+if /i "%~1"=="-s" (
     set /a _execute_console=0
     goto select
 )
-if /i "%1"=="-h" goto usage
+if /i "%~1"=="-h" goto usage
 
 :select
 echo Select a console:

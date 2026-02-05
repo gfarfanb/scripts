@@ -14,7 +14,7 @@ echo     -h: Displays this help message
 goto back
 
 :main
-if /i "%1"=="-h" goto usage
+if /i "%~1"=="-h" goto usage
 
 setlocal enableDelayedExpansion
 
@@ -74,7 +74,7 @@ echo Copied^^!^^!
 goto completed
 
 :getvar
-for %%A in (%~1) do set %2=%%A
+for %%A in (%~1) do set %~2=%%A
 goto :eof
 
 endlocal

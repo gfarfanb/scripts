@@ -20,7 +20,7 @@ echo     -h: Displays this help message
 goto back
 
 :main
-if /i "%1"=="-h" goto usage
+if /i "%~1"=="-h" goto usage
 
 setlocal enableDelayedExpansion
 

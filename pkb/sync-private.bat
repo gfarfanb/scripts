@@ -18,7 +18,7 @@ goto back
 
 
 :main
-if /i "%1"=="-h" goto usage
+if /i "%~1"=="-h" goto usage
 
 echo Select an operation:
 echo 1^) Pull

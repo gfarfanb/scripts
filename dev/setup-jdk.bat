@@ -10,12 +10,11 @@ setlocal enableDelayedExpansion
 
 set "_JDK_INDEX="
 
-if [%1]==[] goto selectjdk
+if /i "%~1"=="" goto selectjdk
 goto searchjdk
 
 :searchjdk
-set "_REQUIRED_JDK=%1"
-set "_REQUIRED_JDK=%_REQUIRED_JDK:"=%"
+set "_REQUIRED_JDK=%~1"
 
 for /l %%i in (1,1,%JDK_HOMES_LENGTH%) do (
     set "_JDK_NAME=!JDK_NAMES[%%i]!"

@@ -9,6 +9,7 @@ call setup-jdk "%CERTIFICA_REQUIRED_JDK%"
 
 cd "%CERTIFICA_HOME%"
 "%JAVA_HOME%\bin\java.exe" -jar Certifica.jar
+goto completed
 
 :completed
 echo:

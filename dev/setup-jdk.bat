@@ -4,6 +4,22 @@ set PWD=%cd%
 call env-vars.bat
 call require-var JDK_HOMES_FILE
 
+goto main
+
+:usage
+echo Shows the JDKs installed based on 'JDK_HOMES_FILE'
+echo file and setups the environment variables
+echo 'JAVA_HOME' and 'JAVA_JRE_HOME'
+echo with the selected JDK.
+echo:
+echo Usage: %0 [^<jdk-version^>]*
+echo Option:
+echo     -h: Displays this help message
+goto back
+
+:main
+if /i "%~1"=="-h" goto usage
+
 call source-file "%JDK_HOMES_FILE%"
 
 setlocal enableDelayedExpansion
@@ -18,9 +34,16 @@ set "_REQUIRED_JDK=%~1"
 
 for /l %%i in (1,1,%JDK_HOMES_LENGTH%) do (
     set "_JDK_NAME=!JDK_NAMES[%%i]!"
+    set "_JDK_ALIASES=!JDK_ALIASES[%%i]!"
 
     if /i "!_JDK_NAME!"=="%_REQUIRED_JDK%" (
         set _JDK_INDEX=%%i
+        goto jdkindex
+    )
+
+    if /i not "x!_JDK_ALIASES:%_REQUIRED_JDK%=!"=="x!_JDK_ALIASES!" (
+        set _JDK_INDEX=%%i
+        goto jdkindex
     )
 )
 goto jdkindex

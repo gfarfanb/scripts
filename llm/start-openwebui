@@ -5,18 +5,38 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ../env-vars
 
 _require_var OPEN_WEBUI_PORT
+_require_var OPEN_WEBUI_WAIT_SECS
 
 _usage() {
     echo "Starts Ollama service and the Open WebUI."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -r: Remove the current Open WebUI container"
+    echo "    -g: Utilize GPU resources"
     echo "    -h: Displays this help message"
     exit 0
 }
 
-while getopts "h" opt; do
+_remove_container() {
+    local _container_id="$(docker ps -q -a -f name=open-webui)"
+
+    if ! [[ -z "$_container_id" ]]; then
+        docker rm "$_container_id"
+    fi
+    exit 0
+}
+
+_with_gpus=""
+
+while getopts "grh" opt; do
     case "$opt" in
+	g)
+	    _with_gpus="--gpus=all"
+	    ;;
+	r)
+	    _remove_container
+	    ;;
         h)
             _usage
             ;;
@@ -27,7 +47,13 @@ if ! [ "$( systemctl is-active ollama )" = "active" ]; then
     ollama serve
 fi
 
-docker run -d -p $OPEN_WEBUI_PORT:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+if [[ -z "$(docker ps -q -a -f name=open-webui)" ]]; then
+    docker run -d -p $OPEN_WEBUI_PORT:8080 $_with_gpus -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+else
+    docker container restart open-webui
+fi
+
+sleep $OPEN_WEBUI_WAIT_SECS
 
 echo "> http://localhost:$OPEN_WEBUI_PORT"
 

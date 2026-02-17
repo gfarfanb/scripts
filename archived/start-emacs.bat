@@ -3,6 +3,7 @@ set PWD=%cd%
 
 call env-vars.bat
 call require-var EMACS_HOME
+rem Last assigned: 5
 call require-var EMACS_WAIT_SECS
 
 goto main

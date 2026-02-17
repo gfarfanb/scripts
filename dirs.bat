@@ -31,6 +31,10 @@ if not "%WORKSPACE_HOME%" == "" (
         mkdir "%WORKSPACE_HOME%"
         echo Created directory '%WORKSPACE_HOME%'
     )
+    if not exist "%WORKSPACE_HOME%\github" (
+        mkdir "%WORKSPACE_HOME%\github"
+        echo Created directory '%WORKSPACE_HOME%\github'
+    )
 )
 if not "%STORAGE_HOME%" == "" (
     if not exist "%STORAGE_HOME%\dist" (

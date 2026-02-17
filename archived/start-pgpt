@@ -4,6 +4,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./.libs/funcs
 . ./env-vars
 
+# Last assigned: $WORKSPACE_HOME/github/private-gpt
 _require_var PRIVATE_GPT_HOME
 
 _usage() {

@@ -4,6 +4,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ../.libs/funcs
 . ../env-vars
 _require_var SYNC_FOLDER_PRIVATE_DIR
+# Last assigned: $WORKSPACE_HOME/pkb/org-roam/private
 _require_var ORG_ROAM_PRIVATE_DIR
 
 _usage() {

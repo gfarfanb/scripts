@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./.libs/funcs
-. ./env-vars
+. ../.libs/funcs
+. ../env-vars
 
 _require_var OPEN_WEBUI_PORT
 
@@ -29,6 +29,6 @@ fi
 
 docker run -d -p $OPEN_WEBUI_PORT:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
 
-echo > http://localhost:$OPEN_WEBUI_PORT
+echo "> http://localhost:$OPEN_WEBUI_PORT"
 
 echo "[Completed]: $0"

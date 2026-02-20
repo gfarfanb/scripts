@@ -53,15 +53,21 @@ fi
 _recognized_container=""
 
 if [[ -z "$(docker ps -q -a -f name=open-webui-cuda)" ]]; then
+    echo "Attempting to run open-webui-cuda ..."
     docker run -d --network=host -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --gpus all -v open-webui:/app/backend/data --name open-webui-cuda ghcr.io/open-webui/open-webui:cuda
 else
+    echo "Attempting to restart open-webui-cuda ..."
     docker container restart open-webui-cuda
 fi
 
 if ! [ $? -eq 0 ]; then
+    echo "Unable to run open-webui-cuda"
+
     if [[ -z "$(docker ps -q -a -f name=open-webui-main)" ]]; then
-        docker run -d --network=host -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+        echo "Attempting to run open-webui-main ..."
+        docker run -d --network=host -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui-main ghcr.io/open-webui/open-webui:main
     else
+        echo "Attempting to restart open-webui-main ..."
         docker container restart open-webui-main
     fi
 
@@ -74,7 +80,8 @@ _waiting_flag=0
 _waited=0
 
 while [ $_waiting_flag -eq 0 ]; do
-    
+    echo "Waiting for $_recognized_container to run..."
+
     if [[ -z "$(docker ps -q -a -f name=$_recognized_container -f status=running)" ]]; then
         sleep $OPEN_WEBUI_WAIT_SECS
         let "_waited+=1"

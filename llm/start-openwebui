@@ -13,30 +13,33 @@ _usage() {
     echo "Usage: $0 [<option>]*"
     echo "Option:"
     echo "    -r: Remove the current Open WebUI container"
-    echo "    -g: Utilize GPU resources"
     echo "    -h: Displays this help message"
     exit 0
 }
 
 _remove_container() {
-    local _container_id="$(docker ps -q -a -f name=open-webui)"
+    local _container_id="$(docker ps -q -a -f name=open-webui-cuda)"
 
     if ! [[ -z "$_container_id" ]]; then
         docker rm "$_container_id"
     fi
-    exit 0
+
+    _container_id="$(docker ps -q -a -f name=open-webui-main)"
+
+    if ! [[ -z "$_container_id" ]]; then
+        docker rm "$_container_id"
+    fi
+    
+    _completed
 }
 
 _with_gpus=""
 
-while getopts "grh" opt; do
+while getopts "rh" opt; do
     case "$opt" in
-	g)
-	    _with_gpus="--gpus=all"
-	    ;;
-	r)
-	    _remove_container
-	    ;;
+        r)
+            _remove_container
+            ;;
         h)
             _usage
             ;;

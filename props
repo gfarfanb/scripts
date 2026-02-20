@@ -63,5 +63,4 @@ fi
 echo "$_prop_value" | xclip -sel clip
 echo Copied!!
 
-echo ;
-echo "[Completed]: $0"
+_completed

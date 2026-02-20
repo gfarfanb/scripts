@@ -91,4 +91,4 @@ for _src in "${CLOUD_REMOTE_SOURCES[@]}"; do
     fi
 done
 
-echo "[Completed]: $0"
+_completed

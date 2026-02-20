@@ -198,6 +198,4 @@ case "$_console_index" in
         ;;
 esac
 
-_back
-
-echo "[Completed]: $0"
+_completed

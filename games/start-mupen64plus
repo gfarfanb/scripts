@@ -404,3 +404,5 @@ echo >&2
 
 # [SOURCE] https://mupen64plus.org/wiki/index.php?title=UIConsoleUsage
 mupen64plus "$@" --set Core[SaveSRAMPath]="$N64_SAVES_HOME" --gfx $_gfx_video_plugin --resolution $_resolution --emumode $_emulation_mode_id --sshotdir "$N64_SCREENSHOTS_HOME" $_all_parts "$_n64_rom"
+
+_completed

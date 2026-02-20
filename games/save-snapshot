@@ -33,5 +33,4 @@ _saves_home="$1"
 
 python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -d "$_saves_home"$_recover_flag
 
-echo ;
-echo "[Completed]: $0"
+_completed

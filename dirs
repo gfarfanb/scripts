@@ -41,4 +41,4 @@ if [ -n "$MEDIA_HOME" ]; then
 fi
 if [ -n "$ROMS_HOME" ]; then sudo mkdir -vp "$ROMS_HOME"; fi
 
-echo "[Completed]: $0"
+_completed

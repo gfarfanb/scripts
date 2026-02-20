@@ -131,7 +131,4 @@ if [ ${#_print_cmds[*]} -gt 0 ]; then
     done
 fi
 
-_back
-
-echo ;
-echo "[Completed]: $0"
+_completed

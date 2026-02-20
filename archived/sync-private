@@ -57,4 +57,4 @@ else
     rsync -av "$SYNC_FOLDER_PRIVATE_DIR"/*.org "$ORG_ROAM_PRIVATE_DIR"
 fi
 
-echo "[Completed]: $0"
+_completed

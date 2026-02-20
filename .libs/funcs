@@ -14,7 +14,18 @@ _require_var() {
 }
 
 _back() {
-  cd $PWD
+    if [ -n "$PWD" ]; then
+        cd $PWD
+    fi
+}
+
+_completed() {
+    echo ;
+    echo "[Completed]: $0"
+
+    _back
+
+    exit 0
 }
 
 _print() {

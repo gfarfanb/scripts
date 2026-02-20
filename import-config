@@ -71,6 +71,4 @@ else
     _append_env_vars "$BACKUP_HOME"
 fi
 
-_back
-
-echo "[Completed]: $0"
+_completed

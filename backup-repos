@@ -91,6 +91,4 @@ done
 
 _select_repo
 
-_back
-
-echo "[Completed]: $0"
+_completed

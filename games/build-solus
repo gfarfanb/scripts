@@ -33,7 +33,4 @@ rsync -cavP --remove-source-files pokesolusgreen.gbc "$GB_GBC_ROMS_HOME/Pokemon 
 rsync -cavP --remove-source-files pokesolusblue.gbc "$GB_GBC_ROMS_HOME/Pokemon Solus Blue Version.gbc"
 rsync -cavP --remove-source-files pokesolusblue_debug.gbc "$GB_GBC_ROMS_HOME/"
 
-_back
-
-echo "[Completed]: $0"
-
+_completed

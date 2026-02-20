@@ -20,13 +20,13 @@ _usage() {
 _remove_container() {
     local _container_id="$(docker ps -q -a -f name=open-webui-cuda)"
 
-    if ! [[ -z "$_container_id" ]]; then
+    if ! [ -z "$_container_id" ]; then
         docker rm "$_container_id"
     fi
 
     _container_id="$(docker ps -q -a -f name=open-webui-main)"
 
-    if ! [[ -z "$_container_id" ]]; then
+    if ! [ -z "$_container_id" ]; then
         docker rm "$_container_id"
     fi
     
@@ -52,22 +52,31 @@ fi
 
 _recognized_container=""
 
-if [[ -z "$(docker ps -q -a -f name=open-webui-cuda)" ]]; then
+if [ -z "$(docker ps -q -a -f name=open-webui-cuda)" ]; then
+    echo ;
     echo "Attempting to run open-webui-cuda ..."
+
     docker run -d --network=host -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --gpus all -v open-webui:/app/backend/data --name open-webui-cuda ghcr.io/open-webui/open-webui:cuda
 else
+    echo ;
     echo "Attempting to restart open-webui-cuda ..."
+
     docker container restart open-webui-cuda
 fi
 
 if ! [ $? -eq 0 ]; then
+    echo ;
     echo "Unable to run open-webui-cuda"
 
-    if [[ -z "$(docker ps -q -a -f name=open-webui-main)" ]]; then
+    if [ -z "$(docker ps -q -a -f name=open-webui-main)" ]; then
+        echo ;
         echo "Attempting to run open-webui-main ..."
+
         docker run -d --network=host -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui-main ghcr.io/open-webui/open-webui:main
     else
+        echo ;
         echo "Attempting to restart open-webui-main ..."
+
         docker container restart open-webui-main
     fi
 
@@ -76,13 +85,15 @@ else
     _recognized_container=open-webui-cuda
 fi
 
+_recognized_container_id="$(docker ps -q -a -f name=$_recognized_container)"
+
 _waiting_flag=0
 _waited=0
 
 while [ $_waiting_flag -eq 0 ]; do
     echo "Waiting for $_recognized_container to run..."
 
-    if [[ -z "$(docker ps -q -a -f name=$_recognized_container -f status=running)" ]]; then
+    if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_recognized_container_id)" = "healthy" ]; then
         sleep $OPEN_WEBUI_WAIT_SECS
         let "_waited+=1"
 

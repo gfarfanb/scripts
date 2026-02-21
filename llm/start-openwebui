@@ -18,17 +18,8 @@ _usage() {
 }
 
 _remove_container() {
-    local _container_id="$(docker ps -q -a -f name=open-webui-cuda)"
-
-    if ! [ -z "$_container_id" ]; then
-        docker rm "$_container_id"
-    fi
-
-    _container_id="$(docker ps -q -a -f name=open-webui-main)"
-
-    if ! [ -z "$_container_id" ]; then
-        docker rm "$_container_id"
-    fi
+    docker rm -f open-webui-cuda
+    docker rm -f open-webui-main
     
     _completed
 }

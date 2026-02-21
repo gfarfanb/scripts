@@ -30,10 +30,12 @@ _remove_container() {
 
 _stop_container() {
     if [ -n "$(docker ps -q -a -f name=open-webui-cuda)" ]; then
+        echo "Stopping open-webui-cuda ..."
         docker container stop open-webui-cuda
     fi
 
     if [ -n "$(docker ps -q -a -f name=open-webui-main)" ]; then
+        echo "Stopping open-webui-main ..."
         docker container stop open-webui-main
     fi
 

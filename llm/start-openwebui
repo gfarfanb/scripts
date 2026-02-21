@@ -12,22 +12,41 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -o: Stop the current Open WebUI container"
     echo "    -r: Remove the current Open WebUI container"
     echo "    -h: Displays this help message"
     exit 0
 }
 
 _remove_container() {
+    echo "Removing open-webui-cuda ..."
     docker rm -f open-webui-cuda
+
+    echo "Removing open-webui-main ..."
     docker rm -f open-webui-main
     
     _completed
 }
 
+_stop_container() {
+    if [ -n "$(docker ps -q -a -f name=open-webui-cuda)" ]; then
+        docker container stop open-webui-cuda
+    fi
+
+    if [ -n "$(docker ps -q -a -f name=open-webui-main)" ]; then
+        docker container stop open-webui-main
+    fi
+
+    _completed
+}
+
 _with_gpus=""
 
-while getopts "rh" opt; do
+while getopts "srh" opt; do
     case "$opt" in
+        s)
+            _stop_container
+            ;;
         r)
             _remove_container
             ;;

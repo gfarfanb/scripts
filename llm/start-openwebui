@@ -76,8 +76,6 @@ _start_container_by_tag() {
         echo "Attempting to run open-webui-$_tag ..."
 
         docker run -d --network=host -e PORT="$OPEN_WEBUI_PORT" -e OLLAMA_BASE_URL="$OPEN_WEBUI_OLLAMA_SERVER" $_gpu_opt -v open-webui:/app/backend/data --name open-webui-$_tag ghcr.io/open-webui/open-webui:$_tag
-
-        echo !!
     else
         echo ;
         echo "Attempting to restart open-webui-$_tag ..."

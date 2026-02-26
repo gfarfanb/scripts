@@ -35,10 +35,10 @@ done
 
 
 # ######################### Profile definition
-# _pak_game_profile_<game-index>=<pak-value>
-# _gfx_game_profile_<game-index>=<gfx-value>
-# _emumode_game_profile_<game-index>=<emumode-value>
-# _params_game_profile_<game-index>=<params-value>
+# _pak_game_profile_<game_index>=<pak_value>
+# _gfx_game_profile_<game_index>=<gfx_value>
+# _emumode_game_profile_<game_index>=<emumode_value>
+# _params_game_profile_<game_index>=<params_value>
 
 
 # ######################### Default values

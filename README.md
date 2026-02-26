@@ -28,7 +28,7 @@ Add the required environment variable to *~/.bashrc* file
 ```sh
 vim ~/.bashrc
 # vim>
-# export ENV_VARS_FILE="<vars-file-location>"
+# export ENV_VARS_FILE="<vars_file_location>"
 
 source ~/.bashrc
 ```

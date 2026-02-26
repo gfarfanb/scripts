@@ -8,7 +8,7 @@ goto main
 :usage
 echo Starts jShell on a selected JDK
 echo:
-echo Usage: %0 [^<jdk-version^>^|^<option^>]*
+echo Usage: %0 [^<jdk_version^>^|^<option^>]*
 echo Option:
 echo     -h: Displays this help message
 goto back

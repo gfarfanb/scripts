@@ -4,7 +4,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ../.libs/funcs
 . ../env-vars
 
-_require_var GAMES_HOME
+_require_var SCRIPTS_GAMES_HOME
 
 _usage() {
     echo "Launches a game console."
@@ -39,7 +39,7 @@ _launch_zelda64() {
 
     rsync -cvrP $ZELDA64RECOMPILED_SAVES_HOME/ $ZELDA64RECOMPILED_BACKUP_HOME/
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$ZELDA64RECOMPILED_BACKUP_HOME"
 }
 
@@ -62,7 +62,7 @@ _launch_1964gepd() {
 
     rsync -cvrP $GEPD_1964_SAVES_HOME/ $GEPD_1964_BACKUP_HOME/
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$GEPD_1964_BACKUP_HOME"
 }
 
@@ -80,7 +80,7 @@ _launch_dolphin() {
 
     rsync -cvrP $DOLPHIN_SAVES_HOME/ $DOLPHIN_BACKUP_HOME/
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$DOLPHIN_BACKUP_HOME"
 }
 
@@ -90,7 +90,7 @@ _launch_mupen64plus() {
 
     . ./start-mupen64plus "$@"
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$N64_SAVES_HOME"
 }
 
@@ -103,7 +103,7 @@ _launch_mgba() {
 
     flatpak run io.mgba.mGBA "$@"
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$MGBA_BACKUP_HOME"
 }
 
@@ -118,7 +118,7 @@ _launch_azahar() {
 
     ./azahar.AppImage  "$@"
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$MGBA_BACKUP_HOME"
 }
 
@@ -131,7 +131,7 @@ _launch_snes9x() {
 
     flatpak run com.snes9x.Snes9x "$@"
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$SNES9X_BACKUP_HOME"
 }
 
@@ -151,7 +151,7 @@ _launch_celeste64() {
 
     rsync -cvrP $CELESTE_64_SAVES_HOME/ $CELESTE_64_BACKUP_HOME/
 
-    cd $GAMES_HOME
+    cd $SCRIPTS_GAMES_HOME
     ./save-snapshot "$CELESTE_64_BACKUP_HOME"
 }
 

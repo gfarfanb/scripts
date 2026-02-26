@@ -9,7 +9,7 @@ goto main
 :usage
 echo Create snapshots of save files.
 echo ;
-echo Usage: %0 <save-home> [^<option^>]*
+echo Usage: %0 <save_home> [^<option^>]*
 echo Option:
 echo     -r: Recovers save from snapshots
 echo     -h: Displays this help message

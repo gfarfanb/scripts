@@ -12,8 +12,8 @@ call require-var GB_GBC_SAVES_HOME
 call require-var N64_CONFIGURED_JOYSTICK_LENGTH
 call require-var N64_CONFIGURED_JOYSTICK_DEFAULT
 
-rem set "N64_JOYSTICK_NAMES[<joystick-index>]=<joystick-name>"
-rem set "N64_JOYSTICK_CONFIGS[<joystick-index>]=<joystick-connection>"
+rem set "N64_JOYSTICK_NAMES[<joystick_index>]=<joystick_name>"
+rem set "N64_JOYSTICK_CONFIGS[<joystick_index>]=<joystick_connection>"
 for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
     call require-var N64_JOYSTICK_NAMES[%%i]
     call require-var N64_JOYSTICK_CONFIGS[%%i]
@@ -37,10 +37,10 @@ if /i "%~1"=="-h" goto usage
 
 
 rem ######################### Profile definition
-rem set _pak_game_profiles[<game-hash>]=<pak-value>
-rem set _gfx_game_profiles[<game-hash>]=<gfx-value>
-rem set _emumode_game_profiles[<game-hash>]=<emumode-value>
-rem set "_params_game_profiles[<game-hash>]=<params-value>"
+rem set _pak_game_profiles[<game_hash>]=<pak_value>
+rem set _gfx_game_profiles[<game_hash>]=<gfx_value>
+rem set _emumode_game_profiles[<game_hash>]=<emumode_value>
+rem set "_params_game_profiles[<game_hash>]=<params_value>"
 
 
 rem ######################### Default values

@@ -8,7 +8,7 @@ goto main
 :usage
 echo Builds PKHeX executable.
 echo ;
-echo Usage: %0 <save-home> [^<option^>]*
+echo Usage: %0 <save_home> [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
 goto :eof

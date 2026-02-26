@@ -85,12 +85,23 @@ if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
     while IFS= read -r line || [ -n "$line" ]; do
         _repo=$( eval echo "${line//[$'\t\r\n']}" )
         _exe=$( cut -d : -f 1 <<< "$_repo" )
-        _branch=$( cut -d : -f 2 <<< "$_repo" )
-        _loc=$( cut -d : -f 3 <<< "$_repo" )
+        _username=$( cut -d : -f 2 <<< "$_repo" )
+        _branch=$( cut -d : -f 3 <<< "$_repo" )
+        _loc=$( cut -d : -f 4 <<< "$_repo" )
 
         if ! [ -d "$_loc" ]; then
+            _repo_name="$(basename $_loc)"
+
+            mkdir -vp "$_loc"
+            cd "$_loc"
+            cd ..
+            rm "$_repo_name"
+
             echo ;
-            echo "'$_loc' is not a directory"
+            echo "Cloning $(basename $_loc) ..."
+
+            git clone https://$_username/$_repo_name.git
+
             continue
         fi
         if [ -h "$_loc" ]; then
@@ -103,7 +114,7 @@ if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
 
         if [ "$_exe" = "e" ]; then
             echo ;
-            echo "Updating $(basename $_loc)"
+            echo "Updating $(basename $_loc) ..."
 
             git checkout $_branch
             git pull origin $_branch

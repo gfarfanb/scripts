@@ -95,7 +95,7 @@ if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
             mkdir -vp "$_loc"
             cd "$_loc"
             cd ..
-            rm "$_repo_name"
+            rm -r "$_repo_name"
 
             echo ;
             echo "Cloning $(basename $_loc) ..."

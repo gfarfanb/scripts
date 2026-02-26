@@ -25,20 +25,20 @@ echo "Creating directories"
 
 if [ -n "$EXECS_HOME" ]; then sudo mkdir -vp "$EXECS_HOME"; fi
 if [ -n "$WORKSPACE_HOME" ]; then
-    sudo mkdir -vp "$WORKSPACE_HOME";
-    sudo mkdir -vp "$WORKSPACE_HOME/github"
+    mkdir -vp "$WORKSPACE_HOME";
+    mkdir -vp "$WORKSPACE_HOME/github"
 fi
 if [ -n "$STORAGE_HOME" ]; then
-    sudo mkdir -vp "$STORAGE_HOME/dist"
-    sudo mkdir -vp "$STORAGE_HOME/iso"
-    sudo mkdir -vp "$STORAGE_HOME/models"
+    mkdir -vp "$STORAGE_HOME/dist"
+    mkdir -vp "$STORAGE_HOME/iso"
+    mkdir -vp "$STORAGE_HOME/models"
 fi
-if [ -n "$CLOUD_HOME" ]; then sudo mkdir -vp "$CLOUD_HOME"; fi
-if [ -n "$REPOS_HOME" ]; then sudo mkdir -vp "$REPOS_HOME"; fi
+if [ -n "$CLOUD_HOME" ]; then mkdir -vp "$CLOUD_HOME"; fi
+if [ -n "$REPOS_HOME" ]; then mkdir -vp "$REPOS_HOME"; fi
 if [ -n "$MEDIA_HOME" ]; then
-    sudo mkdir -vp "$MEDIA_HOME/dlp"
-    sudo mkdir -vp "$MEDIA_HOME/music"
+    mkdir -vp "$MEDIA_HOME/dlp"
+    mkdir -vp "$MEDIA_HOME/music"
 fi
-if [ -n "$ROMS_HOME" ]; then sudo mkdir -vp "$ROMS_HOME"; fi
+if [ -n "$ROMS_HOME" ]; then mkdir -vp "$ROMS_HOME"; fi
 
 _completed

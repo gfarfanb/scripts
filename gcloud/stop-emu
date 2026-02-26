@@ -1,0 +1,95 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../.libs/funcs
+. ../env-vars
+
+GCLOUD_EMULATORS=(
+    pubsub:Pub/Sub
+    spanner:Spanner
+)
+
+_usage() {
+    echo "Stop Gcloud emulators."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
+
+_kill_pids() {
+    local _name=${1:-}
+    local _all_pids=${2:-}
+
+    if [ -n "$_all_pids" ]; then
+        for pid in $_all_pids; do
+            kill -9 $pid
+            waited=0
+            while [ -e /proc/$pid ]; do
+                sleep 1
+                let "waited+=1"
+                if [ $waited -eq 120 ]; then
+                    echo -e "\nWaited two minutes, $pid is not responding to stop requests."
+                    exit 1
+                fi
+            done
+            echo -e "\nStopped '$_name' running with PID $pid"
+        done
+    else
+        echo "Service '$_name' is not running"
+    fi
+}
+
+echo "Select a gcloud emulator:"
+for _idx in "${!GCLOUD_EMULATORS[@]}"; do
+    _service="${GCLOUD_EMULATORS[$_idx]}"
+    _name=$( cut -d : -f 2 <<< "$_service" )
+
+    echo "$((_idx+1))) $_name" >&2
+done
+
+_emu_index=""
+_emu_selected=""
+read -p "emu-index> " _emu_index
+
+_emu_selected="${GCLOUD_EMULATORS[$((_emu_index-1))]}"
+
+if [ -z "$_emu_selected" ]; then
+    echo "Invalid emulator index"
+    echo "[Process stopped]: $0"
+    cd $PWD
+    exit 0
+fi
+
+_emu=$( cut -d : -f 1 <<< "$_emu_selected" )
+_emu_name=$( cut -d : -f 2 <<< "$_emu_selected" )
+all_pids=$( ps -ef | grep $_emu | grep -v grep | awk '{print $2}' )
+
+_kill_pids "$_emu_name" "$all_pids"
+
+if [ "$_emu" = "pubsub" ]; then
+    if [ -n "$PUSH_ENDPOINT_PORT" ]; then
+        all_pids=$( ps -ef | grep json-server | grep "port $PUSH_ENDPOINT_PORT" | grep -v grep | awk '{print $2}' )
+
+        if [ -n "$all_pids" ]; then
+            _kill_pids json-server "$all_pids"
+        fi
+    elif [ -n "" ]; then
+        all_pids=$( ps -ef | grep json-server | grep "port $PUSH_PORT_SELECTED" | grep -v grep | awk '{print $2}' )
+
+        if [ -n "$all_pids" ]; then
+            _kill_pids json-server "$all_pids"
+        fi
+    fi
+fi
+
+_completed

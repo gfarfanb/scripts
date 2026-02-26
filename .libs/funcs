@@ -1,6 +1,12 @@
 #! /usr/bin/env bash
 
 PWD=$(pwd)
+# Files are backed by physical storage
+TEMP_DIR=$(systemd-path temporary-large)
+# Files are flushed out on each reboot
+STEMP_DIR=$(systemd-path temporary)
+# User profile
+USER_HOME=$HOME
 
 _require_var() {
   local _var=${1:-}

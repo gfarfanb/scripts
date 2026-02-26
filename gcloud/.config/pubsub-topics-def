@@ -1,0 +1,21 @@
+
+# ------------------ Topic definition
+
+# Syntax: <n>:<pull_subscription>
+#   n: Index for TOPIC_DEFINITION_NAME
+#   pull_subscription: Pull subscription name
+TOPIC_DEFINITION_PULL_SUBS=()
+
+# Syntax: <n>:<push_subscription>
+#   n: Index for TOPIC_DEFINITION_NAME
+#   push_subscription: Push subscription name
+TOPIC_DEFINITION_PUSH_SUBS=()
+
+# ------------------
+
+TOPIC_DEFINITION_PROJECT[1]=project_name
+TOPIC_DEFINITION_NAME[1]=topic_name
+TOPIC_DEFINITION_PULL_SUBS+=( "1:pull_sub_1" )
+TOPIC_DEFINITION_PULL_SUBS+=( "1:pull_sub_2" )
+TOPIC_DEFINITION_PULL_SUBS+=( "1:pull_sub_3" )
+TOPIC_DEFINITION_PUSH_SUBS+=( "1:push_sub_1" )

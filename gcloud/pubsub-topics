@@ -1,0 +1,202 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../.libs/funcs
+. ../env-vars
+
+# git clone https://github.com/googleapis/python-pubsub.git
+# Last assigned: <python_pubsub_location>/samples/snippets
+_require_var PUBSUB_TOPICS_SNIPPETS_HOME
+# Last assigned: 0
+_require_var PUBSUB_TOPICS_DEFAULT_OPTION
+# Last assigned: ./.config/pubsub-topics-def
+_require_var PUBSUB_TOPICS_DEFINITION_FILE
+
+_usage() {
+    echo "Operations for PubSub topics: create, send messages, monitor messages."
+    echo "   The following env variables must be set previously manually or by executing 'start-pubsub'"
+    echo "   - PUBSUB_PROJECT_ID"
+    echo "   - PUBSUB_PUSH_ENDPOINT"
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -c:           Creates topics for selected project"
+    echo "    -m <message>: Sends a message to a selected topic"
+    echo "                    'message' argument can be a payload or a file"
+    echo "    -w:           Monitors messages for a selected pull subscription"
+    echo "    -h:           Displays this help message"
+    exit 0
+}
+
+_message_to_send=""
+_option=""
+
+_sync_ops=( "Create" "Send" "Monitor" )
+
+while getopts "hcm:w" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+        c)
+            _option="Create"
+            ;;
+        m)
+            _message_to_send="$OPTARG"
+            _option="Send"
+            ;;
+        w)
+            _option="Monitor"
+            ;;
+    esac
+done
+
+. "$PUBSUB_TOPICS_DEFINITION_FILE"
+
+cd "$PUBSUB_TOPICS_SNIPPETS_HOME"
+
+_create_topics() {
+    for _idx in "${!TOPIC_DEFINITION_NAME[@]}"; do
+        _project="${TOPIC_DEFINITION_PROJECT[$_idx]}"
+
+        if [ "$_project" = "$PUBSUB_PROJECT_ID" ]; then
+            _topic="${TOPIC_DEFINITION_NAME[$_idx]}"
+            _dead_letter="$_topic-DEAD_LETTER"
+
+            echo "Creating topic [$_topic] for project [$_project]"
+            python publisher.py "$_project" create "$_topic"
+
+            echo "Creating dead-letter [$_dead_letter] for project [$_project]"
+            python publisher.py "$_project" create "$_dead_letter"
+
+            for _pull_idx in "${!TOPIC_DEFINITION_PULL_SUBS[@]}"; do
+                _pull="${TOPIC_DEFINITION_PULL_SUBS[$_pull_idx]}"
+                _topic_idx=$( cut -d : -f 1 <<< "$_pull" )
+                _pull_name=$( cut -d : -f 2 <<< "$_pull" )
+
+                if [ "$_topic_idx" = "$_idx" ]; then
+                    echo "Creating pull subscription [$_pull_name] for topic [$_project/$_topic]"
+                    python subscriber.py "$_project" create-with-dead-letter-policy "$_topic" "$_pull_name" "$_dead_letter"
+                fi
+            done
+
+            for _push_idx in "${!TOPIC_DEFINITION_PUSH_SUBS[@]}"; do
+                _push="${TOPIC_DEFINITION_PUSH_SUBS[$_push_idx]}"
+                _topic_idx=$( cut -d : -f 1 <<< "$_push" )
+                _push_name=$( cut -d : -f 2 <<< "$_push" )
+
+                if [ "$_topic_idx" = "$_idx" ]; then
+                    echo "Creating push subscription [$_push_name] for topic [$_project/$_topic]"
+                    python subscriber.py "$_project" create-push "$_topic" "$_push_name" $PUBSUB_PUSH_ENDPOINT
+                fi
+            done
+        fi
+    done
+}
+
+_send_message() {
+    # 'publish-with-source' is a custom command
+    # the fork file can be found in https://github.com/gfarfanb/dev-training/blob/main/Python/GCP/PubSub/publisher.py
+
+    if [ -z "$_message_to_send" ]; then
+        echo "Defines a message with option: $0 -m <message>"
+        echo "[Process stopped]: $0"
+        cd $PWD
+        exit 0
+    fi
+
+    echo "Select a topic:"
+    for _idx in "${!TOPIC_DEFINITION_NAME[@]}"; do
+        _project="${TOPIC_DEFINITION_PROJECT[$_idx]}"
+
+        if [ "$_project" = "$PUBSUB_PROJECT_ID" ]; then
+            _topic="${TOPIC_DEFINITION_NAME[$_idx]}"
+
+            echo "$((_idx+1))) $_topic"
+        fi
+    done
+    read -p "topic-index> " _topic_index
+
+    if [ -z "$_topic_index" ]; then
+        echo "Invalid topic index"
+        echo "[Process stopped]: $0"
+        cd $PWD
+        exit 0
+    fi
+
+    _selected_topic="${TOPIC_DEFINITION_NAME[$((_topic_index-1))]}"
+
+    python publisher.py $PUBSUB_PROJECT_ID publish-with-source "$_selected_topic" "$_message_to_send"
+}
+
+_monitor_messages() {
+    _pull_subs=()
+    for _idx in "${!TOPIC_DEFINITION_NAME[@]}"; do
+        _project="${TOPIC_DEFINITION_PROJECT[$_idx]}"
+
+        if [ "$_project" = "$PUBSUB_PROJECT_ID" ]; then
+            for _pull_idx in "${!TOPIC_DEFINITION_PULL_SUBS[@]}"; do
+                _pull="${TOPIC_DEFINITION_PULL_SUBS[$_pull_idx]}"
+                _topic_idx=$( cut -d : -f 1 <<< "$_pull" )
+                _pull_name=$( cut -d : -f 2 <<< "$_pull" )
+
+                if [ "$_topic_idx" = "$_idx" ]; then
+                    _pull_subs+=( "$_pull_name" )
+                fi
+            done
+        fi
+    done
+
+    echo "Select a pull subscription:"
+    for _idx in "${!_pull_subs[@]}"; do
+        _pull="${_pull_subs[$_idx]}"
+
+        echo "$((_idx+1))) $_pull"
+    done
+    read -p "pull-subscription-index> " _pull_index
+
+    if [ -z "$_pull_index" ]; then
+        echo "Invalid pull subscription index"
+        echo "[Process stopped]: $0"
+        cd $PWD
+        exit 0
+    fi
+
+    _selected_pull="${_pull_subs[$((_pull_index-1))]}"
+
+    python subscriber.py $PUBSUB_PROJECT_ID receive "$_selected_pull"
+}
+
+if [ -z "$_option" ]; then
+    echo "Select an operation:"
+    for _idx in "${!_sync_ops[@]}"; do
+        _op="${_sync_ops[$_idx]}"
+
+        if [ "$_idx" = "$PUBSUB_TOPICS_DEFAULT_OPTION" ]; then
+            echo "$((_idx+1))) (default) $_op"
+        else
+            echo "$((_idx+1))) $_op"
+        fi
+    done
+    read -p "operation-index> " _op_index
+
+    if [ -z "$_op_index" ]; then
+        _sync_op="${_sync_ops[$PUBSUB_TOPICS_DEFAULT_OPTION]}"
+    else
+        _sync_op="${_sync_ops[$((_op_index-1))]}"
+    fi
+else
+    _sync_op="$_option"
+fi
+
+if [ "$_sync_op" = "Create" ]; then
+    _create_topics
+elif [ "$_sync_op" = "Send" ]; then
+    _send_message
+elif [ "$_sync_op" = "Monitor" ]; then
+    _monitor_messages
+else
+    echo "Option not implemented yet: $_sync_op"
+fi
+
+_completed

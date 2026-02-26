@@ -1,0 +1,53 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../.libs/funcs
+. ../env-vars
+
+_require_var GCLOUD_DEFAULT_PROJECT_ID
+# Last assigned:
+# GCLOUD_PROJECT_IDS=()
+# GCLOUD_PROJECT_IDS+=( "project_name:project_id:project_port" )
+#   project_name: Project name
+#   project_id: Project ID
+#   project_port: PubSub push endpoint port (e.g. 3000)
+_require_var GCLOUD_PROJECT_IDS
+
+echo "Select a project:"
+
+for _idx in "${!GCLOUD_PROJECT_IDS[@]}"; do
+    _project="${GCLOUD_PROJECT_IDS[$_idx]}"
+    _name=$( cut -d : -f 1 <<< "$_project" )
+    _id=$( cut -d : -f 2 <<< "$_project" )
+
+    if [ "$GCLOUD_DEFAULT_PROJECT_ID" = "$((_idx+1))" ]; then
+        echo "$((_idx+1))) (default) $_name [$_id]" >&2
+    else
+        echo "$((_idx+1))) $_name [$_id]" >&2
+    fi
+done
+
+_project_index=""
+_project_selected=""
+
+read -p "project-index> " _project_index
+
+if [ -z "$_project_index" ]; then
+    _project_index=$GCLOUD_DEFAULT_PROJECT_ID
+fi
+
+if [ -n "$_project_index" ]; then
+    _project_selected="${GCLOUD_PROJECT_IDS[$((_project_index-1))]}"
+fi
+
+if [ -z "$_project_selected" ]; then
+    echo "Invalid project index"
+    echo "[Process stopped]: $0"
+    exit 0
+else
+    _project_id_selected=$( cut -d : -f 2 <<< "$_project_selected" )
+    _push_port_selected=$( cut -d : -f 3 <<< "$_project_selected" )
+fi
+
+export PROJECT_SELECTED=$_project_id_selected
+export PUSH_PORT_SELECTED=$_push_port_selected

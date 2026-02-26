@@ -1,0 +1,76 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../.libs/funcs
+. ../env-vars
+
+_require_var TEMP_DIR
+# Last assigned: ./.config/pubsub-db.json.original
+_require_var PUBSUB_CONFIG_DB_ORIGINAL
+# Last assigned: 0.0.0.0:8085
+_require_var PUBSUB_HOST_PORT
+
+_usage() {
+    echo "Starts PubSub emulator for a specific project."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -r: Restores the PubSub DB file"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+_option=""
+
+while getopts "hr" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+        r)
+            option="Restore"
+            ;;
+    esac
+done
+
+. ./select-project
+
+_require_var PUSH_PORT_SELECTED
+
+gcloud beta emulators pubsub start --project=$PROJECT_SELECTED --host-port=$PUBSUB_HOST_PORT &
+sleep 2
+
+PUBSUB_JSON_FILE=$TEMP_DIR/pubsub/pubsub-db.$PROJECT_SELECTED.json
+PUBSUB_TMP_HOME="$(dirname $PUBSUB_JSON_FILE)"
+
+mkdir -vp "$PUBSUB_TMP_HOME"
+
+if [ "$option" = "Restore" ]; then
+    echo "Restoring $PUBSUB_JSON_FILE file"
+
+    if [ -f "$PUBSUB_JSON_FILE" ]; then
+        rm "$PUBSUB_JSON_FILE"
+    fi
+
+    cp "$PUBSUB_CONFIG_DB_ORIGINAL" "$PUBSUB_JSON_FILE"
+else
+    if [ ! -f "$PUBSUB_JSON_FILE" ]; then
+        cp "$PUBSUB_CONFIG_DB_ORIGINAL" "$PUBSUB_JSON_FILE"
+    fi
+fi
+
+json-server --port $PUSH_PORT_SELECTED --watch $PUBSUB_JSON_FILE &
+sleep 2
+
+PUBSUB_ENVS=$PUBSUB_TMP_HOME/pubsub-envs
+
+gcloud beta emulators pubsub env-init > $PUBSUB_ENVS
+
+echo "export PUBSUB_PROJECT_ID=$PROJECT_SELECTED" >> $PUBSUB_ENVS
+echo "export PUBSUB_PUSH_ENDPOINT=http://localhost:$PUSH_PORT_SELECTED/messages" >> $PUBSUB_ENVS
+echo "export PUSH_ENDPOINT_PORT=$PUSH_PORT_SELECTED" >> $PUBSUB_ENVS
+echo "export PUBSUB_DB_FILE=$PUBSUB_JSON_FILE" >> $PUBSUB_ENVS
+echo ;
+echo "source $PUBSUB_ENVS"
+
+_completed

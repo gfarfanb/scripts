@@ -25,8 +25,6 @@ while getopts "h" opt; do
     esac
 done
 
-
-
 echo "Updating packages:"
 echo -e "$( hostnamectl | grep 'Operating System:' )"
 

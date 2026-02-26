@@ -1,6 +1,8 @@
 @echo OFF
 set PWD=%cd%
 
+rem https://blog.marcnuri.com/windows-postgresql-without-installation-portable
+
 call env-vars.bat
 call require-var POSTGRESQL_HOME
 

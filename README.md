@@ -10,7 +10,7 @@ Edit the environment variables
 | --- | --- |
 | SCRIPTS_HOME | *Scripts repo location* |
 | ENV_VARS_FILE | *Variables file location* \* |
-| Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\.libs;%SCRIPTS_HOME%\dev;%SCRIPTS_HOME%\games;%SCRIPTS_HOME%\misc; \** |
+| Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\.libs;%SCRIPTS_HOME%\<dir_1>;%SCRIPTS_HOME%\<dir_n>; \** |
 
 > * File extension is not needed, example *env-vars* file:
 > ```bat
@@ -19,7 +19,7 @@ Edit the environment variables
 > 
 > rem Comment
 > ```
-> \** *games*, and *misc* sub-directories are optional
+> \** Directories: *dev*, *games*, *misc*, *sys*, ...
 
 
 ## Linux setup

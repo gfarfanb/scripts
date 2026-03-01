@@ -12,7 +12,7 @@ Edit the environment variables
 | ENV_VARS_FILE | *Variables file location* \* |
 | Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\.libs;%SCRIPTS_HOME%\<dir_1>;%SCRIPTS_HOME%\<dir_n>; \** |
 
-> * File extension is not needed, example *env-vars* file:
+> * Example of *env-vars* file:
 > ```bat
 > set "VARIABLE_1=VALUE1"
 > set "VARIABLE_2=VALUE2"
@@ -33,7 +33,7 @@ vim ~/.bashrc
 source ~/.bashrc
 ```
 
-> * Example *env-vars* file:
+> * Example of *env-vars* file:
 > ```bash
 > VARIABLE_1="VALUE1"
 > VARIABLE_2=VALUE2

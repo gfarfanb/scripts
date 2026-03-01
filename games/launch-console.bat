@@ -2,6 +2,7 @@
 set PWD=%cd%
 
 call env-vars.bat
+call require-var GAMES_LIBS_HOME
 
 goto main
 
@@ -91,7 +92,7 @@ if %_execute_console% equ 1 (
     robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 )
 
-call save-snapshot "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 
@@ -126,7 +127,7 @@ if %_execute_console% equ 1 (
     robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
 )
 
-call save-snapshot "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 
@@ -156,7 +157,7 @@ if %_execute_console% equ 1 (
     robocopy *.gci "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 )
 
-call save-snapshot "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 
@@ -173,10 +174,10 @@ if %_recover_backup% equ 1 (
 if %_execute_console% equ 1 (
     echo Launching 'Mupen64Plus' at "%MUPEN64PLUS_HOME%"
 
-    call start-mupen64plus.bat %*
+    call "%GAMES_LIBS_HOME%\start-mupen64plus" %*
 )
 
-call save-snapshot "%N64_SAVES_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%N64_SAVES_HOME%" %_execute_recover%
 
 goto completed
 
@@ -200,7 +201,7 @@ if %_execute_console% equ 1 (
     mGBA.exe
 )
 
-call save-snapshot "%MGBA_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%MGBA_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 
@@ -224,7 +225,7 @@ if %_execute_console% equ 1 (
     azahar.exe
 )
 
-call save-snapshot "%AZAHAR_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%AZAHAR_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 
@@ -248,7 +249,7 @@ if %_execute_console% equ 1 (
     snes9x-x64.exe
 )
 
-call save-snapshot "%SNES9X_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%SNES9X_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 
@@ -278,7 +279,7 @@ if %_execute_console% equ 1 (
     robocopy "%CELESTE_64_SAVES_HOME%" "%CELESTE_64_BACKUP_HOME%" /z
 )
 
-call save-snapshot "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
+call "%GAMES_LIBS_HOME%\save-snapshot" "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
 
 goto completed
 

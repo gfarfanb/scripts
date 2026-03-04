@@ -20,17 +20,7 @@ def pull_models(host, models_def_file):
 
     for model in models:
         model_def = models[model]
-
-        if model_def['hub'] == 'ollama':
-            model = model_def['ollama']['model']
-
-        elif model_def['hub'] == "huggingface":
-            model = "hf.co/{org}/{model}".format(
-                org=model_def['huggingface']['organization'],
-                model=model_def['huggingface']['model'])
-
-        else:
-            raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
+        model = get_model(model_def)
 
         required_models.add(model)
 
@@ -90,19 +80,11 @@ def sync_opencode(host, config_file, models_def_file):
 
     for model in models:
         model_def = models[model]
-
-        if not model_def['hub'] == 'ollama':
-            continue
-        elif not model_def['ollama']['launch']:
-            continue
-        else:
-            model = model_def['ollama']['model']
-            model_name = model_def['name']
-            launch = model_def['ollama']['launch']
+        model = get_model(model_def)
 
         model_base = {
-            '_launch': launch,
-            'name': model_name
+            '_launch': model_def['ollama']['launch'],
+            'name': model_def['name']
         }
         models_config[model] = { **model_base, **model_def['opencode']}
 
@@ -122,6 +104,35 @@ def sync_opencode(host, config_file, models_def_file):
         logger.info("Created file {file}".format(file=config_file))
     else:
         logger.info("Updated file {file}".format(file=config_file))
+
+
+def get_model(model_def):
+    if model_def['hub'] == 'ollama':
+        ollama_def = model_def['ollama']
+
+        if not ollama_def['model']:
+            raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
+
+        return ollama_def['model']
+    elif model_def['hub'] == "huggingface":
+        huggingface_def = model_def['huggingface']
+
+        if not huggingface_def['organization']:
+            raise ValueError("'organization' is empty: {n}".format(n=model_def['hub']))
+        if not huggingface_def['model']:
+            raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
+
+        model = "hf.co/{org}/{model}".format(
+            org=huggingface_def['organization'],
+            model=huggingface_def['model'])
+        
+        if huggingface_def['quantization']:
+            return "{model}:{quantization}".format(model=model,
+                                                   quantization=huggingface_def['quantization'])
+        else:
+            return "{model}:latest".format(model=model)
+    else:
+        raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
 
 
 def env_value(name, default_value=...):

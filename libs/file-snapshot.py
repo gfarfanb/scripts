@@ -162,7 +162,7 @@ def execute_snapshot(files_home, number_to_keep):
     if file_name is None:
         not_created_err()
 
-    logger.info()
+    logger.info('')
 
     snapshots_home = get_snapshot_dir(files_home)
     snapshot_file_names = create_snapshot(files_home, file_name, snapshots_home)
@@ -187,7 +187,7 @@ def execute_recover(files_home):
     if snapshot_file_names is None:
         not_recovered_err()
 
-    logger.info()
+    logger.info('')
 
     cleanup_current(file_name, files_home)
     recover_snapshot(files_home, snapshots_home, snapshot_file_names)

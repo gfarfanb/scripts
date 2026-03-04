@@ -32,9 +32,9 @@ done
 _saves_home="$1"
 
 if ! [ $_recover_flag -eq 1 ]; then
-    python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home"
+    $(command -v python3 || command -v python) "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home"
 else
-    python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home" --recover
+    $(command -v python3 || command -v python) "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home" --recover
 fi
 
 _completed

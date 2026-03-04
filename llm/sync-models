@@ -37,9 +37,9 @@ if ! [ "$( systemctl is-active ollama )" = "active" ]; then
 fi
 
 if ! [ $_opencode_flag -eq 1 ]; then
-    python "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE"
+    $(command -v python3 || command -v python) "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE"
 else
-    python "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE" -c $OPENCODE_CONFIG_FILE --sync
+    $(command -v python3 || command -v python) "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE" -c $OPENCODE_CONFIG_FILE --sync
 fi
 
 _completed

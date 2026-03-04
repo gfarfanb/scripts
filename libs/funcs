@@ -85,8 +85,3 @@ _trim_separator() {
 _trim_trailing_separator() {
     echo "${1:-}" | sed 's/\/*$//'
 }
-
-
-if ! which "python" > /dev/null; then
-    python() { python3 "$@"; }
-fi

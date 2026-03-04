@@ -2,18 +2,15 @@
 
 from os import listdir, makedirs, remove, environ
 from os.path import isfile, join, basename, exists, splitext
-from sys import argv, exit
+from sys import exit
 from shutil import copyfile
 
 import datetime
 import argparse
+import logging
 
 
-def env_value(name):
-    try:
-        return environ[name]
-    except KeyError:
-        raise ValueError("Missing env-variable: {n}".format(n=name))
+logger = logging.getLogger()
 
 
 def names_without_ext(files_path):
@@ -30,16 +27,16 @@ def name_without_ext(file_path):
 
 
 def select_file_name(names, select_message):
-    print(select_message)
+    logger.info(select_message)
 
     i = 1
     for name in names:
-        print("{i}) {name}".format(i=i, name=name))
+        logger.info("{i}) {name}".format(i=i, name=name))
         i+=1
 
-    print("{i}) (default) <skip file>".format(i=i))
+    logger.info("{i}) (default) <skip file>".format(i=i))
 
-    print("file-index> ")
+    logger.info("file-index> ")
     try:
         file_idx = int(input())
     except ValueError:
@@ -69,7 +66,7 @@ def create_snapshot(files_home, file_name, snapshots_home):
             snapshot_file = join(snapshots_home, "{}.{}".format(f, tmp_tag))
             snapshot_file_names.add(basename(f))
 
-            print("Creating snapshot: \"{file}\"".format(file=snapshot_file))
+            logger.info("Creating snapshot: \"{file}\"".format(file=snapshot_file))
             copyfile(join(files_home, f), snapshot_file)
 
     return snapshot_file_names
@@ -80,7 +77,7 @@ def recover_snapshot(files_home, snapshots_home, snapshot_file_names):
         snapshot = join(snapshots_home, f)
         file = splitext(basename(f))[0]
 
-        print("Recovering file: \"{snapshot}\" -> \"{file}\"".format(snapshot=snapshot, file=file))
+        logger.info("Recovering file: \"{snapshot}\" -> \"{file}\"".format(snapshot=snapshot, file=file))
         copyfile(snapshot, join(files_home, file))
 
 
@@ -105,7 +102,7 @@ def cleanup_current(file_name, files_home):
         if basename(f).startswith(file_name):
             file = join(files_home, f)
 
-            print("Removing file: \"{file}\"".format(file=file))
+            logger.info("Removing file: \"{file}\"".format(file=file))
             remove(file)
 
 
@@ -126,18 +123,18 @@ def select_snapshot(file_name, snapshots_home):
 
             snapshot_groups[str(version)] = group
 
-    print("\nSelect backup version")
+    logger.info("\nSelect backup version")
 
     last = 0
     for k, v in snapshot_groups.items():
-        print("{i}) {name}".format(i=k, name=v))
+        logger.info("{i}) {name}".format(i=k, name=v))
 
         if int(k) > last:
             last = int(k)
 
-    print("{i}) (default) <skip file>".format(i=(last + 1)))
+    logger.info("{i}) (default) <skip file>".format(i=(last + 1)))
 
-    print("version-index> ")
+    logger.info("version-index> ")
     selected_version = input()
 
     try:
@@ -154,8 +151,7 @@ def not_recovered_err():
     raise ValueError("Snapshot not recovered")
 
 
-def execute_snapshot(files_home):
-    number_to_keep = int(env_value('SNAPSHOTS_TO_KEEP'))
+def execute_snapshot(files_home, number_to_keep):
     names = names_without_ext(files_home)
 
     if len(names) < 1:
@@ -166,7 +162,7 @@ def execute_snapshot(files_home):
     if file_name is None:
         not_created_err()
 
-    print()
+    logger.info()
 
     snapshots_home = get_snapshot_dir(files_home)
     snapshot_file_names = create_snapshot(files_home, file_name, snapshots_home)
@@ -191,23 +187,47 @@ def execute_recover(files_home):
     if snapshot_file_names is None:
         not_recovered_err()
 
-    print()
+    logger.info()
 
     cleanup_current(file_name, files_home)
     recover_snapshot(files_home, snapshots_home, snapshot_file_names)
 
 
+def env_value(name, default_value=...):
+    try:
+        if not environ[name]:
+            return default_value
+        else:
+            return environ[name]
+    except KeyError:
+        logger.error("Environment variable {name} not found, default: {default}".format(name=name, default=default_value))
+        return default_value
+
+
 def main():
     try:
+        logging.basicConfig(
+            format='%(message)s',
+            level=logging.getLevelName(
+                env_value("LOGGING_LEVEL", "INFO")
+                ))
+
         parser = argparse.ArgumentParser()
-        parser.add_argument("-d", "--directory", help="Location of the files")
-        parser.add_argument("-r", "--recover", action="store_true", help="Enables recover snapshot files")
+        parser.add_argument("-d", "--directory",
+                            help="Location of the files",
+                            default=env_value("SNAPSHOTS_SOURCE_DIR"))
+        parser.add_argument("-k", "--keep", type=int,
+                            help="Number of snapshots to keep",
+                            default=env_value("SNAPSHOTS_TO_KEEP", 1))
+        parser.add_argument("-r", "--recover", action="store_true",
+                            help="Enables recover snapshot files")
         args = parser.parse_args()
 
         if args.recover:
-            execute_recover(args.directory)
+            execute_recover(files_home=args.directory)
         else:
-            execute_snapshot(args.directory)
+            execute_snapshot(files_home=args.directory,
+                             number_to_keep=args.keep)
     except ValueError as err:
         print(err.args[0])
 

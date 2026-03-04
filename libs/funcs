@@ -86,3 +86,7 @@ _trim_trailing_separator() {
     echo "${1:-}" | sed 's/\/*$//'
 }
 
+
+if ! which "python" > /dev/null; then
+    python() { python3 "$@"; }
+fi

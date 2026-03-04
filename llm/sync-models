@@ -1,0 +1,41 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../libs/funcs
+. ../env-vars
+
+_require_var OLLAMA_SERVER
+_require_var OLLAMA_MODELS_DEF_FILE
+_require_var OPENCODE_CONFIG_FILE
+_require_var SCRIPTS_LLM_LIBS_HOME
+
+_usage() {
+    echo "Starts Ollama service and synchronizes pull models."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -s: Syncs models with OpenCode config file"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+_opencode_sync_flag=""
+
+while getopts "sh" opt; do
+    case "$opt" in
+        s)
+            _opencode_flag=" --sync"
+            ;;
+        h)
+            _usage
+            ;;
+    esac
+done
+
+if ! [ "$( systemctl is-active ollama )" = "active" ]; then
+    ollama serve
+fi
+
+python "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE" -c $OPENCODE_CONFIG_FILE$_opencode_flag
+
+_completed

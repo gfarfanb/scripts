@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/funcs
+. ../libs/funcs
 . ../env-vars
 
 # Last assigned: 0.0.0.0:9010

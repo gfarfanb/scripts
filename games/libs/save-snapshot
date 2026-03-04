@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-. ../.libs/funcs
+. ../libs/funcs
 . ../env-vars
 
 _require_var SNAPSHOTS_TO_KEEP
@@ -31,6 +31,6 @@ done
 
 _saves_home="$1"
 
-python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -d "$_saves_home"$_recover_flag
+python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home"$_recover_flag
 
 _completed

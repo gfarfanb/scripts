@@ -76,16 +76,7 @@ def sync_opencode(host, config_file, models_def_file):
         is_create = True
         data = {
             "$schema": "https://opencode.ai/config.json",
-            "provider": {
-                "ollama": {
-                    "models": {},
-                    "name": "Ollama (local)",
-                    "npm": "@ai-sdk/openai-compatible",
-                    "options": {
-                        "baseURL": "{host}/v1".format(host=host)
-                    }
-                }
-            }
+            "provider": {}
         }
     else:
         is_create = False
@@ -115,7 +106,14 @@ def sync_opencode(host, config_file, models_def_file):
         }
         models_config[model] = { **model_base, **model_def['opencode']}
 
-    data['provider']['ollama']['models'] = models_config
+    data['provider']['ollama'] = {
+        "models": models_config,
+        "name": "Ollama (local)",
+        "npm": "@ai-sdk/openai-compatible",
+        "options": {
+            "baseURL": "{host}/v1".format(host=host)
+        }
+    }
 
     with open(config_file, 'w') as f:
         json.dump(data, f, indent=2)

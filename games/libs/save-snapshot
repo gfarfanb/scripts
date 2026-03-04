@@ -16,12 +16,12 @@ _usage() {
     exit 0
 }
 
-_recover_flag=""
+_recover_flag=0
 
 while getopts "rh" opt; do
     case "$opt" in
         r)
-            _recover_flag=" --recover"
+            _recover_flag=1
             ;;
         h)
             _usage
@@ -31,6 +31,10 @@ done
 
 _saves_home="$1"
 
-python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home"$_recover_flag
+if ! [ $_recover_flag -eq 1 ]; then
+    python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home"
+else
+    python "$SCRIPTS_LIBS_HOME/file-snapshot.py" -k "$SNAPSHOTS_TO_KEEP" -d "$_saves_home" --recover
+fi
 
 _completed

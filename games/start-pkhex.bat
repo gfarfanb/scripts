@@ -17,9 +17,7 @@ echo     -h: Displays this help message
 goto :eof
 
 :main
-if /i "%~1"=="-b" (
-    goto build
-)
+if /i "%~1"=="-b" goto build
 if /i "%~1"=="-h" goto usage
 goto execute
 

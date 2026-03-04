@@ -16,13 +16,18 @@ echo     -h: Displays this help message
 goto :eof
 
 :main
-set "_recover_flag="
-if /i "%~1"=="-h" goto usage
-if /i "%~2"=="-r" set "_recover_flag= --recover"
-
 set "_saves_home=%~1"
 
-python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" -k "%SNAPSHOTS_TO_KEEP%" -d "%_saves_home%"%_recover_flag%
+if /i "%~2"=="-r" goto getsnapshot
+if /i "%~1"=="-h" goto usage
+goto snapshot
+
+:snapshot
+python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" -k "%SNAPSHOTS_TO_KEEP%" -d "%_saves_home%"
+goto completed
+
+:getsnapshot
+python "%SCRIPTS_LIBS_HOME%\file-snapshot.py" -k "%SNAPSHOTS_TO_KEEP%" -d "%_saves_home%" --recover
 goto completed
 
 :completed

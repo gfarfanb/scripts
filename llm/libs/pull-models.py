@@ -82,11 +82,16 @@ def sync_opencode(host, config_file, models_def_file):
         model_def = models[model]
         model = get_model(model_def)
 
-        model_base = {
-            '_launch': model_def['ollama']['launch'],
-            'name': model_def['name']
-        }
-        models_config[model] = { **model_base, **model_def['opencode']}
+        try:
+            model_base = {
+                '_launch': True,
+                'name': model_def['name']
+            }
+            models_config[model] = { **model_base, **model_def['opencode']}
+
+            logger.info("Model [{model}] added to OpenCode configuration".format(model=model))
+        except KeyError:
+            logger.debug("No OpenCode configuration defined for model [{model}]".format(model=model))
 
     data['provider']['ollama'] = {
         "models": models_config,
@@ -162,7 +167,7 @@ def main():
                             help="Models definition file",
                             default=env_value("OLLAMA_MODELS_DEF_FILE"))
         parser.add_argument("-s", "--sync", action="store_true",
-                            help="Sync models with OpenCode configuration file")
+                            help="Only sync models with OpenCode configuration file")
         parser.add_argument("-c", "--config",
                             help="OpenCode configuration file",
                             default=env_value("OPENCODE_CONFIG_FILE"))
@@ -175,6 +180,10 @@ def main():
         else:
             pull_models(host=args.ollama,
                         models_def_file=args.models)
+
+            sync_opencode(host=args.ollama,
+                          config_file=args.config,
+                          models_def_file=args.models)
     except ValueError as err:
         logger.error(err.args[0])
 

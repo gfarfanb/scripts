@@ -10,11 +10,11 @@ call require-var SCRIPTS_LLM_LIBS_HOME
 goto main
 
 :usage
-echo Synchronizes Ollama models.
+echo Synchronizes Ollama models and updates OpenCode configuration.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
-echo     -s: Syncs models with OpenCode configuration file
+echo     -s: Only syncs models on OpenCode configuration file
 echo     -h: Displays this help message
 goto back
 
@@ -25,7 +25,7 @@ if /i "%~1"=="-h" goto usage
 goto sync
 
 :sync
-python "%SCRIPTS_LLM_LIBS_HOME%\pull-models.py" -o "%OLLAMA_SERVER%" -m "%OLLAMA_MODELS_DEF_FILE%"
+python "%SCRIPTS_LLM_LIBS_HOME%\pull-models.py" -o "%OLLAMA_SERVER%" -m "%OLLAMA_MODELS_DEF_FILE%" -c "%OPENCODE_CONFIG_FILE%"
 goto completed
 
 :opencode

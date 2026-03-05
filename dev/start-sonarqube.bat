@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var SONARQUBE_SERVER_HOME
 
 goto main

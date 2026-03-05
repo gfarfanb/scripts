@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var H2_HOME
 call require-var H2_WEB_PORT
 call require-var H2_REQUIRED_JDK

@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var SYNC_FOLDER_PRIVATE_DIR
 call require-var ORG_ROAM_PRIVATE_DIR
 

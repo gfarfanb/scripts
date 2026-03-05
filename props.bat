@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 
 goto main
 
@@ -18,6 +17,17 @@ if /i "%~1"=="-h" goto usage
 
 setlocal enableDelayedExpansion
 
+if not "%~1"=="" goto getvalue
+goto props
+
+
+:getvalue
+call eval set "_prop_value=%%%~1%%"
+echo !_prop_value!
+goto :eof
+
+
+:props
 set /a _var_idx=1
 
 for /f "tokens=*" %%l in (%ENV_VARS_FILE%) do (

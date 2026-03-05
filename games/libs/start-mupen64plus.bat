@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var MUPEN64PLUS_HOME
 call require-var N64_PROFILES_FILE
 call require-var N64_ROMS_HOME

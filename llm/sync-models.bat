@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var OLLAMA_SERVER
 call require-var OLLAMA_MODELS_DEF_FILE
 call require-var OPENCODE_CONFIG_FILE
@@ -25,11 +24,11 @@ if /i "%~1"=="-h" goto usage
 goto sync
 
 :sync
-python "%SCRIPTS_LLM_LIBS_HOME%\pull-models.py" -o "%OLLAMA_SERVER%" -m "%OLLAMA_MODELS_DEF_FILE%" -c "%OPENCODE_CONFIG_FILE%"
+python "%SCRIPTS_LLM_LIBS_HOME%\ollama_models.py" -a opencode
 goto completed
 
 :opencode
-python "%SCRIPTS_LLM_LIBS_HOME%\pull-models.py" -o "%OLLAMA_SERVER%" -m "%OLLAMA_MODELS_DEF_FILE%" -c "%OPENCODE_CONFIG_FILE%" --sync
+python "%SCRIPTS_LLM_LIBS_HOME%\ollama_models.py" -a opencode --sync
 goto completed
 
 

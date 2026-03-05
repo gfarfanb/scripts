@@ -1,5 +1,13 @@
 #! /usr/bin/env bash
 
+PWD=$(pwd)
+# Files are backed by physical storage
+TEMP_DIR=$(systemd-path temporary-large)
+# Files are flushed out on each reboot
+STEMP_DIR=$(systemd-path temporary)
+# User profile
+USER_HOME=$HOME
+
 if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
     echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in ~/.bashrc"
     exit 0
@@ -13,3 +21,42 @@ if [ ! -f "$ENV_VARS_FILE" ]; then
 fi
 
 . "$ENV_VARS_FILE"
+
+
+_require_var() {
+  local _var=${1:-}
+  local _val_cmd="echo \$$_var"
+  local _val=$(eval "$_val_cmd")
+
+  if [ -z "$_val" ]; then
+    echo "Undefined environment variable: $_var"
+    exit 0
+  fi
+}
+
+_back() {
+    if [ -n "$PWD" ]; then
+        cd $PWD
+    fi
+}
+
+_completed() {
+    echo ;
+    echo "[Completed]: $0"
+
+    _back
+
+    exit 0
+}
+
+_print() {
+    echo "$*" >&2
+}
+
+_trim_separator() {
+    echo "${1:-}" | sed 's/^\/*\|\/*$//g'
+}
+
+_trim_trailing_separator() {
+    echo "${1:-}" | sed 's/\/*$//'
+}

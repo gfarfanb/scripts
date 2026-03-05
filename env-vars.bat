@@ -1,6 +1,9 @@
 @echo OFF
 
-set USER_HOME=%USERPROFILE%
+set "PWD=%cd%"
+set "TEMP_DIR=%TEMP%"
+set "STEMP_DIR=%TEMP%"
+set "USER_HOME=%USERPROFILE%"
 
 if "%ENV_VARS_FILE%"=="" (
     echo Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...'

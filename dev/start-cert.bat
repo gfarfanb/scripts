@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var JDK_CERT_BACKUP_HOME
 call require-var JDK_PEM_HOME
 

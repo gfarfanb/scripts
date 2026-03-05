@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var KAFKA_HOME
 call require-var KAFKA_KRAFT_HOME
 call require-var KAFKA_REQUIRED_JDK

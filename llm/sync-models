@@ -1,7 +1,6 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../libs/fns
 . ../env-vars
 
 _require_var OLLAMA_SERVER
@@ -37,9 +36,9 @@ if ! [ "$( systemctl is-active ollama )" = "active" ]; then
 fi
 
 if ! [ $_opencode_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE" -c "$OPENCODE_CONFIG_FILE"
+    $(command -v python3 || command -v python) "$SCRIPTS_LLM_LIBS_HOME/ollama_models.py" -a opencode
 else
-    $(command -v python3 || command -v python) "$SCRIPTS_LLM_LIBS_HOME/pull-models.py" -o "$OLLAMA_SERVER" -m "$OLLAMA_MODELS_DEF_FILE" -c "$OPENCODE_CONFIG_FILE" --sync
+    $(command -v python3 || command -v python) "$SCRIPTS_LLM_LIBS_HOME/pull_models.py" -a opencode --sync
 fi
 
 _completed

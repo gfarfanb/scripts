@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var REPOS_HOME
 call require-var REPOS_LIST_FILE
 

@@ -1,7 +1,6 @@
 @echo OFF
-set PWD=%cd%
 
-call env-vars.bat
+call env-vars
 call require-var EMACS_HOME
 rem Last assigned: 5
 call require-var EMACS_WAIT_SECS

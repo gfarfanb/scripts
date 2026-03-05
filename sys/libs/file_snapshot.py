@@ -5,10 +5,14 @@ from os.path import isfile, join, basename, exists, splitext
 from sys import exit
 from shutil import copyfile
 
+import sys
 import datetime
 import argparse
 import logging
 
+sys.path.append(environ["ENVVARSPATH"]) ; import env_vars
+
+number_to_keep = int(env_vars.env_value('SNAPSHOTS_TO_KEEP'))
 
 logger = logging.getLogger()
 
@@ -81,7 +85,7 @@ def recover_snapshot(files_home, snapshots_home, snapshot_file_names):
         copyfile(snapshot, join(files_home, file))
 
 
-def cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep):
+def cleanup_snapshots(snapshots_home, snapshot_file_names):
     for n in snapshot_file_names:
         snapshots = sorted(
             list( f for f in listdir(join(snapshots_home)) if splitext(basename(f))[0] == n ),
@@ -151,7 +155,7 @@ def not_recovered_err():
     raise ValueError("Snapshot not recovered")
 
 
-def execute_snapshot(files_home, number_to_keep):
+def execute_snapshot(files_home):
     names = names_without_ext(files_home)
 
     if len(names) < 1:
@@ -167,7 +171,7 @@ def execute_snapshot(files_home, number_to_keep):
     snapshots_home = get_snapshot_dir(files_home)
     snapshot_file_names = create_snapshot(files_home, file_name, snapshots_home)
 
-    cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep)
+    cleanup_snapshots(snapshots_home, snapshot_file_names)
 
 
 def execute_recover(files_home):
@@ -193,32 +197,16 @@ def execute_recover(files_home):
     recover_snapshot(files_home, snapshots_home, snapshot_file_names)
 
 
-def env_value(name, default_value=...):
-    try:
-        if not environ[name]:
-            return default_value
-        else:
-            return environ[name]
-    except KeyError:
-        logger.error("Environment variable {name} not found, default: {default}".format(name=name, default=default_value))
-        return default_value
-
-
 def main():
     try:
         logging.basicConfig(
             format='%(message)s',
-            level=logging.getLevelName(
-                env_value("LOGGING_LEVEL", "INFO")
-                ))
+            level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
         parser.add_argument("-d", "--directory",
-                            help="Location of the files",
-                            default=env_value("SNAPSHOTS_SOURCE_DIR"))
-        parser.add_argument("-k", "--keep", type=int,
-                            help="Number of snapshots to keep",
-                            default=env_value("SNAPSHOTS_TO_KEEP", 1))
+                            help="Source files directory",
+                            default=input("source-files-directory> "))
         parser.add_argument("-r", "--recover", action="store_true",
                             help="Enables recover snapshot files")
         args = parser.parse_args()
@@ -226,8 +214,7 @@ def main():
         if args.recover:
             execute_recover(files_home=args.directory)
         else:
-            execute_snapshot(files_home=args.directory,
-                             number_to_keep=args.keep)
+            execute_snapshot(files_home=args.directory)
     except ValueError as err:
         print(err.args[0])
 

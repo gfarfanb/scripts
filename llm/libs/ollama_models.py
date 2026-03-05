@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 
-from os import environ
+from os import environ, system
 from os.path import isfile
 
+import sys
 import argparse
 import json
 import requests
 import logging
 
+sys.path.append(environ["ENVVARSPATH"]) ; import env_vars
+
+ollama_host = env_vars.env_value('OLLAMA_SERVER')
+ollama_models_def = env_vars.env_value('OLLAMA_MODELS_DEF_FILE')
+opencode_config_file = env_vars.env_value('OPENCODE_CONFIG_FILE')
 
 logger = logging.getLogger()
 
 
-def pull_models(host, models_def_file):
-    with open(models_def_file, 'r') as f:
+def pull_models():
+    with open(ollama_models_def, 'r') as f:
         models = json.load(f)
 
     required_models = set()
@@ -29,7 +35,7 @@ def pull_models(host, models_def_file):
 
         logger.info("Pulling model [{model}]".format(model=model))
 
-        response = requests.post("{host}/api/pull".format(host=host), data=json_payload)
+        response = requests.post("{host}/api/pull".format(host=ollama_host), data=json_payload)
 
         if response.status_code == 200:
             logger.info("Model [{model}] is up to date".format(model=model))
@@ -38,11 +44,11 @@ def pull_models(host, models_def_file):
                 model=model,
                 error=response.json()['error']))
 
-    cleanup_models(host=host, required_models=required_models)
+    cleanup_models(required_models)
 
 
-def cleanup_models(host, required_models):
-    response = requests.get("{host}/api/tags".format(host=host))
+def cleanup_models(required_models):
+    response = requests.get("{host}/api/tags".format(host=ollama_host))
 
     for model in response.json()['models']:
         model_name = model['model']
@@ -51,7 +57,7 @@ def cleanup_models(host, required_models):
             payload = { 'model': model_name }
             json_payload = json.dumps(payload)
 
-            response = requests.delete("{host}/api/delete".format(host=host), data=json_payload)
+            response = requests.delete("{host}/api/delete".format(host=ollama_host), data=json_payload)
 
             if response.status_code == 200:
                 logger.info("Model [{model}] was removed".format(model=model_name))
@@ -61,8 +67,8 @@ def cleanup_models(host, required_models):
                     error=response.json()['error']))
 
 
-def sync_opencode(host, config_file, models_def_file):
-    if not isfile(config_file):
+def sync_opencode():
+    if not isfile(opencode_config_file):
         is_create = True
         data = {
             "$schema": "https://opencode.ai/config.json",
@@ -70,10 +76,10 @@ def sync_opencode(host, config_file, models_def_file):
         }
     else:
         is_create = False
-        with open(config_file, 'r') as f:
+        with open(opencode_config_file, 'r') as f:
             data = json.load(f)
 
-    with open(models_def_file, 'r') as f:
+    with open(ollama_models_def, 'r') as f:
         models = json.load(f)
 
     models_config = {}
@@ -94,21 +100,21 @@ def sync_opencode(host, config_file, models_def_file):
             logger.debug("No OpenCode configuration defined for model [{model}]".format(model=model))
 
     data['provider']['ollama'] = {
-        "models": models_config,
-        "name": "Ollama (local)",
-        "npm": "@ai-sdk/openai-compatible",
-        "options": {
-            "baseURL": "{host}/v1".format(host=host)
+        'models': models_config,
+        'name': 'Ollama (local)',
+        'npm': '@ai-sdk/openai-compatible',
+        'options': {
+            'baseURL': "{host}/v1".format(host=ollama_host)
         }
     }
 
-    with open(config_file, 'w') as f:
+    with open(opencode_config_file, 'w') as f:
         json.dump(data, f, indent=2)
 
     if is_create:
-        logger.info("Created file {file}".format(file=config_file))
+        logger.info("Created file {file}".format(file=opencode_config_file))
     else:
-        logger.info("Updated file {file}".format(file=config_file))
+        logger.info("Updated file {file}".format(file=opencode_config_file))
 
 
 def get_model(model_def):
@@ -140,50 +146,29 @@ def get_model(model_def):
         raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
 
 
-def env_value(name, default_value=...):
-    try:
-        if not environ[name]:
-            return default_value
-        else:
-            return environ[name]
-    except KeyError:
-        logger.debug("Environment variable {name} not found, default: {default}".format(name=name, default=default_value))
-        return default_value
-
-
 def main():
     try:
         logging.basicConfig(
             format='%(asctime)s %(levelname)s - %(message)s',
-            level=logging.getLevelName(
-                env_value("LOGGING_LEVEL", "INFO")
-                ))
+            level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
-        parser.add_argument("-o", "--ollama",
-                            help="Ollama host",
-                            default=env_value("OLLAMA_SERVER", "http://localhost:11434"))
-        parser.add_argument("-m", "--models",
-                            help="Models definition file",
-                            default=env_value("OLLAMA_MODELS_DEF_FILE"))
-        parser.add_argument("-s", "--sync", action="store_true",
-                            help="Only sync models with OpenCode configuration file")
-        parser.add_argument("-c", "--config",
-                            help="OpenCode configuration file",
-                            default=env_value("OPENCODE_CONFIG_FILE"))
+        parser.add_argument('-a', '--agent', default='opencode', required=False,
+                            choices=[ 'opencode' ],
+                            help='Only synchronizes models with configuration file')
+        parser.add_argument('-s', '--sync', action='store_true',
+                            help='Only synchronizes models with configuration file')
         args = parser.parse_args()
 
-        if args.sync:
-            sync_opencode(host=args.ollama,
-                          config_file=args.config,
-                          models_def_file=args.models)
-        else:
-            pull_models(host=args.ollama,
-                        models_def_file=args.models)
-
-            sync_opencode(host=args.ollama,
-                          config_file=args.config,
-                          models_def_file=args.models)
+        match args.agent:
+            case 'opencode':
+                if args.sync:
+                    sync_opencode()
+                else:
+                    pull_models()
+                    sync_opencode()
+            case _:
+                raise ValueError("Invalid agent: {agent}".format(agent=args.agent))
     except ValueError as err:
         logger.error(err.args[0])
 

@@ -1,8 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./libs/fns
-. ./env-vars
+. ../env-vars
 
 _usage() {
     echo "Creates directories based on 'env-vars' file."

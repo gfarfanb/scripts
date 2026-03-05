@@ -8,10 +8,10 @@ import sys
 
 def prop_value(name):
     if sys.platform == 'win32':
-        command = "{dir}\\props".format(dir=environ['SCRIPTS_HOME'])
+        command = "{dir}\\props".format(dir=environ['ENVVARSPATH'])
         value = subprocess.run(['props', name], capture_output=True, shell=True, text=True)
     else:
-        command = "{dir}/props".format(dir=environ['SCRIPTS_HOME'])
+        command = "{dir}/props".format(dir=environ['ENVVARSPATH'])
         value = subprocess.run(['sh', command, name], capture_output=True, text=True)
 
     return value.stdout.rstrip()

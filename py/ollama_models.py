@@ -23,13 +23,13 @@ def pull_models():
 
     required_models = set()
 
-    for model in models:
-        model_def = models[model]
+    for model_id in models:
+        model_def = models[model_id]
+        model = get_model(model_def)
 
         if is_readonly(model_def):
+            print_refs(model, model_def)
             continue
-
-        model = get_model(model_def)
 
         required_models.add(model)
 
@@ -55,6 +55,31 @@ def is_readonly(model_def):
         return model_def['readonly']
     except KeyError:
         return False
+
+
+def print_refs(model, model_def):
+    try:
+        logger.debug(
+            "Ref. [{modelName}] https://ollama.com/library/{model}".format(
+                modelName=model,
+                model=model_def['ollama']['model'])
+        )
+    except KeyError as err:
+        logger.debug("Undefined field for model [{modelName}]: {field}".format(
+            modelName=model,
+            field=err.args[0]))
+
+    try:
+        logger.debug(
+            "Ref. [{modelName}] https://huggingface.co/{org}/{model}".format(
+                modelName=model,
+                org=model_def['huggingface']['organization'],
+                model=model_def['huggingface']['model'])
+        )
+    except KeyError as err:
+        logger.debug("Undefined field for model [{modelName}]: {field}".format(
+            modelName=model,
+            field=err.args[0]))
 
 
 def cleanup_models(required_models):
@@ -94,13 +119,13 @@ def sync_opencode():
 
     models_config = {}
 
-    for model in models:
-        model_def = models[model]
-
-        if not required_opencode(model_def):
-            continue
-
+    for model_id in models:
+        model_def = models[model_id]
         model = get_model(model_def)
+
+        if not required_opencode(model, model_def):
+            logger.debug("Model [{model}] not required for OpenCode".format(model=model))
+            continue
 
         try:
             model_base = {
@@ -111,8 +136,10 @@ def sync_opencode():
                                                                        hub=model_def['hub'])}
 
             logger.info("Model [{model}] added to OpenCode configuration".format(model=model))
-        except KeyError:
-            logger.debug("No OpenCode configuration defined for model [{model}]".format(model=model))
+        except KeyError as err:
+            logger.debug("No OpenCode configuration defined for model [{model}] - {msg}".format(
+                model=model,
+                msg=err.args[0]))
 
     data['provider']['ollama'] = {
         'models': models_config,
@@ -132,7 +159,7 @@ def sync_opencode():
         logger.info("Updated file {file}".format(file=opencode_config_file))
 
 
-def required_opencode(model_def):
+def required_opencode(model, model_def):
     if model_def['hub'] == 'ollama':
         try:
             return model_def['ollama']['opencode']
@@ -144,7 +171,9 @@ def required_opencode(model_def):
         except KeyError:
             return False
     else:
-        raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
+        raise ValueError("Invalid hub for model [{model}]: {n}".format(
+            model=model,
+            n=model_def['hub']))
 
 
 def get_model(model_def):

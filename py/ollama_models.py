@@ -264,7 +264,7 @@ def main():
                     sync_opencode()
             case _:
                 raise ValueError("Invalid agent: {agent}".format(agent=args.agent))
-    except ValueError as err:
+    except BaseException as err:
         logger.error(err.args[0])
 
     return 0

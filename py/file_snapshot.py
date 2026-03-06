@@ -214,8 +214,8 @@ def main():
             execute_recover(files_home=args.directory)
         else:
             execute_snapshot(files_home=args.directory)
-    except ValueError as err:
-        print(err.args[0])
+    except BaseException as err:
+        logger.error(err.args[0])
 
     return 0
 

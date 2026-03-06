@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 
 from os.path import isfile
-from progressbar2 import ProgressBar
+import sys
+
+if sys.platform == 'win32':
+    from progressbar import ProgressBar
+else:
+    from progressbar2 import ProgressBar
 
 import argparse
 import json
 import requests
 import logging
-import re
 
 import env_vars
 

@@ -10,17 +10,17 @@ Edit the environment variables
 | Variable | Value |
 | --- | --- |
 | SCRIPTS_HOME | *Scripts repo location* |
-| ENV_VARS_FILE | *Environment variables file location* \* |
-| ENVVARSPATH | *env_vars.py directory location* \* |
+| ENV_VARS_FILE | *Environment variables file location* |
+| PROPSPATH | *props.bat script directory* |
 | Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\win;<other_scripts_dirs>; |
 
-> \* Example of *env-vars* file:
-> ```bat
-> set "VARIABLE_1=VALUE1"
-> set "VARIABLE_2=VALUE2"
-> 
-> rem Comment
-> ```
+Example of *env-vars* file:
+```bat
+set "VARIABLE_1=VALUE1"
+set "VARIABLE_2=VALUE2"
+
+rem Comment
+```
 
 
 ## Linux setup
@@ -30,18 +30,18 @@ Add the required environment variable to *~/.bashrc* file
 vim ~/.bashrc
 # vim>
 # export ENV_VARS_FILE="<environment_variables_file_location>"
-# export ENVVARSPATH="<env_vars_py_directory_location>"
+# export PROPSPATH="<props_script_directory>"
 
 source ~/.bashrc
 ```
 
-> \* Example of *env-vars* file:
-> ```bash
-> VARIABLE_1="VALUE1"
-> VARIABLE_2=VALUE2
-> 
-> # Comment
-> ```
+Example of *env-vars* file:
+```bash
+VARIABLE_1="VALUE1"
+VARIABLE_2=VALUE2
+
+# Comment
+```
 
 
 ## VS Code configuration
@@ -76,3 +76,35 @@ source ~/.bashrc
     ]
 }
 ```
+
+
+## Ollama Models definition
+
+```json
+{
+    "<model_identifier>": {
+        "name": "<model_display_name>",
+        "readonly": true,
+        "hub": "ollama|huggingface",
+        "ollama": {
+            "model": "<model>",
+            "parameters": "<parameters>",
+            "opencode": true
+        },
+        "huggingface": {
+            "organization": "<organization_name>",
+            "model": "<model>",
+            "quantization": "<quantization>",
+            "opencode": true
+        }
+    }
+}
+```
+
+| Field | Default Value |
+| --- | --- |
+| **readonly** | `false` |
+| **ollama.opencode** | `false` |
+| **huggingface.opencode** | `false` |
+
+> \* `.<SCRIPTS_LLM_HOME>/sync-models`

@@ -3,7 +3,7 @@
 . ../env-vars
 
 _require_var SNAPSHOTS_TO_KEEP
-_require_var SCRIPTS_SYS_LIBS_HOME
+_require_var SCRIPTS_PY_HOME
 
 _usage() {
     echo "Create snapshots of save files."
@@ -31,9 +31,9 @@ done
 _saves_home="$1"
 
 if ! [ $_recover_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "$SCRIPTS_SYS_LIBS_HOME/file_snapshot.py" -d "$_saves_home"
+    $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/file_snapshot.py" -d "$_saves_home"
 else
-    $(command -v python3 || command -v python) "$SCRIPTS_SYS_LIBS_HOME/file_snapshot.py" -d "$_saves_home" --recover
+    $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/file_snapshot.py" -d "$_saves_home" --recover
 fi
 
 _completed

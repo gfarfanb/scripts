@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
-from os import environ, system
 from os.path import isfile
 
-import sys
 import argparse
 import json
 import requests
 import logging
+import subprocess
 
-sys.path.append(environ["ENVVARSPATH"]) ; import env_vars
+import env_vars
 
 ollama_host = env_vars.env_value('OLLAMA_SERVER')
 ollama_models_def = env_vars.env_value('OLLAMA_MODELS_DEF_FILE')
@@ -26,6 +25,10 @@ def pull_models():
 
     for model in models:
         model_def = models[model]
+
+        if is_readonly(model_def):
+            continue
+
         model = get_model(model_def)
 
         required_models.add(model)
@@ -47,11 +50,18 @@ def pull_models():
     cleanup_models(required_models)
 
 
+def is_readonly(model_def):
+    try:
+        return model_def['readonly']
+    except KeyError:
+        return False
+
+
 def cleanup_models(required_models):
     response = requests.get("{host}/api/tags".format(host=ollama_host))
 
-    for model in response.json()['models']:
-        model_name = model['model']
+    for model_tag in response.json()['models']:
+        model_name = model_tag['model']
 
         if not model_name in required_models:
             payload = { 'model': model_name }
@@ -71,8 +81,8 @@ def sync_opencode():
     if not isfile(opencode_config_file):
         is_create = True
         data = {
-            "$schema": "https://opencode.ai/config.json",
-            "provider": {}
+            '$schema': 'https://opencode.ai/config.json',
+            'provider': {}
         }
     else:
         is_create = False
@@ -86,6 +96,10 @@ def sync_opencode():
 
     for model in models:
         model_def = models[model]
+
+        if not required_opencode(model_def):
+            continue
+
         model = get_model(model_def)
 
         try:
@@ -93,7 +107,8 @@ def sync_opencode():
                 '_launch': True,
                 'name': model_def['name']
             }
-            models_config[model] = { **model_base, **model_def['opencode']}
+            models_config[model] = { **model_base, **get_opencode_spec(model=model,
+                                                                       hub=model_def['hub'])}
 
             logger.info("Model [{model}] added to OpenCode configuration".format(model=model))
         except KeyError:
@@ -117,6 +132,21 @@ def sync_opencode():
         logger.info("Updated file {file}".format(file=opencode_config_file))
 
 
+def required_opencode(model_def):
+    if model_def['hub'] == 'ollama':
+        try:
+            return model_def['ollama']['opencode']
+        except KeyError:
+            return False
+    elif model_def['hub'] == 'huggingface':
+        try:
+            return model_def['huggingface']['opencode']
+        except KeyError:
+            return False
+    else:
+        raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
+
+
 def get_model(model_def):
     if model_def['hub'] == 'ollama':
         ollama_def = model_def['ollama']
@@ -124,8 +154,14 @@ def get_model(model_def):
         if not ollama_def['model']:
             raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
 
-        return ollama_def['model']
-    elif model_def['hub'] == "huggingface":
+        model = ollama_def['model']
+
+        if ollama_def['parameters']:
+            return "{model}:{parameters}".format(model=model,
+                                                 parameters=ollama_def['parameters'])
+        else:
+            return "{model}:latest".format(model=model)
+    elif model_def['hub'] == 'huggingface':
         huggingface_def = model_def['huggingface']
 
         if not huggingface_def['organization']:
@@ -144,6 +180,65 @@ def get_model(model_def):
             return "{model}:latest".format(model=model)
     else:
         raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
+
+
+def get_opencode_spec(model, hub):
+    payload = { 'model': model }
+    json_payload = json.dumps(payload)
+    response = requests.post("{host}/api/show".format(host=ollama_host), data=json_payload)
+    model_details = response.json()
+    family = model_details['details']['family']
+    capabilities = model_details['capabilities']
+    context_length = model_details['model_info']["{f}.context_length".format(f=family)]
+    embedding_length = model_details['model_info']["{f}.embedding_length".format(f=family)]
+    inputs = []
+
+    if 'completion' in capabilities:
+        inputs.append('text')
+
+    if 'vision' in capabilities:
+        inputs.append('image')
+        inputs.append('video')
+
+    opencode_spec = {
+        'reasoning': 'thinking' in capabilities,
+        'tool_call': 'tools' in capabilities,
+        'family': family,
+        'modalities': {
+            'input': inputs,
+            'output': [ 'text' ]
+        },
+        'cost': {
+            'input': 0,
+            'output': 0
+        },
+        'limit': {
+            'context': context_length,
+            'output': 0
+        }
+    }
+
+    model_spec = """
+        Model
+          name             {name}
+          hub              {hub}
+          architecture     {architecture}
+          parameters       {parameters}
+          context length   {contextLength}
+          embedding length {embeddingLength}
+          quantization     {quantization}
+          capabilities     {capabilities}""".format(
+            name=model,
+            hub=hub,
+            architecture=model_details['model_info']['general.architecture'],
+            parameters=model_details['details']['parameter_size'],
+            contextLength=context_length,
+            embeddingLength=embedding_length,
+            quantization=model_details['details']['quantization_level'],
+            capabilities=capabilities)
+    logger.info(model_spec)
+
+    return opencode_spec
 
 
 def main():

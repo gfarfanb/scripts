@@ -2,7 +2,7 @@
 
 call env-vars
 call require-var SNAPSHOTS_TO_KEEP
-call require-var SCRIPTS_SYS_LIBS_HOME
+call require-var SCRIPTS_PY_HOME
 
 goto main
 
@@ -23,11 +23,11 @@ if /i "%~1"=="-h" goto usage
 goto snapshot
 
 :snapshot
-python "%SCRIPTS_SYS_LIBS_HOME%\file_snapshot.py" -d "%_saves_home%"
+python "%SCRIPTS_PY_HOME%\file_snapshot.py" -d "%_saves_home%"
 goto completed
 
 :getsnapshot
-python "%SCRIPTS_SYS_LIBS_HOME%\file_snapshot.py" -d "%_saves_home%" --recover
+python "%SCRIPTS_PY_HOME%\file_snapshot.py" -d "%_saves_home%" --recover
 goto completed
 
 :completed

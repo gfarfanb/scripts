@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-from os import listdir, makedirs, remove, environ
+from os import listdir, makedirs, remove
 from os.path import isfile, join, basename, exists, splitext
 from sys import exit
 from shutil import copyfile
 
-import sys
 import datetime
 import argparse
 import logging
 
-sys.path.append(environ["ENVVARSPATH"]) ; import env_vars
+import env_vars
 
 number_to_keep = int(env_vars.env_value('SNAPSHOTS_TO_KEEP'))
 

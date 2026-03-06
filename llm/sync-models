@@ -38,7 +38,7 @@ fi
 if ! [ $_opencode_flag -eq 1 ]; then
     $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/ollama_models.py" -a opencode
 else
-    $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/pull_models.py" -a opencode --sync
+    $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/ollama_models.py" -a opencode --sync
 fi
 
 _completed

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 from os.path import isfile
+from progressbar2 import ProgressBar
 
 import argparse
 import json
 import requests
 import logging
-import subprocess
+import re
 
 import env_vars
 
@@ -21,8 +22,6 @@ def pull_models():
     with open(ollama_models_def, 'r') as f:
         models = json.load(f)
 
-    required_models = set()
-
     for model_id in models:
         model_def = models[model_id]
         model = get_model(model_def)
@@ -31,14 +30,24 @@ def pull_models():
             print_refs(model, model_def)
             continue
 
-        required_models.add(model)
-
-        payload = { 'model': model, 'stream': False }
+        payload = { 'model': model }
         json_payload = json.dumps(payload)
 
         logger.info("Pulling model [{model}]".format(model=model))
 
-        response = requests.post("{host}/api/pull".format(host=ollama_host), data=json_payload)
+        session = requests.Session()
+        with session.post("{host}/api/pull".format(host=ollama_host),
+                          data=json_payload,
+                          stream=True) as response:
+            progress_bars = dict()
+            last_status = None
+
+            for response_line in response.iter_lines():
+                if response_line:
+                    last_status = process_status(last_status=last_status,
+                                                 progress_bars=progress_bars,
+                                                 model=model,
+                                                 response_line=response_line)
 
         if response.status_code == 200:
             logger.info("Model [{model}] is up to date".format(model=model))
@@ -47,7 +56,42 @@ def pull_models():
                 model=model,
                 error=response.json()['error']))
 
-    cleanup_models(required_models)
+
+def process_status(last_status, progress_bars: dict[str, ProgressBar], model, response_line):
+    response_status = json.loads(response_line.decode("utf-8"))
+    status = get_or_default(response_status, 'status', 'ref')
+    total = get_or_default(response_status, 'total')
+
+    if status != last_status:
+        if progress_bars.get(last_status):
+            progress_bars.get(last_status).finish()
+
+        sha256 = get_or_default(response_status, 'digest')
+
+        if sha256:
+            logger.info("[{model}] - pulling {sha256}".format(model=model,
+                                                              sha256=sha256))
+        else:
+            logger.info("[{model}] - {status}".format(model=model,
+                                                      status=status))
+
+    if not progress_bars.get(status) and total:
+        progress_bars[status] = ProgressBar(max_value=total)
+
+    if progress_bars.get(status):
+        completed = get_or_default(response_status, 'completed')
+
+        if completed:
+            progress_bars.get(status).update(completed)
+
+    return status
+
+
+def get_or_default(json, key, default=None):
+    try:
+        return json[key]
+    except KeyError:
+        return default
 
 
 def is_readonly(model_def):
@@ -82,7 +126,8 @@ def print_refs(model, model_def):
             field=err.args[0]))
 
 
-def cleanup_models(required_models):
+def cleanup_models():
+    required_models = get_required_models()
     response = requests.get("{host}/api/tags".format(host=ollama_host))
 
     for model_tag in response.json()['models']:
@@ -100,6 +145,23 @@ def cleanup_models(required_models):
                 logger.error("Unable to remove model [{model}] - {error}".format(
                     model=model_name,
                     error=response.json()['error']))
+
+
+def get_required_models():
+    with open(ollama_models_def, 'r') as f:
+        models = json.load(f)
+
+    required_models = set()
+
+    for model_id in models:
+        model_def = models[model_id]
+
+        if is_readonly(model_def):
+            continue
+
+        required_models.add(get_model(model_def))
+
+    return required_models
 
 
 def sync_opencode():
@@ -279,18 +341,18 @@ def main():
         parser = argparse.ArgumentParser()
         parser.add_argument('-a', '--agent', default='opencode', required=False,
                             choices=[ 'opencode' ],
-                            help='Only synchronizes models with configuration file')
+                            help='Coding agent to synchronize models')
         parser.add_argument('-s', '--sync', action='store_true',
                             help='Only synchronizes models with configuration file')
         args = parser.parse_args()
 
+        if not args.sync:
+            pull_models()
+            cleanup_models()
+
         match args.agent:
             case 'opencode':
-                if args.sync:
-                    sync_opencode()
-                else:
-                    pull_models()
-                    sync_opencode()
+                sync_opencode()
             case _:
                 raise ValueError("Invalid agent: {agent}".format(agent=args.agent))
     except BaseException as err:

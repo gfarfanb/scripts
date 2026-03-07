@@ -2,7 +2,7 @@
 
 call env-vars
 call require-var OLLAMA_SERVER
-call require-var OLLAMA_MODELS_DEF_FILE
+call require-var OLLAMA_MODELS_DEFS_FILE
 call require-var OPENCODE_CONFIG_FILE
 call require-var SCRIPTS_PY_HOME
 

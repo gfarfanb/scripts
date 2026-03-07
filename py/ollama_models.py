@@ -16,24 +16,17 @@ import logging
 import env_vars
 
 ollama_host = env_vars.env_value('OLLAMA_SERVER')
-ollama_models_def = env_vars.env_value('OLLAMA_MODELS_DEF_FILE')
+ollama_model_defs = env_vars.env_value('OLLAMA_MODELS_DEFS_FILE')
 opencode_config_file = env_vars.env_value('OPENCODE_CONFIG_FILE')
 
 logger = logging.getLogger()
 
 
 def pull_models():
-    with open(ollama_models_def, 'r') as f:
-        models = json.load(f)
+    model_defs, _ = __get_model_defs()
 
-    for model_id in models:
-        model_def = models[model_id]
-        model = get_model(model_def)
-
-        if is_readonly(model_def):
-            print_refs(model, model_def)
-            continue
-
+    for model_def in model_defs:
+        model, _ = __get_model(model_def)
         payload = { 'model': model }
         json_payload = json.dumps(payload)
 
@@ -48,10 +41,10 @@ def pull_models():
 
             for response_line in response.iter_lines():
                 if response_line:
-                    last_status = process_status(last_status=last_status,
-                                                 progress_bars=progress_bars,
-                                                 model=model,
-                                                 response_line=response_line)
+                    last_status = __process_status(last_status=last_status,
+                                                   progress_bars=progress_bars,
+                                                   model=model,
+                                                   response_line=response_line)
 
         if response.status_code == 200:
             logger.info("Model [{model}] is up to date".format(model=model))
@@ -61,16 +54,16 @@ def pull_models():
                 error=response.json()['error']))
 
 
-def process_status(last_status, progress_bars: dict[str, ProgressBar], model, response_line):
+def __process_status(last_status, progress_bars: dict[str, ProgressBar], model, response_line):
     response_status = json.loads(response_line.decode("utf-8"))
-    status = get_or_default(response_status, 'status', 'ref')
-    total = get_or_default(response_status, 'total')
+    status = __get_or_default(response_status, 'status', 'ref')
+    total = __get_or_default(response_status, 'total')
 
     if status != last_status:
         if progress_bars.get(last_status):
             progress_bars.get(last_status).finish()
 
-        sha256 = get_or_default(response_status, 'digest')
+        sha256 = __get_or_default(response_status, 'digest')
 
         if sha256:
             logger.info("[{model}] - pulling {sha256}".format(model=model,
@@ -83,7 +76,7 @@ def process_status(last_status, progress_bars: dict[str, ProgressBar], model, re
         progress_bars[status] = ProgressBar(max_value=total)
 
     if progress_bars.get(status):
-        completed = get_or_default(response_status, 'completed')
+        completed = __get_or_default(response_status, 'completed')
 
         if completed:
             progress_bars.get(status).update(completed)
@@ -91,47 +84,8 @@ def process_status(last_status, progress_bars: dict[str, ProgressBar], model, re
     return status
 
 
-def get_or_default(json, key, default=None):
-    try:
-        return json[key]
-    except KeyError:
-        return default
-
-
-def is_readonly(model_def):
-    try:
-        return model_def['readonly']
-    except KeyError:
-        return False
-
-
-def print_refs(model, model_def):
-    try:
-        logger.debug(
-            "Ref. [{modelName}] https://ollama.com/library/{model}".format(
-                modelName=model,
-                model=model_def['ollama']['model'])
-        )
-    except KeyError as err:
-        logger.debug("Undefined field for model [{modelName}]: {field}".format(
-            modelName=model,
-            field=err.args[0]))
-
-    try:
-        logger.debug(
-            "Ref. [{modelName}] https://huggingface.co/{org}/{model}".format(
-                modelName=model,
-                org=model_def['huggingface']['organization'],
-                model=model_def['huggingface']['model'])
-        )
-    except KeyError as err:
-        logger.debug("Undefined field for model [{modelName}]: {field}".format(
-            modelName=model,
-            field=err.args[0]))
-
-
 def cleanup_models():
-    required_models = get_required_models()
+    _, required_models = __get_model_defs()
     response = requests.get("{host}/api/tags".format(host=ollama_host))
 
     for model_tag in response.json()['models']:
@@ -149,23 +103,97 @@ def cleanup_models():
                 logger.error("Unable to remove model [{model}] - {error}".format(
                     model=model_name,
                     error=response.json()['error']))
+                
 
-
-def get_required_models():
-    with open(ollama_models_def, 'r') as f:
-        models = json.load(f)
+def __get_model_defs():
+    with open(ollama_model_defs, 'r') as f:
+        model_defs = json.load(f)
 
     required_models = set()
+    hubs = [ 'ollama', 'huggingface' ]
 
-    for model_id in models:
-        model_def = models[model_id]
+    for model_def in model_defs:
+        try:
+            if model_def['hub'] not in hubs:
+                raise ValueError("Invalid hub for model: {hub} - {model}".format(
+                    model=model_def,
+                    hub=model_def['hub']))
 
-        if is_readonly(model_def):
+            not_defined_count = 0
+            for hub in hubs:
+                try:
+                    model_def[hub]
+                except KeyError:
+                    not_defined_count += 1
+
+            if not_defined_count == len(hubs):
+                raise ValueError("No hub definition found in model, expected: {hubs} - {model}".format(
+                    model=model_def,
+                    hubs=hubs))
+            else:
+                try:
+                    model_def[model_def['hub']]
+                except KeyError:
+                    raise ValueError("No hub definition found in model: {hub} - {model}".format(
+                    model=model_def,
+                    hub=model_def['hub']))
+        except KeyError as err:
+            raise ValueError("Undefined field for model: {n} - {model}".format(
+                model=model_def,
+                n=err.args[0]))
+
+        if __is_readonly(model_def):
             continue
 
-        required_models.add(get_model(model_def))
+        model, _ = __get_model(model_def)
+        required_models.add(model)
 
-    return required_models
+    return model_defs, required_models
+
+
+def __get_model(model_def):
+    if model_def['hub'] == 'ollama':
+        ollama_def = model_def['ollama']
+
+        if not ollama_def['model']:
+            raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
+
+        model = ollama_def['model']
+
+        if ollama_def['parameters']:
+            model = "{model}:{parameters}".format(model=model,
+                                                 parameters=ollama_def['parameters'])
+        else:
+            model = "{model}:latest".format(model=model)
+
+        basename = __get_ollama_basename(ollama_def)
+
+        if basename:
+            model_name = "{name} ({model})".format(name=model_def['name'], model=basename)
+        else:
+            model_name = "{name} ({model})".format(name=model_def['name'], model=model)
+
+    if model_def['hub'] == 'huggingface':
+        huggingface_def = model_def['huggingface']
+
+        if not huggingface_def['organization']:
+            raise ValueError("'organization' is empty: {n}".format(n=model_def['hub']))
+        if not huggingface_def['model']:
+            raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
+
+        model = "hf.co/{org}/{model}".format(
+            org=huggingface_def['organization'],
+            model=huggingface_def['model'])
+
+        if huggingface_def['quantization']:
+            model = "{model}:{quantization}".format(model=model,
+                                                   quantization=huggingface_def['quantization'])
+        else:
+            model = "{model}:latest".format(model=model)
+
+        model_name = "{name} ({model})".format(name=model_def['name'], model=model)
+
+    return model, model_name
 
 
 def sync_opencode():
@@ -180,26 +208,23 @@ def sync_opencode():
         with open(opencode_config_file, 'r') as f:
             data = json.load(f)
 
-    with open(ollama_models_def, 'r') as f:
-        models = json.load(f)
-
+    model_defs, _ = __get_model_defs()
     models_config = {}
 
-    for model_id in models:
-        model_def = models[model_id]
-        model = get_model(model_def)
+    for model_def in model_defs:
+        model, model_name = __get_model(model_def)
 
-        if not required_opencode(model, model_def):
+        if not __required_opencode(model, model_def):
             logger.debug("Model [{model}] not required for OpenCode".format(model=model))
             continue
 
         try:
             model_base = {
                 '_launch': True,
-                'name': model_def['name']
+                'name': model_name
             }
-            models_config[model] = { **model_base, **get_opencode_spec(model=model,
-                                                                       hub=model_def['hub'])}
+            models_config[model] = { **model_base, **__get_opencode_spec(model=model,
+                                                                         hub=model_def['hub'])}
 
             logger.info("Model [{model}] added to OpenCode configuration".format(model=model))
         except KeyError as err:
@@ -225,59 +250,7 @@ def sync_opencode():
         logger.info("Updated file {file}".format(file=opencode_config_file))
 
 
-def required_opencode(model, model_def):
-    if model_def['hub'] == 'ollama':
-        try:
-            return model_def['ollama']['opencode']
-        except KeyError:
-            return False
-    elif model_def['hub'] == 'huggingface':
-        try:
-            return model_def['huggingface']['opencode']
-        except KeyError:
-            return False
-    else:
-        raise ValueError("Invalid hub for model [{model}]: {n}".format(
-            model=model,
-            n=model_def['hub']))
-
-
-def get_model(model_def):
-    if model_def['hub'] == 'ollama':
-        ollama_def = model_def['ollama']
-
-        if not ollama_def['model']:
-            raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
-
-        model = ollama_def['model']
-
-        if ollama_def['parameters']:
-            return "{model}:{parameters}".format(model=model,
-                                                 parameters=ollama_def['parameters'])
-        else:
-            return "{model}:latest".format(model=model)
-    elif model_def['hub'] == 'huggingface':
-        huggingface_def = model_def['huggingface']
-
-        if not huggingface_def['organization']:
-            raise ValueError("'organization' is empty: {n}".format(n=model_def['hub']))
-        if not huggingface_def['model']:
-            raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
-
-        model = "hf.co/{org}/{model}".format(
-            org=huggingface_def['organization'],
-            model=huggingface_def['model'])
-        
-        if huggingface_def['quantization']:
-            return "{model}:{quantization}".format(model=model,
-                                                   quantization=huggingface_def['quantization'])
-        else:
-            return "{model}:latest".format(model=model)
-    else:
-        raise ValueError("Invalid hub: {n}".format(n=model_def['hub']))
-
-
-def get_opencode_spec(model, hub):
+def __get_opencode_spec(model, hub):
     payload = { 'model': model }
     json_payload = json.dumps(payload)
     response = requests.post("{host}/api/show".format(host=ollama_host), data=json_payload)
@@ -334,6 +307,34 @@ def get_opencode_spec(model, hub):
     logger.info(model_spec)
 
     return opencode_spec
+
+
+def __get_ollama_basename(ollama_def):
+    try:
+        return ollama_def['info']['basename']
+    except KeyError:
+        return None
+
+
+def __is_readonly(model_def):
+    try:
+        return model_def['readonly']
+    except KeyError:
+        return False
+
+
+def __required_opencode(model, model_def):
+    try:
+        return model_def[model_def['hub']]['opencode']
+    except KeyError:
+        return False
+
+
+def __get_or_default(json, key, default=None):
+    try:
+        return json[key]
+    except KeyError:
+        return default
 
 
 def main():

@@ -89,13 +89,15 @@ VARIABLE_2=VALUE2
         "ollama": {
             "model": "<model>",
             "parameters": "<parameters>",
-            "opencode": true
+            "opencode": true,
+            "embeddings": true
         },
         "huggingface": {
             "organization": "<organization_name>",
             "model": "<model>",
             "quantization": "<quantization>",
-            "opencode": true
+            "opencode": true,
+            "embeddings": true
         }
     }
 }

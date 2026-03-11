@@ -57,8 +57,7 @@ if [ -z "$_sync_op" ]; then
 
     if [ -z "$_op_index" ]; then
         echo "Invalid operation index"
-        echo "[Process stopped]: $0"
-        exit 0
+        _stopped
     fi
 
     _sync_op="${_sync_ops[$((_op_index-1))]}"

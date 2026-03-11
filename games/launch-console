@@ -193,8 +193,7 @@ case "$_console_index" in
         ;;
     *)
         echo "Invalid console index"
-        echo "[Process stopped]: $0"
-        exit 0
+        _stopped
         ;;
 esac
 

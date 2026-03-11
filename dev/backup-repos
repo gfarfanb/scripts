@@ -61,9 +61,7 @@ _select_repo() {
 
     if [ "$_repo_flag" = "false" ]; then
         echo "Invalid repo index"
-        echo "[Process stopped]: $0"
-        _back
-        exit 0
+        _stopped
     fi
 }
 

@@ -49,6 +49,15 @@ _completed() {
     exit 0
 }
 
+_stopped() {
+    echo ;
+    echo "[Process stopped]: $0"
+
+    _back
+
+    exit 0
+}
+
 _print() {
     echo "$*" >&2
 }

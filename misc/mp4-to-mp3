@@ -57,9 +57,7 @@ elif [ -f "$_mp4_location" ]; then
     _convert "$_mp4_location"
 else
     echo "Invalid MP4 location/file: $_mp4_location"
-    echo "[Process stopped]: $0"
-    _back
-    exit 0
+    _stopped
 fi
 
 _completed

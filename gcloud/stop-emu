@@ -64,9 +64,7 @@ _emu_selected="${GCLOUD_EMULATORS[$((_emu_index-1))]}"
 
 if [ -z "$_emu_selected" ]; then
     echo "Invalid emulator index"
-    echo "[Process stopped]: $0"
-    cd $PWD
-    exit 0
+    _stopped
 fi
 
 _emu=$( cut -d : -f 1 <<< "$_emu_selected" )

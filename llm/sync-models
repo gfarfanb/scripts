@@ -3,10 +3,12 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var OLLAMA_SERVER
 _require_var OLLAMA_MODELS_DEFS_FILE
 _require_var OPENCODE_CONFIG_FILE
 _require_var SCRIPTS_PY_HOME
+
+# http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+: "${OLLAMA_SERVER:=http://127.0.0.1:11434}"
 
 _usage() {
     echo "Starts Ollama service, synchronizes models and updates OpenCode configuration."

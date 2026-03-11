@@ -41,8 +41,7 @@ fi
 
 if [ -z "$_project_selected" ]; then
     echo "Invalid project index"
-    echo "[Process stopped]: $0"
-    exit 0
+    _stopped
 else
     _project_id_selected=$( cut -d : -f 2 <<< "$_project_selected" )
     _push_port_selected=$( cut -d : -f 3 <<< "$_project_selected" )

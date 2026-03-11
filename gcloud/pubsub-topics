@@ -99,9 +99,7 @@ _send_message() {
 
     if [ -z "$_message_to_send" ]; then
         echo "Defines a message with option: $0 -m <message>"
-        echo "[Process stopped]: $0"
-        cd $PWD
-        exit 0
+        _stopped
     fi
 
     echo "Select a topic:"
@@ -118,9 +116,7 @@ _send_message() {
 
     if [ -z "$_topic_index" ]; then
         echo "Invalid topic index"
-        echo "[Process stopped]: $0"
-        cd $PWD
-        exit 0
+        _stopped
     fi
 
     _selected_topic="${TOPIC_DEFINITION_NAME[$((_topic_index-1))]}"
@@ -156,9 +152,7 @@ _monitor_messages() {
 
     if [ -z "$_pull_index" ]; then
         echo "Invalid pull subscription index"
-        echo "[Process stopped]: $0"
-        cd $PWD
-        exit 0
+        _stopped
     fi
 
     _selected_pull="${_pull_subs[$((_pull_index-1))]}"

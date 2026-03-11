@@ -3,176 +3,136 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
+_require_var SCRIPTS_DEV_LIBS_HOME
+_require_var OPEN_WEBUI_ENV
 _require_var OPEN_WEBUI_PORT
-_require_var OPEN_WEBUI_WAIT_SECS
-_require_var OPEN_WEBUI_WAIT_TRIES
-
-# http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
-: "${OPEN_WEBUI_TAG:=auto}"
-: "${OPEN_WEBUI_OLLAMA_SERVER:=http://127.0.0.1:11434}"
+_require_var OPEN_WEBUI_COMPOSE_FILE
+_require_var OLLAMA_SERVER
+_require_var DOCLING_SERVER
+_require_var DOCLING_PORT
+_require_var DOCKER_WAIT_SECS
+_require_var DOCKER_WAIT_TRIES
 
 _usage() {
-    echo "Starts Ollama service and the Open WebUI."
+    echo "Starts Ollama service, Open WebUI and Docling."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
-    echo "    -t: Open the terminal for the current Open WebUI container"
-    echo "    -o: Stop the current Open WebUI container"
-    echo "    -r: Remove the current Open WebUI container"
+    echo "    -d: Start only Docling container"
+    echo "    -t: Open the terminal for Open WebUI or Docling containers"
+    echo "    -l: Show the logs for Open WebUI and Docling containers"
+    echo "    -s: Stop Open WebUI and Docling containers"
+    echo "    -r: Remove Open WebUI and Docling containers"
     echo "    -h: Displays this help message"
     exit 0
 }
 
-_select_tag() {
-    echo "Select Open WebUI tag:"
-    echo "m) main (default)"
-    echo "c) cuda"
-    read -p "m/c> " _tag
-    if [ -z "$_tag" ]; then
-        _tag=m
+. "$SCRIPTS_DEV_LIBS_HOME/docker-fn"
+
+_select_service() {
+    _print "Which service do you want to connect?"
+    _print "o) Open WebUI (default)"
+    _print "d) Docling"
+    read -p "o/d> " _service
+
+    if [ -z "$_service" ]; then
+        _service=o
     fi
-    echo "$_tag"
+
+    case "$_service" in
+        o)
+            echo "open-webui-$OPEN_WEBUI_ENV"
+            ;;
+        d)
+            echo "docling-serve-$OPEN_WEBUI_ENV"
+            ;;
+        * )
+            echo "Invalid service option: $_service"
+            _stopped
+            ;;
+    esac
 }
 
-_terminal_container_by_tag() {
-    local _tag=${1:-}
-
-    if [ -n "$(docker ps -q -a -f name=open-webui-$_tag)" ]; then
-        echo "Entering open-webui-$_tag ..."
-        docker exec -it open-webui-$_tag /bin/bash
-    else
-        echo "Already removed open-webui-$_tag"
-    fi
-}
-
-_terminal_container() {
-    if [[ "$OPEN_WEBUI_TAG" == auto* ]]; then
-        local _tag=$( _select_tag )
-
-        case "$_tag" in
-            m)
-                _terminal_container_by_tag "main"
-                ;;
-            c)
-                _terminal_container_by_tag "cuda"
-                ;;
-            *)
-                echo "Invalid tag option: $_tag"
-                ;;
-        esac
-    else
-        _terminal_container_by_tag "$OPEN_WEBUI_TAG"
-    fi
-    
-    _completed
-}
-
-_remove_container_by_tag() {
-    local _tag=${1:-}
-
-    if [ -n "$(docker ps -q -a -f name=open-webui-$_tag)" ]; then
-        echo "Removing open-webui-$_tag ..."
-        docker rm -f open-webui-$_tag
-    else
-        echo "Already removed open-webui-$_tag"
+_start_ollama() {
+    if ! [ "$( systemctl is-active ollama )" = "active" ]; then
+        ollama serve
     fi
 }
 
-_remove_container() {
-    if [[ "$OPEN_WEBUI_TAG" == auto* ]]; then
-        _remove_container_by_tag "cuda"
-        _remove_container_by_tag "main"
-    else
-        _remove_container_by_tag "$OPEN_WEBUI_TAG"
-    fi
-    
-    _completed
-}
+_start_openwebui() {
+    _start_ollama
 
-_stop_container_by_tag() {
-    local _tag=${1:-}
+    OPEN_WEBUI_PORT=$OPEN_WEBUI_PORT \
+        OLLAMA_SERVER=$OLLAMA_SERVER \
+        DOCLING_SERVER=$DOCLING_SERVER \
+        DOCLING_PORT=$DOCLING_PORT \
+        docker compose -f $OPEN_WEBUI_COMPOSE_FILE up
 
-    if [ -n "$(docker ps -q -a -f name=open-webui-$_tag)" ]; then
-        echo "Stopping open-webui-$_tag ..."
-        docker container stop open-webui-$_tag
-    else
-        echo "Already stopped open-webui-$_tag"
-    fi
-}
+    _wait_until_healthy open-webui-$OPEN_WEBUI_ENV
 
-_stop_container() {
-    if [[ "$OPEN_WEBUI_TAG" == auto* ]]; then
-        _stop_container_by_tag "cuda"
-        _stop_container_by_tag "main"
-    else
-        _stop_container_by_tag "$OPEN_WEBUI_TAG"
-    fi
+    _update_container open-webui-$OPEN_WEBUI_ENV
+    _update_container docling-serve-$OPEN_WEBUI_ENV
 
-    _completed
-}
-
-_start_container_by_tag() {
-    local _tag=${1:-}
-    local _gpu_opt=${2:-}
-
-    if [ -z "$(docker ps -q -a -f name=open-webui-$_tag)" ]; then
-        echo ;
-        echo "Attempting to run open-webui-$_tag ..."
-
-        docker run -d --network=host -e PORT="$OPEN_WEBUI_PORT" -e OLLAMA_BASE_URL="$OPEN_WEBUI_OLLAMA_SERVER" $_gpu_opt -v open-webui:/app/backend/data --name open-webui-$_tag ghcr.io/open-webui/open-webui:$_tag
-    else
-        echo ;
-        echo "Attempting to restart open-webui-$_tag ..."
-
-        docker container restart open-webui-$_tag
-    fi
-}
-
-_update_container() {
-    local _container=${1:-}
+    _wait_until_healthy open-webui-$OPEN_WEBUI_ENV
 
     echo ;
-    echo "Attempting to update $_container ..."
-    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once $_container
+    echo "> http://localhost:$OPEN_WEBUI_PORT"
+
+    _completed
 }
 
-_wait_until_up() {
-    local _container=${1:-}
-    local _container_id="$(docker ps -q -a -f name=$_container)"
-    local _waiting_flag=0
-    local _waited=0
+_terminal_openwebui() {
+    _terminal_container $( _select_service )
 
-    if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
-        echo ;
-
-        while [ $_waiting_flag -eq 0 ]; do
-            echo "Waiting for $_container to run..."
-
-            if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
-                sleep $OPEN_WEBUI_WAIT_SECS
-                let "_waited+=1"
-
-                if [ $_waited -eq $OPEN_WEBUI_WAIT_TRIES ]; then
-                    echo "Waited $(($OPEN_WEBUI_WAIT_SECS * $OPEN_WEBUI_WAIT_TRIES)) seconds, $_container is still not running."
-                    exit 1
-                fi
-            else
-                _waiting_flag=1
-            fi
-        done
-    fi
+    _completed
 }
 
-while getopts "srth" opt; do
+_logs_openwebui() {
+    docker compose -f $OPEN_WEBUI_COMPOSE_FILE logs -f $( _select_service )
+
+    _completed
+}
+
+_stop_openwebui() {
+    docker compose -f $OPEN_WEBUI_COMPOSE_FILE stop
+
+    _completed
+}
+
+_remove_openwebui() {
+    docker compose -f $OPEN_WEBUI_COMPOSE_FILE down
+
+    _completed
+}
+
+_start_docling() {
+    OPEN_WEBUI_PORT=$OPEN_WEBUI_PORT \
+        OLLAMA_SERVER=$OLLAMA_SERVER \
+        DOCLING_SERVER=$DOCLING_SERVER \
+        DOCLING_PORT=$DOCLING_PORT \
+        docker compose -f $OPEN_WEBUI_COMPOSE_FILE run --rm docling-serve-$OPEN_WEBUI_ENV
+
+    _update_container docling-serve-$OPEN_WEBUI_ENV
+
+    _completed
+}
+
+while getopts "dtlsrh" opt; do
     case "$opt" in
+        d)
+            _start_docling
+            ;;
         t)
-            _terminal_container
+            _terminal_openwebui
+            ;;
+        l)
+            _logs_openwebui
             ;;
         s)
-            _stop_container
+            _stop_openwebui
             ;;
         r)
-            _remove_container
+            _remove_openwebui
             ;;
         h)
             _usage
@@ -180,38 +140,4 @@ while getopts "srth" opt; do
     esac
 done
 
-if ! [ "$( systemctl is-active ollama )" = "active" ]; then
-    ollama serve
-fi
-
-_recognized_container=""
-
-if [[ "$OPEN_WEBUI_TAG" == auto* ]]; then
-    _start_container_by_tag "cuda" "--gpus all"
-
-    if ! [ $? -eq 0 ]; then
-        echo ;
-        echo "Unable to run open-webui-cuda"
-
-        _start_container_by_tag "main"
-
-        _recognized_container=open-webui-main
-    else
-        _recognized_container=open-webui-cuda
-    fi
-else
-    _start_container_by_tag "$OPEN_WEBUI_TAG" "$OPEN_WEBUI_GPU_OPT"
-
-    _recognized_container=open-webui-$OPEN_WEBUI_TAG
-fi
-
-_wait_until_up "$_recognized_container"
-
-_update_container "$_recognized_container"
-
-_wait_until_up "$_recognized_container"
-
-echo ;
-echo "> http://localhost:$OPEN_WEBUI_PORT"
-
-_completed
+_start_openwebui

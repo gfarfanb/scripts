@@ -1,0 +1,46 @@
+services:
+
+  open-webui-cuda:
+    image: ghcr.io/open-webui/open-webui:cuda
+    container_name: open-webui-cuda
+    volumes:
+      - open-webui-cuda:/app/backend/data
+    environment:
+      - PORT=${OPEN_WEBUI_PORT}
+      # - WEBUI_SECRET_KEY=${OPEN_WEBUI_SECRET_KEY}
+      - OLLAMA_BASE_URL=${OLLAMA_SERVER}
+      - DOCLING_SERVER_URL=${DOCLING_SERVER}
+    network_mode: host
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  docling-serve-cuda:
+    image: quay.io/docling-project/docling-serve-cu128:latest
+    container_name: docling-serve-cuda
+    environment:
+      - UVICORN_PORT=${DOCLING_PORT}
+      - DOCLING_SERVE_ENABLE_UI=true
+      - DOCLING_SERVE_ENABLE_REMOTE_SERVICES=true
+      # - DOCLING_SERVE_MAX_SYNC_WAIT=600
+      - DOCLING_SERVE_ENG_LOC_NUM_WORKERS=2
+      - OMP_NUM_THREADS=4
+      - MKL_NUM_THREADS=4
+      - UVICORN_WORKERS=1
+    network_mode: host
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  open-webui-cuda:

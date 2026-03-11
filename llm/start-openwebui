@@ -16,10 +16,55 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -t: Open the terminal for the current Open WebUI container"
     echo "    -o: Stop the current Open WebUI container"
     echo "    -r: Remove the current Open WebUI container"
     echo "    -h: Displays this help message"
     exit 0
+}
+
+_select_tag() {
+    echo "Select Open WebUI tag:"
+    echo "m) main (default)"
+    echo "c) cuda"
+    read -p "m/c> " _tag
+    if [ -z "$_tag" ]; then
+        _tag=m
+    fi
+    echo "$_tag"
+}
+
+_terminal_container_by_tag() {
+    local _tag=${1:-}
+
+    if [ -n "$(docker ps -q -a -f name=open-webui-$_tag)" ]; then
+        echo "Entering open-webui-$_tag ..."
+        docker exec -it open-webui-$_tag /bin/bash
+    else
+        echo "Already removed open-webui-$_tag"
+    fi
+}
+
+_terminal_container() {
+    if [[ "$OPEN_WEBUI_TAG" == auto* ]]; then
+        local _tag=$( _select_tag )
+
+        case "$_tag" in
+            m)
+                _terminal_container_by_tag "main"
+                ;;
+            c)
+                _terminal_container_by_tag "cuda"
+                ;;
+            *)
+                echo "Invalid tag option: $_tag"
+                ;;
+        esac
+    else
+        _terminal_container_by_tag "$OPEN_WEBUI_TAG"
+    fi
+    
+    _completed
 }
 
 _remove_container_by_tag() {
@@ -118,8 +163,11 @@ _wait_until_up() {
     fi
 }
 
-while getopts "srh" opt; do
+while getopts "srth" opt; do
     case "$opt" in
+        t)
+            _terminal_container
+            ;;
         s)
             _stop_container
             ;;

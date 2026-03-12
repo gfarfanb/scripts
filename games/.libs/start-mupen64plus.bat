@@ -101,7 +101,7 @@ goto romselected
 rem /********** N64 ROM selected **********/
 :romselected
 
-for /f "delims=" %%a in ('sha256sum "%_n64_rom%"') do @set _n64_rom_hash=%%a
+for /f "delims=" %%a in ('sha256sum "%_n64_rom%"') do set _n64_rom_hash=%%a
 
 
 rem /********** Number of controls menu **********/

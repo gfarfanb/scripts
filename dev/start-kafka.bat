@@ -38,7 +38,7 @@ goto invalid
 :initialization
 echo Removing old files...
 del /s /q %KAFKA_KRAFT_HOME%\*
-for /d %%x in (%KAFKA_KRAFT_HOME%\*) do @rd /s /q "%%x"
+for /d %%x in (%KAFKA_KRAFT_HOME%\*) do rd /s /q "%%x"
 
 cd %KAFKA_HOME%
 echo bin\windows\kafka-storage format --standalone -t kafkastore -c config\server.properties

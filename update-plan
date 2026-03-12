@@ -8,7 +8,7 @@ _require_var UPDATE_REPOS_FILE
 _require_var UPDATE_COMMANDS_FILE
 
 _usage() {
-    echo "Update installed packages, scripts and synchronized files."
+    echo "Update packages, scripts and synchronized files."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
@@ -83,38 +83,40 @@ if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
         _exe=$( cut -d : -f 1 <<< "$_repo" )
         _branch=$( cut -d : -f 2 <<< "$_repo" )
         _username=$( cut -d : -f 3 <<< "$_repo" )
-        _loc=$( cut -d : -f 4 <<< "$_repo" )
-        _repo_name="$(basename $_loc)"
-
-        if ! [ -d "$_loc" ]; then
-            mkdir -vp "$_loc"
-            cd "$_loc"
-            cd ..
-            rm -r "$_repo_name"
-
-            echo ;
-            echo "Cloning $_repo_name ..."
-
-            git clone https://$_username/$_repo_name.git
-
-            continue
-        fi
-        if [ -h "$_loc" ]; then
-            echo ;
-            echo "'$_loc' is a symlink"
-            continue
-        fi
-
-        cd "$_loc"
+        _location=$( cut -d : -f 4 <<< "$_repo" )
+        _repo_name="$(basename $_location)"
 
         if [ "$_exe" = "e" ]; then
+
+            if ! [ -d "$_location" ]; then
+                mkdir -vp "$_location"
+                cd "$_location"
+                cd ..
+                rm -r "$_repo_name"
+
+                echo ;
+                echo "Cloning $_repo_name ..."
+
+                git clone https://$_username/$_repo_name.git
+
+                continue
+            fi
+
+            if [ -h "$_location" ]; then
+                echo ;
+                echo "'$_location' is a symlink"
+                continue
+            fi
+
+            cd "$_location"
+
             echo ;
             echo "Updating $_repo_name ..."
 
             git checkout $_branch
             git pull origin $_branch
         else
-            _print_repos+=( "$_loc" )
+            _print_repos+=( "[$_branch] $_location" )
         fi
     done < $UPDATE_REPOS_FILE
 fi

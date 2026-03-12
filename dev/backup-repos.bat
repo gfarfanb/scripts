@@ -29,13 +29,17 @@ goto selectrepo
 
 :allrepos
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
-    set "__repo_zip=%%i.zip"
-    set "__repo_url=%%j"
+    echo %%i | findstr /R "^--:*" >nul
 
-    echo:
-    echo Output: !__repo_zip!
-    echo URL: !__repo_url!
-    curl -L --create-dirs -o !__repo_zip! !__repo_url!
+    if !errorlevel! neq 0 (
+        set "__repo_zip=%%i.zip"
+        set "__repo_url=%%j"
+
+        echo:
+        echo Output: !__repo_zip!
+        echo URL: !__repo_url!
+        curl -L --create-dirs -o !__repo_zip! !__repo_url!
+    )
 )
 goto completed
 
@@ -45,8 +49,12 @@ echo:
 echo Choose a repo to backup:
 set /a _repo_idx=1
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
-    echo !_repo_idx!^) %%i
-    set /a _repo_idx+=1
+    echo %%i | findstr /R "^--:*" >nul
+
+    if !errorlevel! neq 0 (
+        echo !_repo_idx!^) %%i
+        set /a _repo_idx+=1
+    )
 )
 set "_selected_idx="
 set /P _selected_idx="repo-index> "
@@ -54,20 +62,23 @@ set /P _selected_idx="repo-index> "
 set /a _repo_idx=1
 set _repo_flag=false
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
+    echo %%i | findstr /R "^--:*" >nul
 
-    if "%_selected_idx%"=="!_repo_idx!" (
-        set "__repo_zip=%%i.zip"
-        set "__repo_url=%%j"
+    if !errorlevel! neq 0 (
+        if "%_selected_idx%"=="!_repo_idx!" (
+            set "__repo_zip=%%i.zip"
+            set "__repo_url=%%j"
 
-        echo:
-        echo Output: !__repo_zip!
-        echo URL: !__repo_url!
-        curl -L --create-dirs -o !__repo_zip! !__repo_url!
+            echo:
+            echo Output: !__repo_zip!
+            echo URL: !__repo_url!
+            curl -L --create-dirs -o !__repo_zip! !__repo_url!
 
-        set _repo_flag=true
+            set _repo_flag=true
+        )
+
+        set /a _repo_idx+=1
     )
-
-    set /a _repo_idx+=1
 )
 
 if "%_repo_flag%"=="false" (

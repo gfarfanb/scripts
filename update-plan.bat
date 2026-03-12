@@ -23,7 +23,7 @@ set /a _cmd_idx=1
 for /f "tokens=*" %%l in (%UPDATE_COMMANDS_FILE%) do (
     call eval set "_cmd=%%l"
 
-    echo !_cmd! | findstr /R "^p:*" >nul
+    echo !_cmd! | findstr /r "^p:*" >nul
 
     if !errorlevel! equ 0 (
         set "_cmd=!_cmd:~2!"
@@ -43,13 +43,13 @@ set /a _repo_idx=1
 for /f "tokens=*" %%l in (%UPDATE_REPOS_FILE%) do (
     call eval set "_repo=%%l"
 
-    set _execute_flag=false
+    set _execute_flag=true
 
-    echo !_repo! | findstr /R "^e:*" >nul
+    echo !_repo! | findstr /r "^p:*" >nul
 
     if !errorlevel! equ 0 (
         set "_repo=!_repo:~2!"
-        set _execute_flag=true
+        set _execute_flag=false
     )
 
     for /f "tokens=1,2 delims=:" %%a in ("!_repo!") do (
@@ -64,8 +64,10 @@ for /f "tokens=*" %%l in (%UPDATE_REPOS_FILE%) do (
 
     for /f %%i in ("!_location!") do set "_repo_name=%%~ni"
 
-    if "!_execute_flag!"=="true" (
-
+    if "!_execute_flag!"=="false" (
+        set "_print_repos[!_repo_idx!]=[!_branch!] !_location!"
+        set /a _repo_idx+=1
+    ) else (
         if not exist "!_location!" (
             mkdir "!_location!"
             cd "!_location!"
@@ -85,9 +87,6 @@ for /f "tokens=*" %%l in (%UPDATE_REPOS_FILE%) do (
             git checkout !_branch!
             git pull origin !_branch!
         )
-    ) else (
-        set "_print_repos[!_repo_idx!]=[!_branch!] !_location!"
-        set /a _repo_idx+=1
     )
 )
 

@@ -86,8 +86,9 @@ if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
         _location=$( cut -d : -f 4 <<< "$_repo" )
         _repo_name="$(basename $_location)"
 
-        if [ "$_exe" = "e" ]; then
-
+        if [ "$_exe" = "p" ]; then
+            _print_repos+=( "[$_branch] $_location" )
+        else
             if ! [ -d "$_location" ]; then
                 mkdir -vp "$_location"
                 cd "$_location"
@@ -115,8 +116,6 @@ if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
 
             git checkout $_branch
             git pull origin $_branch
-        else
-            _print_repos+=( "[$_branch] $_location" )
         fi
     done < $UPDATE_REPOS_FILE
 fi

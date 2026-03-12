@@ -1,0 +1,27 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../env-vars
+
+_require_var OPENCODE_SERVER_PORT
+
+_usage() {
+    echo "Starts OpenCode server."
+    echo ;
+    echo "Usage: $0 [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            _usage
+            ;;
+    esac
+done
+
+opencode serve --port $OPENCODE_SERVER_PORT --hostname 0.0.0.0
+
+_completed

@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 
 def pull_models():
-    model_defs, _ = __get_model_defs()
+    model_defs, _ = __get_model_defs(filtered=True)
 
     for model_def in model_defs:
         model, _ = __get_model(model_def)
@@ -105,10 +105,11 @@ def cleanup_models():
                     error=response.json()['error']))
                 
 
-def __get_model_defs():
+def __get_model_defs(filtered=False):
     with open(ollama_model_defs, 'r') as f:
         model_defs = json.load(f)
 
+    filtered_defs = []
     required_models = set()
     hubs = [ 'ollama', 'huggingface' ]
 
@@ -146,9 +147,14 @@ def __get_model_defs():
             continue
 
         model, _ = __get_model(model_def)
-        required_models.add(model)
 
-    return model_defs, required_models
+        required_models.add(model)
+        filtered_defs.append(model_def)
+
+    if filtered:
+        return filtered_defs, required_models
+    else:
+        return model_defs, required_models
 
 
 def __get_model(model_def):
@@ -214,7 +220,7 @@ def sync_opencode():
     for model_def in model_defs:
         model, model_name = __get_model(model_def)
 
-        if not __required_opencode(model, model_def):
+        if not __required_opencode(model_def):
             logger.debug("Model [{model}] not required for OpenCode".format(model=model))
             continue
 
@@ -323,7 +329,7 @@ def __is_readonly(model_def):
         return False
 
 
-def __required_opencode(model, model_def):
+def __required_opencode(model_def):
     try:
         return model_def[model_def['hub']]['opencode']
     except KeyError:

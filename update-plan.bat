@@ -34,7 +34,7 @@ for /f "tokens=*" %%l in (%UPDATE_COMMANDS_FILE%) do (
         echo:
         echo Executing: [!_cmd!]
 
-        rem call eval !_cmd!
+        call eval !_cmd!
     )
 )
 

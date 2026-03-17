@@ -59,14 +59,18 @@ _start_ollama() {
     fi
 }
 
-_start_openwebui() {
-    _start_ollama
-
+_docker_compose() {
     OPEN_WEBUI_PORT=$OPEN_WEBUI_PORT \
         OLLAMA_SERVER=$OLLAMA_SERVER \
         DOCLING_SERVER=$DOCLING_SERVER \
         DOCLING_PORT=$DOCLING_PORT \
-        docker compose -f $OPEN_WEBUI_COMPOSE_FILE up
+        docker compose $*
+}
+
+_start_openwebui() {
+    _start_ollama
+
+    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE up
 
     _wait_until_healthy open-webui-$OPEN_WEBUI_ENV
 
@@ -88,29 +92,25 @@ _terminal_openwebui() {
 }
 
 _logs_openwebui() {
-    docker compose -f $OPEN_WEBUI_COMPOSE_FILE logs -f $( _select_service )
+    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE logs -f $( _select_service )
 
     _completed
 }
 
 _stop_openwebui() {
-    docker compose -f $OPEN_WEBUI_COMPOSE_FILE stop
+    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE stop
 
     _completed
 }
 
 _remove_openwebui() {
-    docker compose -f $OPEN_WEBUI_COMPOSE_FILE down
+    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE down
 
     _completed
 }
 
 _start_docling() {
-    OPEN_WEBUI_PORT=$OPEN_WEBUI_PORT \
-        OLLAMA_SERVER=$OLLAMA_SERVER \
-        DOCLING_SERVER=$DOCLING_SERVER \
-        DOCLING_PORT=$DOCLING_PORT \
-        docker compose -f $OPEN_WEBUI_COMPOSE_FILE run --rm docling-serve-$OPEN_WEBUI_ENV
+    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE run --rm docling-serve-$OPEN_WEBUI_ENV
 
     _update_container docling-serve-$OPEN_WEBUI_ENV
 

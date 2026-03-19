@@ -9,7 +9,7 @@ Test WSL connection from *PowerShell*:
 wsl hostname -I
 
 # Test
-Test-NetConnection -ComputerName <wsl_ip> -Port 8085
+Test-NetConnection -ComputerName "<wsl_ip>" -Port 8085
 ```
 
 
@@ -24,37 +24,37 @@ git clone https://github.com/googleapis/python-pubsub.git
 
 Start and setup emulator
 ```sh
-cd <SCRIPTS_HOME>/gcloud
+cd "<SCRIPTS_HOME>/gcloud"
 ./start-emu-pubsub
 
 # Make sure execute:
 # > source .../pubsub-envs
 
-cd <python_pubsub_location>/.env/bin
+cd "<python_pubsub_location>/.env/bin"
 source activate
 
-cd <python_pubsub_location>/samples/snippets
+cd "<python_pubsub_location>/samples/snippets"
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --upgrade --force-reinstall -r requirements.txt
 
-cd <SCRIPTS_HOME>/gcloud
+cd "<SCRIPTS_HOME>/gcloud"
 ./pubsub-topics -c
 ```
 
 Publish messages
 ```sh
-cd <python_pubsub_location>/.env/bin
+cd "<python_pubsub_location>/.env/bin"
 source activate
 
-cd <SCRIPTS_HOME>/gcloud
+cd "<SCRIPTS_HOME>/gcloud"
 ./pubsub-topics -m '{ "id": "6d8070c1-4589-447c-8a0c-2e8e1d71aa2e" }'
 ```
 
 Monitor messages
 ```sh
-cd <python_pubsub_location>/.env/bin
+cd "<python_pubsub_location>/.env/bin"
 source activate
 
-cd <SCRIPTS_HOME>/gcloud
+cd "<SCRIPTS_HOME>/gcloud"
 ./pubsub-topics -w
 ```
 
@@ -71,14 +71,14 @@ git clone https://github.com/googleapis/java-spanner.git
 
 Start and setup emulator
 ```sh
-cd <SCRIPTS_HOME>/gcloud
+cd "<SCRIPTS_HOME>/gcloud"
 ./start-emu-spanner
 
 # Make sure execute:
 # > source .../spanner-envs
 
-export SPANNER_INSTANCE=<spanner_instance>
-export SPANNER_DATABASE=<spanner_db_name>
+export SPANNER_INSTANCE="<spanner_instance>"
+export SPANNER_DATABASE="<spanner_db_name>"
 
 # Register emulator
 gcloud config configurations create emulator
@@ -89,7 +89,7 @@ gcloud config set api_endpoint_overrides/spanner http://$SPANNER_EMULATOR_HOST/
 # Register instance
 gcloud spanner instances create $SPANNER_INSTANCE --config=emulator-config --description="Spanner Instance" --nodes=1
 
-cd <java_spanner_location>/samples/snippets
+cd "<java_spanner_location>/samples/snippets"
 
 # Omit if JAR is already created
 mvn clean package

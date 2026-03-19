@@ -161,12 +161,12 @@ def __get_model(model_def):
     if model_def['hub'] == 'ollama':
         ollama_def = model_def['ollama']
 
-        if not ollama_def['model']:
+        if not __get_or_default(ollama_def, 'model'):
             raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
 
         model = ollama_def['model']
 
-        if ollama_def['parameters']:
+        if __get_or_default(ollama_def, 'parameters'):
             model = "{model}:{parameters}".format(model=model,
                                                  parameters=ollama_def['parameters'])
         else:
@@ -182,18 +182,18 @@ def __get_model(model_def):
     if model_def['hub'] == 'huggingface':
         huggingface_def = model_def['huggingface']
 
-        if not huggingface_def['organization']:
+        if not __get_or_default(huggingface_def, 'organization'):
             raise ValueError("'organization' is empty: {n}".format(n=model_def['hub']))
-        if not huggingface_def['model']:
+        if not __get_or_default(huggingface_def, 'model'):
             raise ValueError("'model' is empty: {n}".format(n=model_def['hub']))
 
         model = "hf.co/{org}/{model}".format(
             org=huggingface_def['organization'],
             model=huggingface_def['model'])
 
-        if huggingface_def['quantization']:
+        if __get_or_default(huggingface_def, 'quantization'):
             model = "{model}:{quantization}".format(model=model,
-                                                   quantization=huggingface_def['quantization'])
+                                                    quantization=huggingface_def['quantization'])
         else:
             model = "{model}:latest".format(model=model)
 

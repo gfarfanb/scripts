@@ -12,6 +12,7 @@ Edit the environment variables
 | SCRIPTS_HOME | *Scripts repo location* |
 | ENV_VARS_FILE | *Environment variables file location* |
 | PROPSPATH | *props.bat script directory* |
+| PYLIBSPATH | *Python libs directory* |
 | Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\win;<other_scripts_dirs>; |
 
 Example of *env-vars* file:
@@ -31,6 +32,7 @@ vim ~/.bashrc
 # vim>
 # export ENV_VARS_FILE="<environment_variables_file_location>"
 # export PROPSPATH="<props_script_directory>"
+# export PYLIBSPATH="<py_libs_directory>"
 
 source ~/.bashrc
 ```

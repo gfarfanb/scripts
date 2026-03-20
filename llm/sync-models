@@ -3,9 +3,9 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var OLLAMA_MODELS_DEFS_FILE
+_require_var OLLAMA_MODELS_DEF_FILE
 _require_var OPENCODE_CONFIG_FILE
-_require_var SCRIPTS_PY_HOME
+_require_var SCRIPTS_LLM_PY_HOME
 
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 : "${OLLAMA_SERVER:=http://127.0.0.1:11434}"
@@ -38,9 +38,9 @@ if ! [ "$( systemctl is-active ollama )" = "active" ]; then
 fi
 
 if ! [ $_opencode_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/ollama_models.py" -a opencode
+    $(command -v python3 || command -v python) "$SCRIPTS_LLM_PY_HOME/ollama_models.py" -a opencode
 else
-    $(command -v python3 || command -v python) "$SCRIPTS_PY_HOME/ollama_models.py" -a opencode --sync
+    $(command -v python3 || command -v python) "$SCRIPTS_LLM_PY_HOME/ollama_models.py" -a opencode --sync
 fi
 
 _completed

@@ -1,12 +1,13 @@
 @echo OFF
 
 call env-vars
-call require-var UPDATE_COMMANDS_FILE
+call require-var WORKSPACE_HOME
+call require-var UPDATE_PLAN_FILE
 
 goto main
 
 :usage
-echo Update packages, scripts and synchronized files.
+echo Update packages and execute a plan.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
@@ -20,7 +21,7 @@ setlocal enableDelayedExpansion
 
 set /a _cmd_idx=1
 
-for /f "tokens=*" %%l in (%UPDATE_COMMANDS_FILE%) do (
+for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
     call eval set "_cmd=%%l"
 
     echo !_cmd! | findstr /r "^p:*" >nul
@@ -35,69 +36,6 @@ for /f "tokens=*" %%l in (%UPDATE_COMMANDS_FILE%) do (
         echo Executing: [!_cmd!]
 
         call eval !_cmd!
-    )
-)
-
-set /a _repo_idx=1
-
-for /f "tokens=*" %%l in (%UPDATE_REPOS_FILE%) do (
-    call eval set "_repo=%%l"
-
-    set _execute_flag=true
-
-    echo !_repo! | findstr /r "^p:*" >nul
-
-    if !errorlevel! equ 0 (
-        set "_repo=!_repo:~2!"
-        set _execute_flag=false
-    )
-
-    for /f "tokens=1,2 delims=:" %%a in ("!_repo!") do (
-        set "_branch=%%a"
-        set "_username=%%b"
-    )
-
-    set "_prefix=!_branch!:!_username!:"
-
-    call length "!_prefix!" _prefix_length
-    call eval set "_location=%%_repo:~!_prefix_length!%%"
-
-    for /f %%i in ("!_location!") do set "_repo_name=%%~ni"
-
-    if "!_execute_flag!"=="false" (
-        set "_print_repos[!_repo_idx!]=[!_branch!] !_location!"
-        set /a _repo_idx+=1
-    ) else (
-        if not exist "!_location!" (
-            mkdir "!_location!"
-            cd "!_location!"
-            cd ..
-            rd /s /q "!_location!"
-
-            echo:
-            echo "Cloning !_repo_name! ..."
-
-            git clone https://!_username!/!_repo_name!.git
-        ) else (
-            cd "!_location!"
-
-            echo:
-            echo Updating !_repo_name! ...
-
-            git checkout !_branch!
-            git pull origin !_branch!
-        )
-    )
-)
-
-set /a _repo_count=%_repo_idx%-1
-
-if %_repo_count% gtr 0 (
-    echo:
-    echo Update these repos if needed:
-
-    for /L %%i in (1,1,%_repo_count%) do (
-        echo ^> !_print_repos[%%i]!
     )
 )
 

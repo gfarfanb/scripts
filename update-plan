@@ -4,11 +4,10 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./env-vars
 
 _require_var WORKSPACE_HOME
-_require_var UPDATE_REPOS_FILE
-_require_var UPDATE_COMMANDS_FILE
+_require_var UPDATE_PLAN_FILE
 
 _usage() {
-    echo "Update packages, scripts and synchronized files."
+    echo "Update packages and execute a plan."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
@@ -59,7 +58,7 @@ fi
 
 _print_cmds=()
 
-if [ -f "$UPDATE_COMMANDS_FILE" ]; then
+if [ -f "$UPDATE_PLAN_FILE" ]; then
     while IFS= read -r line || [ -n "$line" ]; do
         _cmd=$( echo "${line//[$'\t\r\n']}" )
         _exe=$( cut -d : -f 1 <<< "$_cmd" )
@@ -72,64 +71,7 @@ if [ -f "$UPDATE_COMMANDS_FILE" ]; then
             echo "Executing: [$_cmd]"
             eval "$_cmd"
         fi
-    done < $UPDATE_COMMANDS_FILE
-fi
-
-_print_repos=()
-
-if [ -n "$( type -t git )" ] && [ -f "$UPDATE_REPOS_FILE" ]; then
-    while IFS= read -r line || [ -n "$line" ]; do
-        _repo=$( eval echo "${line//[$'\t\r\n']}" )
-        _exe=$( cut -d : -f 1 <<< "$_repo" )
-
-        if [ "$_exe" = "p" ]; then
-            _branch=$( cut -d : -f 2 <<< "$_repo" )
-            _location=$( cut -d : -f 4 <<< "$_repo" )
-            _print_repos+=( "[$_branch] $_location" )
-        else
-            _branch=$( cut -d : -f 1 <<< "$_repo" )
-            _username=$( cut -d : -f 2 <<< "$_repo" )
-            _location=$( cut -d : -f 3 <<< "$_repo" )
-            _repo_name="$(basename $_location)"
-
-            if ! [ -d "$_location" ]; then
-                mkdir -vp "$_location"
-                cd "$_location"
-                cd ..
-                rm -r "$_repo_name"
-
-                echo ;
-                echo "Cloning $_repo_name ..."
-
-                git clone https://$_username/$_repo_name.git
-
-                continue
-            fi
-
-            if [ -h "$_location" ]; then
-                echo ;
-                echo "'$_location' is a symlink"
-                continue
-            fi
-
-            cd "$_location"
-
-            echo ;
-            echo "Updating $_repo_name ..."
-
-            git checkout $_branch
-            git pull origin $_branch
-        fi
-    done < $UPDATE_REPOS_FILE
-fi
-
-if [ ${#_print_repos[*]} -gt 0 ]; then
-    echo ;
-    echo "Update these repos if needed:"
-
-    for _repo in "${_print_repos[@]}"; do
-        echo "> $_repo"
-    done
+    done < $UPDATE_PLAN_FILE
 fi
 
 if [ ${#_print_cmds[*]} -gt 0 ]; then

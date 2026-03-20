@@ -8,7 +8,6 @@ import sys
 
 def prop_value(name):
     if sys.platform == 'win32':
-        command = "{dir}\\props".format(dir=environ['PROPSPATH'])
         value = subprocess.run(['props', name], capture_output=True, shell=True, text=True)
     else:
         command = "{dir}/props".format(dir=environ['PROPSPATH'])
@@ -35,10 +34,10 @@ def get_default_or_fail(name, default_value):
         raise ValueError("Undefined environment variable: {name}".format(name=name))
 
 
-def logging_level() -> int:
+def logging_level(default_level='INFO') -> int:
     return logging.getLevelNamesMapping()[
         env_value(
-            name="LOGGING_LEVEL",
-            default_value="INFO",
+            name='LOGGING_LEVEL',
+            default_value=default_level,
             only_envs=True)
     ]

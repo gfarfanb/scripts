@@ -2,9 +2,9 @@
 
 call env-vars
 call require-var OLLAMA_SERVER
-call require-var OLLAMA_MODELS_DEFS_FILE
+call require-var OLLAMA_MODELS_DEF_FILE
 call require-var OPENCODE_CONFIG_FILE
-call require-var SCRIPTS_PY_HOME
+call require-var SCRIPTS_LLM_PY_HOME
 
 goto main
 
@@ -24,11 +24,11 @@ if /i "%~1"=="-h" goto usage
 goto sync
 
 :sync
-python "%SCRIPTS_PY_HOME%\ollama_models.py" -a opencode
+python "%SCRIPTS_LLM_PY_HOME%\ollama_models.py" -a opencode
 goto completed
 
 :opencode
-python "%SCRIPTS_PY_HOME%\ollama_models.py" -a opencode --sync
+python "%SCRIPTS_LLM_PY_HOME%\ollama_models.py" -a opencode --sync
 goto completed
 
 

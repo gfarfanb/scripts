@@ -39,7 +39,7 @@ def select_file_name(names, select_message):
 
     logger.info("{i}) (default) <skip file>".format(i=i))
 
-    logger.info("file-index> ")
+    logger.info('file-index> ')
     try:
         file_idx = int(input())
     except ValueError:
@@ -52,7 +52,7 @@ def select_file_name(names, select_message):
 
 
 def get_snapshot_dir(files_home):
-    snapshots_home = join(files_home, "snapshots")
+    snapshots_home = join(files_home, 'snapshots')
 
     if not exists(snapshots_home):
         makedirs(snapshots_home)
@@ -61,7 +61,7 @@ def get_snapshot_dir(files_home):
 
 
 def create_snapshot(files_home, file_name, snapshots_home):
-    tmp_tag = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tmp_tag = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     snapshot_file_names = set()
 
     for f in listdir(join(files_home)):
@@ -126,7 +126,7 @@ def select_snapshot(file_name, snapshots_home):
 
             snapshot_groups[str(version)] = group
 
-    logger.info("\nSelect backup version")
+    logger.info('\nSelect backup version')
 
     last = 0
     for k, v in snapshot_groups.items():
@@ -137,7 +137,7 @@ def select_snapshot(file_name, snapshots_home):
 
     logger.info("{i}) (default) <skip file>".format(i=(last + 1)))
 
-    logger.info("version-index> ")
+    logger.info('version-index> ')
     selected_version = input()
 
     try:
@@ -146,24 +146,16 @@ def select_snapshot(file_name, snapshots_home):
         return None
 
 
-def not_created_err():
-    raise ValueError("Snapshot not created")
-
-
-def not_recovered_err():
-    raise ValueError("Snapshot not recovered")
-
-
 def execute_snapshot(files_home):
     names = names_without_ext(files_home)
 
     if len(names) < 1:
-        not_created_err()
+        raise ValueError('Snapshot not created')
 
-    file_name = select_file_name(names, "Choose a file to create a snapshot:")
+    file_name = select_file_name(names, 'Choose a file to create a snapshot:')
 
     if file_name is None:
-        not_created_err()
+        raise ValueError('Snapshot not created')
 
     logger.info('')
 
@@ -178,17 +170,17 @@ def execute_recover(files_home):
     names = names_without_ext(snapshots_home)
 
     if len(names) < 1:
-        not_recovered_err()
+        raise ValueError('Snapshot not recovered')
 
-    file_name = select_file_name(names, "Choose a file to recover its snapshot:")
+    file_name = select_file_name(names, 'Choose a file to recover its snapshot:')
 
     if file_name is None:
-        not_recovered_err()
+        raise ValueError('Snapshot not recovered')
 
     snapshot_file_names = select_snapshot(file_name, snapshots_home)
 
     if snapshot_file_names is None:
-        not_recovered_err()
+        raise ValueError('Snapshot not recovered')
 
     logger.info('')
 
@@ -203,11 +195,11 @@ def main():
             level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
-        parser.add_argument("-d", "--directory",
-                            help="Source files directory",
-                            default=input("source-files-directory> "))
-        parser.add_argument("-r", "--recover", action="store_true",
-                            help="Enables recover snapshot files")
+        parser.add_argument('-d', '--directory',
+                            help='Source files directory',
+                            default=input('source-files-directory> '))
+        parser.add_argument('-r', '--recover', action='store_true',
+                            help='Enables recover snapshot files')
         args = parser.parse_args()
 
         if args.recover:

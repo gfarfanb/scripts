@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 
 from os.path import isfile
+from os import environ
+
 import sys
+import argparse
+import json
+import requests
+import logging
 
 if sys.platform == 'win32':
     from progressbar import ProgressBar
 else:
     from progressbar2 import ProgressBar
 
-import argparse
-import json
-import requests
-import logging
-
-import env_vars
+sys.path.append(environ['PYLIBSPATH'])
+import env_vars # pyright: ignore[reportMissingImports]
 
 ollama_host = env_vars.env_value('OLLAMA_SERVER')
-ollama_model_defs = env_vars.env_value('OLLAMA_MODELS_DEFS_FILE')
+ollama_models_def = env_vars.env_value('OLLAMA_MODELS_DEF_FILE')
 opencode_config_file = env_vars.env_value('OPENCODE_CONFIG_FILE')
 
 logger = logging.getLogger()
@@ -106,7 +108,7 @@ def cleanup_models():
                 
 
 def __get_model_defs(filtered=False):
-    with open(ollama_model_defs, 'r') as f:
+    with open(ollama_models_def, 'r') as f:
         model_defs = json.load(f)
 
     filtered_defs = []

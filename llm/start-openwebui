@@ -7,6 +7,8 @@ _require_var SCRIPTS_DEV_LIBS_HOME
 _require_var OPEN_WEBUI_ENV
 _require_var OPEN_WEBUI_PORT
 _require_var OPEN_WEBUI_COMPOSE_FILE
+_require_var OPEN_WEBUI_BACKUP_HOME
+_require_var OPEN_WEBUI_BACKUP_TO_KEEP
 _require_var OLLAMA_SERVER
 _require_var DOCLING_SERVER
 _require_var DOCLING_PORT
@@ -18,6 +20,8 @@ _usage() {
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
+    echo "    -b: Backup Open WebUI"
+    echo "    -a: Restore backup for Open WebUI"
     echo "    -d: Start only Docling container"
     echo "    -t: Open the terminal for Open WebUI or Docling containers"
     echo "    -l: Show the logs for Open WebUI and Docling containers"
@@ -64,13 +68,13 @@ _docker_compose() {
         OLLAMA_SERVER=$OLLAMA_SERVER \
         DOCLING_SERVER=$DOCLING_SERVER \
         DOCLING_PORT=$DOCLING_PORT \
-        docker compose $*
+        docker compose -f $OPEN_WEBUI_COMPOSE_FILE $*
 }
 
 _start_openwebui() {
     _start_ollama
 
-    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE up
+    _docker_compose up
 
     _wait_until_healthy open-webui-$OPEN_WEBUI_ENV
 
@@ -85,6 +89,67 @@ _start_openwebui() {
     _completed
 }
 
+_backup_openwebui() {
+    echo "Creating backup for open-webui-$OPEN_WEBUI_ENV..."
+
+    docker run --rm -v open-webui-$OPEN_WEBUI_ENV:/data -v $OPEN_WEBUI_BACKUP_HOME:/backup \
+        alpine tar czf /backup/openwebui-$(date +%Y%m%d).tar.gz data
+
+    cd $OPEN_WEBUI_BACKUP_HOME
+
+    _files_count=$(ls | wc -l)
+
+    if [ $_files_count -gt $OPEN_WEBUI_BACKUP_TO_KEEP ]; then
+        ls -t | tail --lines=+$(expr $OPEN_WEBUI_BACKUP_TO_KEEP + 1) | xargs -d '\n' rm
+    fi
+
+    _completed
+}
+
+_restore_openwebui() {
+    echo "Restoring backup for open-webui-$OPEN_WEBUI_ENV..."
+
+    declare -a _backups=( $( ls $OPEN_WEBUI_BACKUP_HOME -t ) )
+
+    _length=${#_backups[@]}
+    _last=$((_length-1))
+
+    echo ;
+    echo "Select a backup to recover:"
+    for _idx in "${!_backups[@]}"; do
+        _backup="${_backups[$_idx]}"
+
+        if [ $_idx -eq $_last ]; then
+            echo "$((_idx+1))) (default) $_backup "
+        else
+            echo "$((_idx+1))) $_backup"
+        fi
+    done
+    read -p "backup-index> " _backup_idx
+
+    if [ -z "$_backup_idx" ]; then
+        _backup_idx=$_last
+    else
+        _backup_idx=$((_backup_idx-1))
+    fi
+
+    _backup="${_backups[$_backup_idx]}"
+
+    if [ -z "$_backup" ]; then
+        echo "Invalid backup index"
+        _stopped
+    fi
+
+    _docker_compose stop open-webui-$OPEN_WEBUI_ENV
+
+    docker run --rm -v open-webui-$OPEN_WEBUI_ENV:/data -v $OPEN_WEBUI_BACKUP_HOME:/backup \
+        alpine sh -c "rm -rf /data/* && tar xzf /backup/$_backup -C /"
+
+    _docker_compose run --rm open-webui-$OPEN_WEBUI_ENV
+
+    _completed
+}
+
 _terminal_openwebui() {
     _terminal_container $( _select_service )
 
@@ -92,33 +157,39 @@ _terminal_openwebui() {
 }
 
 _logs_openwebui() {
-    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE logs -f $( _select_service )
+    _docker_compose logs -f $( _select_service )
 
     _completed
 }
 
 _stop_openwebui() {
-    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE stop
+    _docker_compose stop
 
     _completed
 }
 
 _remove_openwebui() {
-    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE down
+    _docker_compose down
 
     _completed
 }
 
 _start_docling() {
-    _docker_compose -f $OPEN_WEBUI_COMPOSE_FILE run --rm docling-serve-$OPEN_WEBUI_ENV
+    _docker_compose run --rm docling-serve-$OPEN_WEBUI_ENV
 
     _update_container docling-serve-$OPEN_WEBUI_ENV
 
     _completed
 }
 
-while getopts "dtlsrh" opt; do
+while getopts "badtlsrh" opt; do
     case "$opt" in
+        b)
+            _backup_openwebui
+            ;;
+        a)
+            _restore_openwebui
+            ;;
         d)
             _start_docling
             ;;

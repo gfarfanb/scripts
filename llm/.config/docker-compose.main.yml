@@ -45,6 +45,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  # spring-app:
+  #   build: .
+  #   container_name: spring-app
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SPRING_REDIS_HOST: redis
+  #     SPRING_REDIS_PORT: 6379
+
+  # redis:
+  #   image: redis
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+
   docling-serve-main:
     image: quay.io/docling-project/docling-serve:latest
     container_name: docling-serve-main

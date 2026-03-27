@@ -58,14 +58,35 @@ _stopped() {
     exit 0
 }
 
-_print() {
-    echo "$*" >&2
-}
-
 _trim_separator() {
     echo "${1:-}" | sed 's/^\/*\|\/*$//g'
 }
 
 _trim_trailing_separator() {
     echo "${1:-}" | sed 's/\/*$//'
+}
+
+_kill_process() {
+    local _name=${1:-}
+    local _all_pids=$( ps -ef | grep "$_name" | grep -v grep | awk '{print $2}' )
+
+    if [ -n "$_all_pids" ]; then
+        echo "Stopping process '$_name'..."
+
+        for pid in $_all_pids; do
+            sudo kill -9 $pid
+            waited=0
+            while [ -e /proc/$pid ]; do
+                sleep 1
+                let "waited+=1"
+                if [ $waited -eq 120 ]; then
+                    echo -e "\nWaited two minutes, $pid is not responding to stop '$_name'"
+                    exit 1
+                fi
+            done
+            echo -e "\nStopped '$_name' running with PID $pid"
+        done
+    else
+        echo "Process '$_name' is not running"
+    fi
 }

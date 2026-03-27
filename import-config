@@ -24,9 +24,9 @@ _append_env_vars() {
 }
 
 _yes_prompt() {
-    _print "${1:-}"
-    _print "y) Yes (default)"
-    _print "n) No"
+    echo "${1:-}"
+    echo "y) Yes (default)"
+    echo "n) No"
     read -p "y/n> " _yesno
     if [ -z "$_yesno" ]; then
         _yesno=y

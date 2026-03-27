@@ -40,9 +40,9 @@ _usage() {
 . "$SCRIPTS_DEV_LIBS_HOME/docker-fn"
 
 _select_service() {
-    _print "Which service do you want to connect?"
-    _print "o) Open WebUI (default)"
-    _print "d) Docling"
+    echo "Which service do you want to connect?"
+    echo "o) Open WebUI (default)"
+    echo "d) Docling"
     read -p "o/d> " _service
 
     if [ -z "$_service" ]; then

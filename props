@@ -24,10 +24,7 @@ _prop_name=${1:-}
 
 if [ -n "$_prop_name" ]; then
     _prop_value=$( eval "echo \$$_prop_name" )
-    echo "$_prop_value" | xclip -sel clip
-    echo Copied!!
-
-    _completed
+    echo "$_prop_value"
 fi
 
 _all_props=( $( cat $ENV_VARS_FILE | grep '^.*=.*' | grep -v '^#.*' | cut -d "=" -f 1 ) )

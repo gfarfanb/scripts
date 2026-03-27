@@ -28,11 +28,9 @@ rem Comment
 
 Add the required environment variable to *~/.bashrc* file
 ```sh
-vim ~/.bashrc
-# vim>
-# export ENV_VARS_FILE="<environment_variables_file_location>"
-# export PROPSPATH="<scripts_location>"
-# export PYLIBSPATH="<scripts_py_libs_directory>"
+echo 'export ENV_VARS_FILE="<environment_variables_file_location>"' >> ~/.bashrc
+echo 'export PROPSPATH="<scripts_location>"' >> ~/.bashrc
+echo 'export PYLIBSPATH="<scripts_py_libs_directory>"' >> ~/.bashrc
 
 source ~/.bashrc
 ```
@@ -91,15 +89,26 @@ VARIABLE_2=VALUE2
         "ollama": {
             "model": "<model>",
             "parameters": "<parameters>",
-            "opencode": true,
-            "embeddings": true
+            "info": {
+                "basename": "<model_basename>",
+                "opencode": true,
+                "embeddings": true,
+                "image": true,
+                "ocr": true
+            }
+
         },
         "huggingface": {
             "organization": "<organization_name>",
             "model": "<model>",
             "quantization": "<quantization>",
-            "opencode": true,
-            "embeddings": true
+            "info": {
+                "basename": "<model_basename>",
+                "opencode": true,
+                "embeddings": true,
+                "image": true,
+                "ocr": true
+            }
         }
     }
 }

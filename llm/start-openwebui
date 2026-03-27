@@ -9,6 +9,11 @@ _require_var OPEN_WEBUI_PORT
 _require_var OPEN_WEBUI_COMPOSE_FILE
 _require_var OPEN_WEBUI_BACKUP_HOME
 _require_var OPEN_WEBUI_BACKUP_TO_KEEP
+_require_var OPEN_WEBUI_POSTGRESQL_PASSWORD
+_require_var OPEN_WEBUI_POSTGRESQL_PORT
+_require_var OPEN_WEBUI_DATABASE_NAME
+_require_var OPEN_WEBUI_GITHUB_CLIENT_ID
+_require_var OPEN_WEBUI_GITHUB_CLIENT_SECRET
 _require_var OLLAMA_SERVER
 _require_var DOCLING_SERVER
 _require_var DOCLING_PORT
@@ -22,11 +27,12 @@ _usage() {
     echo "Option:"
     echo "    -b: Backup Open WebUI"
     echo "    -a: Restore backup for Open WebUI"
+    echo "    -p: Start only Postgres container"
     echo "    -d: Start only Docling container"
     echo "    -t: Open the terminal for Open WebUI or Docling containers"
     echo "    -l: Show the logs for Open WebUI and Docling containers"
-    echo "    -s: Stop Open WebUI and Docling containers"
-    echo "    -r: Remove Open WebUI and Docling containers"
+    echo "    -s: Stop all containers"
+    echo "    -r: Remove all containers"
     echo "    -h: Displays this help message"
     exit 0
 }
@@ -66,6 +72,11 @@ _start_ollama() {
 _docker_compose() {
     OPEN_WEBUI_PORT=$OPEN_WEBUI_PORT \
         OLLAMA_SERVER=$OLLAMA_SERVER \
+        OPEN_WEBUI_POSTGRESQL_PASSWORD=$OPEN_WEBUI_POSTGRESQL_PASSWORD \
+        OPEN_WEBUI_POSTGRESQL_PORT=$OPEN_WEBUI_POSTGRESQL_PORT \
+        OPEN_WEBUI_DATABASE_NAME=$OPEN_WEBUI_DATABASE_NAME \
+        OPEN_WEBUI_GITHUB_CLIENT_ID=$OPEN_WEBUI_GITHUB_CLIENT_ID \
+        OPEN_WEBUI_GITHUB_CLIENT_SECRET=$OPEN_WEBUI_GITHUB_CLIENT_SECRET \
         DOCLING_SERVER=$DOCLING_SERVER \
         DOCLING_PORT=$DOCLING_PORT \
         docker compose -f $OPEN_WEBUI_COMPOSE_FILE $*
@@ -174,6 +185,12 @@ _remove_openwebui() {
     _completed
 }
 
+_start_postgres() {
+    _docker_compose run --rm postgres
+
+    _completed
+}
+
 _start_docling() {
     _docker_compose run --rm docling-serve-$OPEN_WEBUI_ENV
 
@@ -182,13 +199,16 @@ _start_docling() {
     _completed
 }
 
-while getopts "badtlsrh" opt; do
+while getopts "bapdtlsrh" opt; do
     case "$opt" in
         b)
             _backup_openwebui
             ;;
         a)
             _restore_openwebui
+            ;;
+        p)
+            _start_postgres
             ;;
         d)
             _start_docling

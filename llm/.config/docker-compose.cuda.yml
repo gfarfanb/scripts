@@ -4,11 +4,25 @@ services:
     image: ghcr.io/open-webui/open-webui:cuda
     container_name: open-webui-cuda
     volumes:
-      - open-webui-cuda:/app/backend/data
+      - open_webui_cuda_data:/app/backend/data
     environment:
       - PORT=${OPEN_WEBUI_PORT}
-      # - WEBUI_SECRET_KEY=${OPEN_WEBUI_SECRET_KEY}
+      - USER_PERMISSIONS_CHAT_MULTIPLE_MODELS=true
+      - OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true
+      - ENABLE_OAUTH_PERSISTENT_CONFIG=false
+      - GITHUB_CLIENT_ID=${OPEN_WEBUI_GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${OPEN_WEBUI_GITHUB_CLIENT_SECRET}
       - OLLAMA_BASE_URL=${OLLAMA_SERVER}
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_TEXT_SPLITTER=markdown_header
+      - CHUNK_MIN_SIZE_TARGET=1000
+      - DATABASE_URL=postgresql://postgres:${OPEN_WEBUI_POSTGRESQL_PASSWORD}@localhost:${OPEN_WEBUI_POSTGRESQL_PORT}/openwebui
+      - DATABASE_POOL_SIZE=20
+      - DATABASE_POOL_MAX_OVERFLOW=10
+      - DATABASE_POOL_TIMEOUT=30
+      - DATABASE_POOL_RECYCLE=1800
+      - VECTOR_DB=pgvector
+      - PGVECTOR_DB_URL=postgresql://postgres:${OPEN_WEBUI_POSTGRESQL_PASSWORD}@localhost:${OPEN_WEBUI_POSTGRESQL_PORT}/openwebui
       - DOCLING_SERVER_URL=${DOCLING_SERVER}
     network_mode: host
     restart: unless-stopped
@@ -19,6 +33,24 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    depends_on:
+      - postgres
+
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg18-trixie
+    container_name: postgres
+    hostname: postgres
+    network_mode: host
+    restart: unless-stopped
+    command: postgres -c shared_buffers=256MB -c work_mem=16MB -c maintenance_work_mem=128MB -c effective_cache_size=512MB -c max_connections=100
+    environment:
+      - PGPORT=${OPEN_WEBUI_POSTGRESQL_PORT}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${OPEN_WEBUI_POSTGRESQL_PASSWORD}
+      - POSTGRES_DB=openwebui
+      - POSTGRES_MULTIPLE_DATABASES=langflow,linkwarden,n8n
+    volumes:
+      - postgres_data:/var/lib/postgresql
 
   docling-serve-cuda:
     image: quay.io/docling-project/docling-serve-cu128:latest
@@ -43,4 +75,5 @@ services:
               capabilities: [gpu]
 
 volumes:
-  open-webui-cuda:
+  open_webui_cuda_data:
+  postgres_data:

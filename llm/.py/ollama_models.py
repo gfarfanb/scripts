@@ -333,7 +333,7 @@ def __is_readonly(model_def):
 
 def __required_opencode(model_def):
     try:
-        return model_def[model_def['hub']]['opencode']
+        return model_def[model_def['hub']]['info']['opencode']
     except KeyError:
         return False
 

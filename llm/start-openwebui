@@ -15,6 +15,10 @@ _require_var OPEN_WEBUI_DATABASE_NAME
 _require_var OPEN_WEBUI_GITHUB_CLIENT_ID
 _require_var OPEN_WEBUI_GITHUB_CLIENT_SECRET
 _require_var OLLAMA_SERVER
+_require_var GITHUB_COPILOT_TOKEN
+_require_var COPILOT_ADAPTER_PORT
+_require_var COPILOT_ADAPTER_API_URL
+_require_var COPILOT_ADAPTER_API_VERSION
 _require_var DOCLING_SERVER
 _require_var DOCLING_PORT
 _require_var DOCKER_WAIT_SECS
@@ -40,21 +44,33 @@ _usage() {
 . "$SCRIPTS_DEV_LIBS_HOME/docker-fn"
 
 _select_service() {
-    echo "Which service do you want to connect?"
-    echo "o) Open WebUI (default)"
-    echo "d) Docling"
-    read -p "o/d> " _service
+    echo "Which service do you want to connect?" >&2
+    echo "1) Open WebUI (default)" >&2
+    echo "2) Docling" >&2
+    echo "3) Copilot Adapter" >&2
+    echo "4) PostgreSQL" >&2
+    echo "5) Redis" >&2
+    read -p "service-index> " _service_index
 
-    if [ -z "$_service" ]; then
-        _service=o
+    if [ -z "$_service_index" ]; then
+        _service_index=1
     fi
 
-    case "$_service" in
-        o)
+    case "$_service_index" in
+        1)
             echo "open-webui-$OPEN_WEBUI_ENV"
             ;;
-        d)
+        2)
             echo "docling-serve-$OPEN_WEBUI_ENV"
+            ;;
+        3)
+            echo "copilot-adapter"
+            ;;
+        4)
+            echo "postgres"
+            ;;
+        5)
+            echo "redis"
             ;;
         * )
             echo "Invalid service option: $_service"
@@ -77,6 +93,10 @@ _docker_compose() {
         OPEN_WEBUI_DATABASE_NAME=$OPEN_WEBUI_DATABASE_NAME \
         OPEN_WEBUI_GITHUB_CLIENT_ID=$OPEN_WEBUI_GITHUB_CLIENT_ID \
         OPEN_WEBUI_GITHUB_CLIENT_SECRET=$OPEN_WEBUI_GITHUB_CLIENT_SECRET \
+        COPILOT_ADAPTER_PORT=$COPILOT_ADAPTER_PORT \
+        COPILOT_ADAPTER_GITHUB_TOKEN=$GITHUB_COPILOT_TOKEN \
+        COPILOT_ADAPTER_API_URL=$COPILOT_ADAPTER_API_URL \
+        COPILOT_ADAPTER_API_VERSION=$COPILOT_ADAPTER_API_VERSION \
         DOCLING_SERVER=$DOCLING_SERVER \
         DOCLING_PORT=$DOCLING_PORT \
         docker compose -f $OPEN_WEBUI_COMPOSE_FILE $*

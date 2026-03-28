@@ -25,16 +25,16 @@ _require_var DOCKER_WAIT_SECS
 _require_var DOCKER_WAIT_TRIES
 
 _usage() {
-    echo "Starts Ollama service, Open WebUI and Docling."
+    echo "Starts Open WebUI and the related services."
     echo ;
     echo "Usage: $0 [<option>]*"
     echo "Option:"
     echo "    -b: Backup Open WebUI"
     echo "    -a: Restore backup for Open WebUI"
-    echo "    -p: Start only Postgres container"
-    echo "    -d: Start only Docling container"
-    echo "    -t: Open the terminal for Open WebUI or Docling containers"
-    echo "    -l: Show the logs for Open WebUI and Docling containers"
+    echo "    -e: Execute a container"
+    echo "    -k: Kill a container"
+    echo "    -t: Open the terminal for a containers"
+    echo "    -l: Show the logs for a containers"
     echo "    -s: Stop all containers"
     echo "    -r: Remove all containers"
     echo "    -h: Displays this help message"
@@ -181,45 +181,43 @@ _restore_openwebui() {
     _completed
 }
 
-_terminal_openwebui() {
+_terminal_services() {
     _terminal_container $( _select_service )
 
     _completed
 }
 
-_logs_openwebui() {
+_logs_services() {
     _docker_compose logs -f $( _select_service )
 
     _completed
 }
 
-_stop_openwebui() {
+_stop_services() {
     _docker_compose stop
 
     _completed
 }
 
-_remove_openwebui() {
+_remove_services() {
     _docker_compose down
 
     _completed
 }
 
-_start_postgres() {
-    _docker_compose run --rm postgres
+_execute_services() {
+    _docker_compose run --rm $( _select_service )
 
     _completed
 }
 
-_start_docling() {
-    _docker_compose run --rm docling-serve-$OPEN_WEBUI_ENV
-
-    _update_container docling-serve-$OPEN_WEBUI_ENV
+_kill_services() {
+    _docker_compose stop $( _select_service )
 
     _completed
 }
 
-while getopts "bapdtlsrh" opt; do
+while getopts "baektlsrh" opt; do
     case "$opt" in
         b)
             _backup_openwebui
@@ -227,23 +225,23 @@ while getopts "bapdtlsrh" opt; do
         a)
             _restore_openwebui
             ;;
-        p)
-            _start_postgres
+        e)
+            _execute_services
             ;;
-        d)
-            _start_docling
+        k)
+            _kill_services
             ;;
         t)
-            _terminal_openwebui
+            _terminal_services
             ;;
         l)
-            _logs_openwebui
+            _logs_services
             ;;
         s)
-            _stop_openwebui
+            _stop_services
             ;;
         r)
-            _remove_openwebui
+            _remove_services
             ;;
         h)
             _usage

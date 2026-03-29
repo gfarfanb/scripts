@@ -126,7 +126,8 @@ def select_snapshot(file_name, snapshots_home):
 
             snapshot_groups[str(version)] = group
 
-    logger.info('\nSelect backup version')
+    logger.info('')
+    logger.info('Select backup version')
 
     last = 0
     for k, v in snapshot_groups.items():

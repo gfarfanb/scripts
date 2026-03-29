@@ -53,10 +53,13 @@ services:
       - postgres_data:/var/lib/postgresql
 
   copilot-adapter:
-    image: gfarfanb/copilot-adapter:1.0.0-beta.3
+    image: gfarfanb/copilot-adapter:1.0.0-beta.4
     container_name: copilot-adapter
     environment:
       - SERVER_PORT=${COPILOT_ADAPTER_PORT}
+      - REDIS_HOST=localhost
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DATABASE=0
       - GITHUB_COPILOT_TOKEN=${COPILOT_ADAPTER_GITHUB_TOKEN}
       - COPILOT_API_URL=${COPILOT_ADAPTER_API_URL}
       - COPILOT_API_VERSION=${COPILOT_ADAPTER_API_VERSION}

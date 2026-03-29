@@ -45,7 +45,8 @@ def pull_repos(select=False):
                 __pull_repo(repo_def)
 
     if discarded_repos:
-        logger.info('\nUpdate these repos if needed:')
+        logger.info('')
+        logger.info('Update these repos if needed:')
 
         for repo_def in discarded_repos:
             repo_home = join(repo_def['location'], repo_def['name'])
@@ -107,7 +108,8 @@ def backup_repos(select=False):
                 __backup_repo(repo_def)
 
     if discarded_repos:
-        logger.info('\nBackup these repos if needed:')
+        logger.info('')
+        logger.info('Backup these repos if needed:')
 
         for repo_def in discarded_repos:
             logger.info("> {backup}".format(backup=__get_backup_link(repo_def)))
@@ -123,11 +125,12 @@ def __backup_repo(repo_def):
         backup_location = "{zip}.bak".format(zip=zip_location)
         rename(src=zip_location, dst=backup_location)
 
-    logger.info("URL: {url}".format(url=zip_url))
+    logger.info('')
+    logger.info("Getting URL: {url}".format(url=zip_url))
 
     output = wget.download(zip_url, out=zip_location, bar=wget.bar_thermometer)
 
-    logger.info("Downloaded: {output}".format(output=output))
+    logger.info("Downloaded backup: {output}".format(output=output))
 
     if exists(backup_location):
         remove(backup_location)

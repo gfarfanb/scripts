@@ -130,7 +130,7 @@ _backup_openwebui() {
 
     cd $OPEN_WEBUI_BACKUP_HOME
 
-    _files_count=$(ls | wc -l)
+    _files_count=$( ls | wc -l )
 
     if [ $_files_count -gt $OPEN_WEBUI_BACKUP_TO_KEEP ]; then
         ls -t | tail --lines=+$(expr $OPEN_WEBUI_BACKUP_TO_KEEP + 1) | xargs -d '\n' rm
@@ -142,8 +142,7 @@ _backup_openwebui() {
 _restore_openwebui() {
     echo "Restoring backup for open-webui-$OPEN_WEBUI_ENV..."
 
-    declare -a _backups=( $( ls $OPEN_WEBUI_BACKUP_HOME -t ) )
-
+    _backups=( $( ls "$OPEN_WEBUI_BACKUP_HOME" -t ) )
     _length=${#_backups[@]}
     _last=$((_length-1))
 

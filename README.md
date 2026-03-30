@@ -117,7 +117,9 @@ VARIABLE_2=VALUE2
 | Field | Default Value |
 | --- | --- |
 | **readonly** | `false` |
-| **ollama.opencode** | `false` |
-| **huggingface.opencode** | `false` |
+| **<hub>.info.opencode** | `false` |
+| **<hub>.info.embeddings** | `false` |
+| **<hub>.info.image** | `false` |
+| **<hub>.info.ocr** | `false` |
 
-> \* `.<SCRIPTS_LLM_HOME>/sync-models`
+> \* `.<SCRIPTS_LLM_HOME>/sync-ollama`

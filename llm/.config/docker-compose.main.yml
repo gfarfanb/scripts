@@ -14,8 +14,16 @@ services:
       - GITHUB_CLIENT_SECRET=${OPEN_WEBUI_GITHUB_CLIENT_SECRET}
       - OLLAMA_BASE_URL=${OLLAMA_SERVER}
       - RAG_EMBEDDING_ENGINE=ollama
-      - RAG_TEXT_SPLITTER=markdown_header
+      - RAG_EMBEDDING_MODEL=nomic-embed-text:v1.5
+      - RAG_TEXT_SPLITTER=token
+      - ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER=true
       - CHUNK_MIN_SIZE_TARGET=1000
+      - ENABLE_RAG_WEB_SEARCH=true
+      - ENABLE_RAG_LOCAL_WEB_FETCH=true
+      - RAG_WEB_SEARCH_ENGINE=searxng
+      - RAG_WEB_SEARCH_RESULT_COUNT=3
+      - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
+      - SEARXNG_QUERY_URL=${SEARXNG_SERVER}/search?q=<query>
       - DATABASE_URL=postgresql://postgres:${OPEN_WEBUI_POSTGRESQL_PASSWORD}@localhost:${OPEN_WEBUI_POSTGRESQL_PORT}/${OPEN_WEBUI_DATABASE_NAME}
       - DATABASE_POOL_SIZE=20
       - DATABASE_POOL_MAX_OVERFLOW=10
@@ -23,6 +31,10 @@ services:
       - DATABASE_POOL_RECYCLE=1800
       - VECTOR_DB=pgvector
       - PGVECTOR_DB_URL=postgresql://postgres:${OPEN_WEBUI_POSTGRESQL_PASSWORD}@localhost:${OPEN_WEBUI_POSTGRESQL_PORT}/${OPEN_WEBUI_DATABASE_NAME}
+      # - CONTENT_EXTRACTION_ENGINE=tika
+      # - TIKA_SERVER_URL=${TIKA_SERVER}
+      - CONTENT_EXTRACTION_ENGINE=docling
+      - DOCLING_ASYNC=true
       - DOCLING_SERVER_URL=${DOCLING_SERVER}
     network_mode: host
     restart: unless-stopped
@@ -66,6 +78,35 @@ services:
     container_name: redis
     network_mode: host
     restart: unless-stopped
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_PORT=${SEARXNG_PORT}
+      - SEARXNG_HOST=${SEARXNG_SERVER}
+    network_mode: host
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  # tika:
+  #   image: apache/tika:latest-full
+  #   container_name: tika
+  #   network_mode: host
+  #   restart: unless-stopped
 
   docling-serve-main:
     image: quay.io/docling-project/docling-serve:latest

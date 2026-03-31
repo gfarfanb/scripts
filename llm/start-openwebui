@@ -53,8 +53,8 @@ _select_service() {
     echo "3) PostgreSQL" >&2
     echo "4) Redis" >&2
     echo "5) SearXNG" >&2
-    echo "6) Tika" >&2
-    echo "7) Docling" >&2
+    echo "6) Docling" >&2
+    echo "7) Tika" >&2
     read -p "service-index> " _service_index
 
     if [ -z "$_service_index" ]; then
@@ -78,10 +78,10 @@ _select_service() {
             echo "searxng"
             ;;
         6)
-            echo "tika"
+            echo "docling-serve-$OPEN_WEBUI_ENV"
             ;;
         7)
-            echo "docling-serve-$OPEN_WEBUI_ENV"
+            echo "tika"
             ;;
         * )
             echo "Invalid service option: $_service"

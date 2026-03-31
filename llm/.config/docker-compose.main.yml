@@ -97,16 +97,10 @@ services:
       - SETUID
       - DAC_OVERRIDE
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "1m"
-        max-file: "1"
-
-  # tika:
-  #   image: apache/tika:latest-full
-  #   container_name: tika
-  #   network_mode: host
-  #   restart: unless-stopped
+        max-size: 1m
+        max-file: 1
 
   docling-serve-main:
     image: quay.io/docling-project/docling-serve:latest
@@ -115,13 +109,19 @@ services:
       - UVICORN_PORT=${DOCLING_PORT}
       - DOCLING_SERVE_ENABLE_UI=true
       - DOCLING_SERVE_ENABLE_REMOTE_SERVICES=true
-      - DOCLING_SERVE_MAX_SYNC_WAIT=600
+      - DOCLING_SERVE_MAX_SYNC_WAIT=1800
       - DOCLING_SERVE_ENG_LOC_NUM_WORKERS=2
       - OMP_NUM_THREADS=4
       - MKL_NUM_THREADS=4
       - UVICORN_WORKERS=1
     network_mode: host
     restart: unless-stopped
+
+  # tika:
+  #   image: apache/tika:latest-full
+  #   container_name: tika
+  #   network_mode: host
+  #   restart: unless-stopped
 
 volumes:
   open_webui_main_data:

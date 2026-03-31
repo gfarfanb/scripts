@@ -6,6 +6,7 @@ services:
     volumes:
       - open_webui_main_data:/app/backend/data
     environment:
+      - ENV=dev
       - PORT=${OPEN_WEBUI_PORT}
       - USER_PERMISSIONS_CHAT_MULTIPLE_MODELS=true
       - OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true

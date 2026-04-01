@@ -9,19 +9,18 @@ Edit the environment variables
 
 | Variable | Value |
 | --- | --- |
-| SCRIPTS_HOME | *Scripts repo location* |
 | ENV_VARS_FILE | *Environment variables file location* |
+| SCRIPTS_HOME | *Scripts repo location* |
 | PROPSPATH | *scripts/ location* |
 | PYLIBSPATH | *scripts/.py/ location* |
-| Path | %Path%;%SCRIPTS_HOME%;%SCRIPTS_HOME%\win;<other_scripts_dirs>; |
 
-Example of *env-vars* file:
-```bat
-set "VARIABLE_1=VALUE1"
-set "VARIABLE_2=VALUE2"
-
-rem Comment
-```
+> Example of *env-vars* file:
+> ```bat
+> set "VARIABLE_1=VALUE1"
+> set "VARIABLE_2=VALUE2"
+> 
+> rem Comment
+> ```
 
 
 ## Linux setup
@@ -36,13 +35,13 @@ echo 'export PYLIBSPATH="<scripts_py_libs_directory>"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Example of *env-vars* file:
-```bash
-VARIABLE_1="VALUE1"
-VARIABLE_2=VALUE2
-
-# Comment
-```
+> Example of *env-vars* file:
+> ```bash
+> VARIABLE_1="VALUE1"
+> VARIABLE_2=VALUE2
+> 
+> # Comment
+> ```
 
 
 ## VS Code configuration
@@ -118,9 +117,10 @@ VARIABLE_2=VALUE2
 | Field | Default Value |
 | --- | --- |
 | **readonly** | `false` |
-| **<hub>.info.opencode** | `false` |
-| **<hub>.info.embeddings** | `false` |
-| **<hub>.info.image** | `false` |
-| **<hub>.info.ocr** | `false` |
+| **\<hub>.info.opencode** | `false` |
+| **\<hub>.info.embeddings** | `false` |
+| **\<hub>.info.image** | `false` |
+| **\<hub>.info.ocr** | `false` |
 
-> \* `.<SCRIPTS_LLM_HOME>/sync-ollama`
+> \* Windows: `%SCRIPTS_HOME%/llm/sync-ollama` \
+> \* Linux: `$SCRIPTS_HOME/llm/sync-ollama`

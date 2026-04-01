@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-# :__usage_lib_page
+# __usage_lib_page:
 # Defines common environment variables,
 # imports environment variables from from $ENV_VARS_FILE file
 # and imports common functions

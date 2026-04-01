@@ -1,30 +1,32 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var JDK_CERT_BACKUP_HOME
-call require-var JDK_PEM_HOME
+call ..\env-vars
+call ..\.win\require-var JDK_CERT_BACKUP_HOME
+call ..\.win\require-var JDK_PEM_HOME
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Generates a CERT based on a PEM file and imports it
 echo:
 echo Usage: %0 [^<jdk_version^>^|^<option^>]*
 echo Option:
 echo     -i: Imports a CERT from backup
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
-if /i "%~1"=="-i" goto import
+if /i "%~1"=="-i" goto :import
+if /i "%~1"=="-h" goto :__usage_page
 
 setlocal enableDelayedExpansion
 
-call setup-jdk %*
+call .\setup-jdk %*
 
-if exist "%PEM_FILE_HOME%\*.pem" goto loadcerts
-goto certnotfound
+if exist "%PEM_FILE_HOME%\*.pem" goto :loadcerts
+goto :certnotfound
 
 :loadcerts
 set /a PEM_ID=1
@@ -76,11 +78,11 @@ echo %IMPORT_CMD%
 
 cd "%PEM_FILE_HOME%"
 del %PEM_FILE%
-goto completed
+goto :completed
 
 
 :import
-call setup-jdk
+call .\setup-jdk
 
 set /a CERT_ID=1
 
@@ -116,7 +118,7 @@ set "IMPORT_CMD=keytool -import -alias %CERT_ALIAS% -file ^"%CERT_FILENAME%.cert
 echo:
 echo %IMPORT_CMD%
 %IMPORT_CMD%
-goto completed
+goto :completed
 
 endlocal
 
@@ -124,13 +126,13 @@ endlocal
 :certnotfound
 echo PEM files not found
 echo [Process invalid]: %0
-goto back
+goto :back
 
 
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

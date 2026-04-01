@@ -1,22 +1,24 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var REPOS_HOME
-call require-var REPOS_LIST_FILE
+call ..\env-vars
+call ..\.win\require-var REPOS_HOME
+call ..\.win\require-var REPOS_LIST_FILE
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Download the repositories backup.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -a: Makes a backup for all repos
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
 echo Backing up repos at "%REPOS_HOME%"
 
@@ -24,8 +26,8 @@ setlocal enableDelayedExpansion
 
 cd /d %REPOS_HOME%
 
-if /i "%~1"=="-a" goto allrepos
-goto selectrepo
+if /i "%~1"=="-a" goto :allrepos
+goto :selectrepo
 
 :allrepos
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
@@ -41,7 +43,7 @@ for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
         curl -L --create-dirs -o !__repo_zip! !__repo_url!
     )
 )
-goto completed
+goto :completed
 
 :selectrepo
 
@@ -84,16 +86,16 @@ for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
 if "%_repo_flag%"=="false" (
     echo Invalid repo index
     echo [Process stopped]: %0
-    goto back
+    goto :back
 )
-goto completed
+goto :completed
 
 endlocal
 
 
 :completed
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

@@ -1,6 +1,18 @@
 @echo OFF
 
-set "PWD=%cd%"
+rem __usage_lib_page:
+rem Defines common environment variables and
+rem imports environment variables from from $ENV_VARS_FILE file
+rem
+rem Usage in script:
+rem   @echo OFF
+rem   set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+rem   cd %BASEDIR%
+rem
+rem   call .\env-vars rem Relative call
+rem
+rem   call .\.win\require-var <ENVIRONMENT_VARIABLE>
+
 set "TEMP_DIR=%TEMP%"
 set "STEMP_DIR=%TEMP%"
 set "USER_HOME=%USERPROFILE%"

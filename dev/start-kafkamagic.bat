@@ -1,20 +1,22 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var KAFKA_MAGIC_HOME
+call ..\env-vars
+call ..\.win\require-var KAFKA_MAGIC_HOME
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Starts Kafka Magic using binaries
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
 echo:
 echo To change the port number edit parameter 'CONFIG_PORT' in:
@@ -24,12 +26,12 @@ echo:
 cd %KAFKA_MAGIC_HOME%
 
 KafkaMagic
-goto completed
+goto :completed
 
 
 :completed
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

@@ -1,5 +1,13 @@
 @echo OFF
 
+rem __usage_lib_page:
+rem Creates a hash (SHA256) from input
+rem
+rem Arguments:
+rem   %* - Input
+rem Usage in script:
+rem   call .\.win\sha256sum <arg1> <arg2> <argn> # Relative call
+
 setlocal
 
 set "__input=%*"

@@ -1,26 +1,28 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var EMACS_HOME
+call ..\env-vars
+call ..\.win\require-var EMACS_HOME
 rem Last assigned: 5
-call require-var EMACS_WAIT_SECS
+call ..\.win\require-var EMACS_WAIT_SECS
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Starts Emacs editor.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
 cd %EMACS_HOME%
 
-tasklist | find /i "runemacs.exe" && goto client || goto server
+tasklist | find /i "runemacs.exe" && goto :client || goto :server
 
 
 :server
@@ -28,18 +30,18 @@ echo Launching 'Emacs Server' at "%EMACS_HOME%"
 runemacs.exe --daemon
 
 timeout %EMACS_WAIT_SECS% > NUL
-goto client
+goto :client
 
 
 :client
 echo Launching 'Emacs Client' at "%EMACS_HOME%"
 emacsclientw.exe -create-frame --alternate-editor=""
-goto completed
+goto :completed
 
 
 :completed
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

@@ -1,11 +1,13 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var JDK_HOMES_FILE
+call ..\env-vars
+call ..\.win\require-var JDK_HOMES_FILE
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Shows the JDKs installed based on 'JDK_HOMES_FILE'
 echo file and setups the environment variables
 echo 'JAVA_HOME' and 'JAVA_JRE_HOME'
@@ -14,19 +16,19 @@ echo:
 echo Usage: %0 [^<jdk_version^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
-call source-file "%JDK_HOMES_FILE%"
+call ..\.win\source-file "%JDK_HOMES_FILE%"
 
 setlocal enableDelayedExpansion
 
 set "_JDK_INDEX="
 
-if /i "%~1"=="" goto selectjdk
-goto searchjdk
+if /i "%~1"=="" goto :selectjdk
+goto :searchjdk
 
 :searchjdk
 set "_REQUIRED_JDK=%~1"
@@ -38,20 +40,20 @@ for /l %%i in (1,1,%JDK_HOMES_LENGTH%) do (
 
     if /i "!_JDK_NAME!"=="%_REQUIRED_JDK%" (
         set _JDK_INDEX=%%i
-        goto jdkname
+        goto :jdkname
     )
 
     if /i "!_JDK_VERSION!"=="%_REQUIRED_JDK%" (
         set _JDK_INDEX=%%i
-        goto jdkname
+        goto :jdkname
     )
 
     if /i not "x!_JDK_ALIASES:%_REQUIRED_JDK%=!"=="x!_JDK_ALIASES!" (
         set _JDK_INDEX=%%i
-        goto jdkname
+        goto :jdkname
     )
 )
-goto jdkname
+goto :jdkname
 
 :selectjdk
 echo Select a JDK:
@@ -78,7 +80,7 @@ set "_JDK_NAME=!JDK_NAMES[%_JDK_INDEX%]!"
 if "%_JDK_NAME%"=="" (
     echo Invalid JDK index
     echo [Process stopped]: %0
-    goto back
+    goto :back
 )
 
 set "JAVA_HOME=!JDK_HOMES[%_JDK_INDEX%]!"
@@ -89,12 +91,12 @@ endlocal & set "JAVA_HOME=%JAVA_HOME%" & set "JAVA_JRE_HOME=%JAVA_JRE_HOME%"
 echo Defined Environment Variables:
 echo     JAVA_HOME=%JAVA_HOME%
 echo     JAVA_JRE_HOME=%JAVA_JRE_HOME%
-goto completed
+goto :completed
 
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

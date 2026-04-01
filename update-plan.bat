@@ -1,10 +1,12 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var WORKSPACE_HOME
-call require-var UPDATE_PLAN_FILE
+call .\env-vars
+call .\.win\require-var WORKSPACE_HOME
+call .\.win\require-var UPDATE_PLAN_FILE
 
-goto main
+goto :main
 
 :__usage_page
 echo Update packages and execute a plan.
@@ -12,17 +14,17 @@ echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto __usage_page
+if /i "%~1"=="-h" goto :__usage_page
 
 setlocal enableDelayedExpansion
 
 set /a _cmd_idx=1
 
 for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
-    call eval set "_cmd=%%l"
+    call .\.win\eval set "_cmd=%%l"
 
     echo !_cmd! | findstr /r "^p:*" >nul
 
@@ -35,7 +37,7 @@ for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
         echo:
         echo Executing: [!_cmd!]
 
-        call eval !_cmd!
+        call .\.win\eval !_cmd!
     )
 )
 
@@ -56,7 +58,7 @@ endlocal
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

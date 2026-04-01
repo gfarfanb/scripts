@@ -1,5 +1,15 @@
 @echo OFF
 
+rem __usage_lib_page:
+rem Validated the specified environment variable is accessible
+rem
+rem Arguments:
+rem   %1 - Environment variable name
+rem Dependencies:
+rem   call .\env-vars rem Relative call
+rem Usage in script:
+rem   call .\.win\require-var <var> # Relative call
+
 setlocal
 
 set __require_var_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%

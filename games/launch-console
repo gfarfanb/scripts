@@ -3,8 +3,6 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var SCRIPTS_GAMES_HOME
-
 __usage_page() {
     echo "Launches a game console."
     echo ;
@@ -38,8 +36,7 @@ _launch_zelda64() {
 
     rsync -cvrP $ZELDA64RECOMPILED_SAVES_HOME/ $ZELDA64RECOMPILED_BACKUP_HOME/
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$ZELDA64RECOMPILED_BACKUP_HOME"
+    bash ../sys/save-snapshot "$ZELDA64RECOMPILED_BACKUP_HOME"
 }
 
 _launch_1964gepd() {
@@ -61,8 +58,7 @@ _launch_1964gepd() {
 
     rsync -cvrP $GEPD_1964_SAVES_HOME/ $GEPD_1964_BACKUP_HOME/
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$GEPD_1964_BACKUP_HOME"
+    bash ../sys/save-snapshot "$GEPD_1964_BACKUP_HOME"
 }
 
 _launch_dolphin() {
@@ -79,18 +75,16 @@ _launch_dolphin() {
 
     rsync -cvrP $DOLPHIN_SAVES_HOME/ $DOLPHIN_BACKUP_HOME/
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$DOLPHIN_BACKUP_HOME"
+    bash ../sys/save-snapshot "$DOLPHIN_BACKUP_HOME"
 }
 
 _launch_mupen64plus() {
     echo >&2
     echo "Launching 'Mupen64Plus'" >&2
 
-    . ./start-mupen64plus "$@"
+    . ./.libs/start-mupen64plus "$@"
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$N64_SAVES_HOME"
+    bash ../sys/save-snapshot "$N64_SAVES_HOME"
 }
 
 _launch_mgba() {
@@ -102,8 +96,7 @@ _launch_mgba() {
 
     flatpak run io.mgba.mGBA "$@"
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$MGBA_BACKUP_HOME"
+    bash ../sys/save-snapshot "$MGBA_BACKUP_HOME"
 }
 
 _launch_azahar() {
@@ -117,8 +110,7 @@ _launch_azahar() {
 
     ./azahar.AppImage  "$@"
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$MGBA_BACKUP_HOME"
+    bash ../sys/save-snapshot "$MGBA_BACKUP_HOME"
 }
 
 _launch_snes9x() {
@@ -130,8 +122,7 @@ _launch_snes9x() {
 
     flatpak run com.snes9x.Snes9x "$@"
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$SNES9X_BACKUP_HOME"
+    bash ../sys/save-snapshot "$SNES9X_BACKUP_HOME"
 }
 
 _launch_celeste64() {
@@ -150,8 +141,7 @@ _launch_celeste64() {
 
     rsync -cvrP $CELESTE_64_SAVES_HOME/ $CELESTE_64_BACKUP_HOME/
 
-    cd $SCRIPTS_GAMES_HOME
-    "./.libs/save-snapshot" "$CELESTE_64_BACKUP_HOME"
+    bash ../sys/save-snapshot "$CELESTE_64_BACKUP_HOME"
 }
 
 echo "Select a console:"

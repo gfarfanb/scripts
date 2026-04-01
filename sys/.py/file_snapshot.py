@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 
-from os import listdir, makedirs, remove
+from os import environ, listdir, makedirs, remove
 from os.path import isfile, join, basename, exists, splitext
 from sys import exit
 from shutil import copyfile
 
+import sys
 import datetime
 import argparse
 import logging
 
-import env_vars
+sys.path.append(environ['PYLIBSPATH'])
+import env_vars # pyright: ignore[reportMissingImports]
 
 number_to_keep = int(env_vars.env_value('SNAPSHOTS_TO_KEEP'))
 
@@ -197,11 +199,13 @@ def main():
 
         parser = argparse.ArgumentParser()
         parser.add_argument('-d', '--directory',
-                            help='Source files directory',
-                            default=input('source-files-directory> '))
+                            help='Source files directory')
         parser.add_argument('-r', '--recover', action='store_true',
                             help='Enables recover snapshot files')
         args = parser.parse_args()
+
+        if not args.directory:
+            args.directory = input('source-files-directory> ')
 
         if args.recover:
             execute_recover(files_home=args.directory)

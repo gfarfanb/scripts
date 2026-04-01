@@ -1,5 +1,14 @@
 @echo OFF
 
+rem __usage_lib_page:
+rem Saves the string length into a variable
+rem
+rem Arguments:
+rem   %1 - String value
+rem   %2 - Output variable
+rem Usage in script:
+rem   call .\.win\length <value> <var> # Relative call
+
 setlocal
 
 set "__input=%1"

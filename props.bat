@@ -1,29 +1,31 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
+call .\env-vars
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Show the environment variables defined in the 'env-vars' file.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
 setlocal enableDelayedExpansion
 
-if not "%~1"=="" goto getvalue
-goto props
+if not "%~1"=="" goto :getvalue
+goto :props
 
 
 :getvalue
-call eval set "_prop_value=%%%~1%%"
-echo !_prop_value!
+call .\.win\eval set "_prop_value=%%%~1%%"
+echo | set /p=!_prop_value!
 goto :eof
 
 
@@ -58,7 +60,7 @@ set /P _prop_index="env-index> "
 if "%_prop_index%"=="" (
     echo Invalid environment variable index
     echo [Process stopped]: %0
-    goto back
+    goto :back
 )
 
 set "_prop_name=!_vars[%_prop_index%]!"
@@ -66,11 +68,11 @@ set "_prop_name=!_vars[%_prop_index%]!"
 if "%_prop_name%"=="" (
     echo Invalid environment variable index
     echo [Process stopped]: %0
-    goto back
+    goto :back
 )
 
 echo:
-call eval set "_prop_value=%%%_prop_name%%%"
+call .\win\eval set "_prop_value=%%%_prop_name%%%"
 
 if "!_prop_value!"=="" (
     echo !_prop_name!=^<empty^>
@@ -81,7 +83,7 @@ if "!_prop_value!"=="" (
 echo !_prop_value! | clip
 echo Copied^^!^^!
 
-goto completed
+goto :completed
 
 :getvar
 for %%A in (%~1) do set %~2=%%A
@@ -93,7 +95,7 @@ endlocal
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

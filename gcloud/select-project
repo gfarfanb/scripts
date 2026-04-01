@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 
-# :__usage_lib_page
+# __usage_lib_page:
 # Lists a Gcloud projects and allow to select one.
 # It exports the following environment variables:
-# - PROJECT_SELECTED
-# - PUSH_PORT_SELECTED
+#   - PROJECT_SELECTED
+#   - PUSH_PORT_SELECTED
 #
 # Dependencies:
 #   - env-vars (as source file)

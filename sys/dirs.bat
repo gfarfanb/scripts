@@ -1,19 +1,21 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
+call ..\env-vars
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Creates directories based on 'env-vars' file.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
 setlocal enableExtensions
 
@@ -44,8 +46,8 @@ if not "%STORAGE_HOME%" == "" (
         mkdir "%STORAGE_HOME%\iso"
         echo Created directory '%STORAGE_HOME%\iso'
     )
-    if not exist "%STORAGE_HOME%\models" (
-        mkdir "%STORAGE_HOME%\models"
+    if not exist "%STORAGE_HOME%\llm" (
+        mkdir "%STORAGE_HOME%\llm"
         echo Created directory '%STORAGE_HOME%\models'
     )
 )
@@ -80,7 +82,7 @@ endlocal
 
 :completed
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

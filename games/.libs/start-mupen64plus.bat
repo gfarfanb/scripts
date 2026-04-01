@@ -1,38 +1,31 @@
 @echo OFF
 
-call env-vars
-call require-var MUPEN64PLUS_HOME
-call require-var N64_PROFILES_FILE
-call require-var N64_ROMS_HOME
-call require-var N64_SAVES_HOME
-call require-var N64_SCREENSHOTS_HOME
-call require-var GB_GBC_ROMS_HOME
-call require-var GB_GBC_SAVES_HOME
-call require-var N64_CONFIGURED_JOYSTICK_LENGTH
-call require-var N64_CONFIGURED_JOYSTICK_DEFAULT
+rem __usage_lib_page:
+rem Starts Mupen64Plus emulator
+rem
+rem Dependencies:
+rem   call .\env-vars rem Relative call
+rem Usage in script:
+rem   call ".\.libs\start-mupen64plus" %*  rem Relative call
+
+call ..\.win\require-var MUPEN64PLUS_HOME
+call ..\.win\require-var N64_PROFILES_FILE
+call ..\.win\require-var N64_ROMS_HOME
+call ..\.win\require-var N64_SAVES_HOME
+call ..\.win\require-var N64_SCREENSHOTS_HOME
+call ..\.win\require-var GB_GBC_ROMS_HOME
+call ..\.win\require-var GB_GBC_SAVES_HOME
+call ..\.win\require-var N64_CONFIGURED_JOYSTICK_LENGTH
+call ..\.win\require-var N64_CONFIGURED_JOYSTICK_DEFAULT
 
 rem set "N64_JOYSTICK_NAMES[<joystick_index>]=<joystick_name>"
 rem set "N64_JOYSTICK_CONFIGS[<joystick_index>]=<joystick_connection>"
 for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
-    call require-var N64_JOYSTICK_NAMES[%%i]
-    call require-var N64_JOYSTICK_CONFIGS[%%i]
+    call ..\.win\require-var N64_JOYSTICK_NAMES[%%i]
+    call ..\.win\require-var N64_JOYSTICK_CONFIGS[%%i]
 )
 
-call source-file "%N64_PROFILES_FILE%"
-
-
-goto main
-
-:usage
-echo Launches Mupen64Plus emulator.
-echo ;
-echo Usage: %0 [^<option^>]*
-echo Option:
-echo     -h: Displays this help message
-goto back
-
-:main
-if /i "%~1"=="-h" goto usage
+call ..\.win\source-file "%N64_PROFILES_FILE%"
 
 
 rem ######################### Profile definition
@@ -94,14 +87,14 @@ set "_n64_rom_idx="
 set /P _n64_rom_idx="n64-index> "
 set "_n64_rom=!_n64_filenames[%_n64_rom_idx%]!"
 
-if "%_n64_rom%"=="" goto noromfile
-goto romselected
+if "%_n64_rom%"=="" goto :noromfile
+goto :romselected
 
 
 rem /********** N64 ROM selected **********/
 :romselected
 
-for /f "delims=" %%a in ('sha256sum "%_n64_rom%"') do set _n64_rom_hash=%%a
+for /f "delims=" %%a in ('call ..\.win\sha256sum "%_n64_rom%"') do set _n64_rom_hash=%%a
 
 
 rem /********** Number of controls menu **********/
@@ -188,11 +181,11 @@ set _joystick_option_part=%_joystick_option_part:^^=%
 
 set "_expansion_pak_option_part=%_expansion_pak_option_part% --set %_controller_name%[plugin]=%_expansion_pak_idx%"
 
-if "%_expansion_pak_idx%"=="4" goto transferpak
+if "%_expansion_pak_idx%"=="4" goto :transferpak
 set /a _controller_id+=1
 
-if "%_controller_id%" gtr "%_controllers%" goto loading
-goto controller
+if "%_controller_id%" gtr "%_controllers%" goto :loading
+goto :controller
 
 rem ######################### [END] Controller setup
 
@@ -240,8 +233,8 @@ set _transfer_pak_option_part=%_transfer_pak_option_part:^^=%
 
 set /a _controller_id+=1
 
-if "%_controller_id%" gtr "%_controllers%" goto loading
-goto controller
+if "%_controller_id%" gtr "%_controllers%" goto :loading
+goto :controller
 
 rem ######################### [END] Transfer pak
 

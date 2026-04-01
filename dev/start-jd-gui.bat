@@ -1,31 +1,33 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var JD_GUI_JAR
+call ..\env-vars
+call ..\.win\require-var JD_GUI_JAR
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Starts JD-GUI using binaries
 echo:
 echo Usage: %0 [^<jdk_version^>^|^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
-call setup-jdk %*
+call .\setup-jdk %*
 
 "%JAVA_HOME%\bin\java" -jar "%JD_GUI_JAR%"
-goto completed
+goto :completed
 
 
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

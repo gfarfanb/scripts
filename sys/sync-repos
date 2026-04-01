@@ -3,8 +3,6 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var SCRIPTS_SYS_PY_HOME
-
 __usage_page() {
     echo "Pull changes for local repos or clone if they do not exist."
     echo ;
@@ -26,6 +24,6 @@ while getopts "bsh" opt; do
     esac
 done
 
-$(command -v python3 || command -v python) "$SCRIPTS_SYS_PY_HOME/backup_repos.py" $*
+$(command -v python3 || command -v python) "./.py/backup_repos.py" $*
 
 _completed

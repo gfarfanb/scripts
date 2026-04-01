@@ -1,26 +1,28 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var H2_HOME
-call require-var H2_WEB_PORT
-call require-var H2_REQUIRED_JDK
+call ..\env-vars
+call ..\.win\require-var H2_HOME
+call ..\.win\require-var H2_WEB_PORT
+call ..\.win\require-var H2_REQUIRED_JDK
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Starts H2 database using binaries
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
+
+call .\setup-jdk "%H2_REQUIRED_JDK%"
 
 cd %H2_HOME%
-
-call setup-jdk "%H2_REQUIRED_JDK%"
 
 for /F "delims=" %%G in ('dir /b /s "h2*.jar"') do (
     set H2_JAR=%%~G
@@ -28,12 +30,12 @@ for /F "delims=" %%G in ('dir /b /s "h2*.jar"') do (
 
 "%JAVA_HOME%\bin\java" -cp "%H2_JAR%;%H2DRIVERS%;%CLASSPATH%" org.h2.tools.Server -webPort %H2_WEB_PORT%
 
-goto completed
+goto :completed
 
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

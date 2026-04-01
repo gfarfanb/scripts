@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 
-# :__usage_lib_page
+# __usage_lib_page:
 # Defines common Docker functions
 #
 # Dependencies:
-#   - env-vars (as source file)
+#   - env-vars # Imported as source file
 # Usage in script:
 #   . ../dev/.libs/docker-fn  # Relative source
 

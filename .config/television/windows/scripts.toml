@@ -1,0 +1,25 @@
+[metadata]
+name = "scripts"
+description = "Browse and preview scripts"
+requirements = [ "clip", "fd", "rg" ]
+
+[source]
+command = [ "\"$env:SCRIPTS_HOME\\win\\list-files\" \"$env:SCRIPTS_HOME\" __update_plan bat" ]
+display = "{split:\\\\:-1}"
+
+[preview]
+command = "'{}' -h"
+
+[keybindings]
+ctrl-e = "actions:execute"
+ctrl-c = "actions:copy"
+
+[actions.execute]
+description = "Execute the selected script"
+command = "'{}'"
+mode = "execute"
+
+[actions.copy]
+description = "Copy the selected script"
+command = "echo '{}' | clip"
+mode = "execute"

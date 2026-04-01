@@ -30,7 +30,7 @@ fi
 if [ -n "$STORAGE_HOME" ]; then
     mkdir -vp "$STORAGE_HOME/dist"
     mkdir -vp "$STORAGE_HOME/iso"
-    mkdir -vp "$STORAGE_HOME/models"
+    mkdir -vp "$STORAGE_HOME/llm"
 fi
 if [ -n "$CLOUD_HOME" ]; then mkdir -vp "$CLOUD_HOME"; fi
 if [ -n "$REPOS_HOME" ]; then mkdir -vp "$REPOS_HOME"; fi

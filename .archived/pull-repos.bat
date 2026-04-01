@@ -1,27 +1,29 @@
 @echo OFF
+set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+cd %BASEDIR%
 
-call env-vars
-call require-var REPOS_DEF_FILE
+call ..\env-vars
+call ..\.win\require-var REPOS_DEF_FILE
 
-goto main
+goto :main
 
-:usage
+:__usage_page
 echo Synchronize local repos.
 echo:
 echo Usage: %0 [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto back
+goto :back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto :__usage_page
 
 setlocal enableDelayedExpansion
 
 set /a _repo_idx=1
 
 for /f "tokens=*" %%l in (%REPOS_DEF_FILE%) do (
-    call eval set "_repo=%%l"
+    call ..\.win\eval set "_repo=%%l"
 
     set _execute_flag=true
 
@@ -39,8 +41,8 @@ for /f "tokens=*" %%l in (%REPOS_DEF_FILE%) do (
 
     set "_prefix=!_branch!:!_username!:"
 
-    call length "!_prefix!" _prefix_length
-    call eval set "_location=%%_repo:~!_prefix_length!%%"
+    call ..\.win\length "!_prefix!" _prefix_length
+    call ..\.win\eval set "_location=%%_repo:~!_prefix_length!%%"
 
     for /f %%i in ("!_location!") do set "_repo_name=%%~ni"
 
@@ -87,7 +89,7 @@ endlocal
 :completed
 echo:
 echo [Completed]: %0
-goto back
+goto :back
 
 
 :back

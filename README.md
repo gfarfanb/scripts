@@ -29,6 +29,7 @@ rem Comment
 Add the required environment variable to *~/.bashrc* file
 ```sh
 echo 'export ENV_VARS_FILE="<environment_variables_file_location>"' >> ~/.bashrc
+echo 'export SCRIPTS_HOME="<scripts_location>"' >> ~/.bashrc
 echo 'export PROPSPATH="<scripts_location>"' >> ~/.bashrc
 echo 'export PYLIBSPATH="<scripts_py_libs_directory>"' >> ~/.bashrc
 

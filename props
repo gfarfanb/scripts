@@ -64,7 +64,7 @@ else
     echo "$_prop_name=$_prop_value"
 fi
 
-echo "$_prop_value" | xclip -sel clip
+echo -n "$_prop_value" | xclip -sel clip
 echo Copied!!
 
 _completed

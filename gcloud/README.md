@@ -24,7 +24,7 @@ git clone https://github.com/googleapis/python-pubsub.git
 
 Start and setup emulator
 ```sh
-cd "<SCRIPTS_HOME>/gcloud"
+cd "$SCRIPTS_HOME/gcloud"
 ./start-emu-pubsub
 
 # Make sure execute:
@@ -36,7 +36,7 @@ source activate
 cd "<python_pubsub_location>/samples/snippets"
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --upgrade --force-reinstall -r requirements.txt
 
-cd "<SCRIPTS_HOME>/gcloud"
+cd "$SCRIPTS_HOME/gcloud"
 ./pubsub-topics -c
 ```
 
@@ -45,7 +45,7 @@ Publish messages
 cd "<python_pubsub_location>/.env/bin"
 source activate
 
-cd "<SCRIPTS_HOME>/gcloud"
+cd "$SCRIPTS_HOME/gcloud"
 ./pubsub-topics -m '{ "id": "6d8070c1-4589-447c-8a0c-2e8e1d71aa2e" }'
 ```
 
@@ -54,7 +54,7 @@ Monitor messages
 cd "<python_pubsub_location>/.env/bin"
 source activate
 
-cd "<SCRIPTS_HOME>/gcloud"
+cd "$SCRIPTS_HOME/gcloud"
 ./pubsub-topics -w
 ```
 
@@ -71,7 +71,7 @@ git clone https://github.com/googleapis/java-spanner.git
 
 Start and setup emulator
 ```sh
-cd "<SCRIPTS_HOME>/gcloud"
+cd "$SCRIPTS_HOME/gcloud"
 ./start-emu-spanner
 
 # Make sure execute:

@@ -12,7 +12,7 @@ _require_var PUBSUB_HOST_PORT
 __usage_page() {
     echo "Starts PubSub emulator for a specific project."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -r: Restores the PubSub DB file"
     echo "    -h: Displays this help message"

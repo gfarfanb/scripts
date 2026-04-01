@@ -10,7 +10,8 @@ goto :main
 :__usage_page
 echo Starts '8BitDo Firmware Updater' program
 echo:
-echo Usage: %0 [^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
 goto :back

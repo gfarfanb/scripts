@@ -9,7 +9,8 @@ goto :main
 :__usage_page
 echo Pull changes for local repos or clone if they do not exist.
 echo:
-echo Usage: %0 [^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -b: Backup repos as ZIP files
 echo     -s: Allow select a repo

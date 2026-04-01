@@ -9,8 +9,9 @@ goto :main
 
 :__usage_page
 echo Create snapshots of save files.
-echo ;
-echo Usage: %0 <save_home> [^<option^>]*
+echo:
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% ^<save_home^> [^<option^>]*
 echo Option:
 echo     -r: Recovers save from snapshots
 echo     -h: Displays this help message

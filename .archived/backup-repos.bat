@@ -11,7 +11,8 @@ goto :main
 :__usage_page
 echo Download the repositories backup.
 echo:
-echo Usage: %0 [^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -a: Makes a backup for all repos
 echo     -h: Displays this help message

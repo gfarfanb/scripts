@@ -8,7 +8,7 @@ _require_var DOWNLOADS_HOME
 __usage_page() {
     echo "Converts MP4 files to MP3."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -i: Sets the MP4 location/file"
     echo "    -o: Sets the MP3 output location. Default: DOWNLOADS_HOME"

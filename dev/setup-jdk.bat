@@ -13,7 +13,8 @@ echo file and setups the environment variables
 echo 'JAVA_HOME' and 'JAVA_JRE_HOME'
 echo with the selected JDK.
 echo:
-echo Usage: %0 [^<jdk_version^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<jdk_version^>]*
 echo Option:
 echo     -h: Displays this help message
 goto :back

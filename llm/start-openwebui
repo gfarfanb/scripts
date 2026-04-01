@@ -28,7 +28,7 @@ _require_var DOCLING_PORT
 __usage_page() {
     echo "Starts Open WebUI and the related services."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -b: Backup Open WebUI"
     echo "    -a: Restore backup for Open WebUI"

@@ -8,8 +8,9 @@ goto :main
 
 :__usage_page
 echo Launches a game console.
-echo ;
-echo Usage: %0 [^<option^>]*
+echo:
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -s: Saves snapshot without run the console
 echo     -r: Recovers snapshot without run the console

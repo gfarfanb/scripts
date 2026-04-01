@@ -9,7 +9,7 @@ _require_var DOWNLOADS_HOME
 __usage_page() {
     echo "Fetch audio on MP3 format."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -u <URL>:      Resource URL"
     echo "    -s <index>:    Playlist start index"

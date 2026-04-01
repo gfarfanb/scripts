@@ -17,7 +17,7 @@ __usage_page() {
     echo "   - PUBSUB_PROJECT_ID"
     echo "   - PUBSUB_PUSH_ENDPOINT"
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -c:           Creates topics for selected project"
     echo "    -m <message>: Sends a message to a selected topic"

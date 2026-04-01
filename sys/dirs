@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 __usage_page() {
     echo "Creates directories based on 'env-vars' file."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -h: Displays this help message"
     exit 0

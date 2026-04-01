@@ -4,22 +4,22 @@ description = "Browse and preview scripts"
 requirements = [ "clip", "fd", "rg" ]
 
 [source]
-command = [ "\"$env:SCRIPTS_HOME\\win\\list-files\" \"$env:SCRIPTS_HOME\" __update_plan bat" ]
+command = [ "cmd /c \"$env:SCRIPTS_HOME\\.win\\list-files\" \"$env:SCRIPTS_HOME\" __usage_page bat" ]
 display = "{split:\\\\:-1}"
 
 [preview]
-command = "'{}' -h"
+command = "cmd /c '{}' -h"
 
 [keybindings]
 ctrl-e = "actions:execute"
-ctrl-c = "actions:copy"
+ctrl-y = "actions:copy"
 
 [actions.execute]
 description = "Execute the selected script"
-command = "'{}'"
+command = "cmd /c '{}'"
 mode = "execute"
 
 [actions.copy]
 description = "Copy the selected script"
-command = "echo '{}' | clip"
+command = "cmd /c echo '{}' | clip"
 mode = "execute"

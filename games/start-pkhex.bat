@@ -10,8 +10,9 @@ goto :main
 
 :__usage_page
 echo Starts Pokémon save file editor
-echo ;
-echo Usage: %0 <save_home> [^<option^>]*
+echo:
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -b: Builds the executable
 echo     -h: Displays this help message

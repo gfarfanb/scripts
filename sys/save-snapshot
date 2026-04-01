@@ -7,7 +7,7 @@ _require_var SNAPSHOTS_TO_KEEP
 __usage_page() {
     echo "Create snapshots of save files."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -r: Recovers save from snapshots"
     echo "    -h: Displays this help message"

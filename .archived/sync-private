@@ -11,7 +11,7 @@ __usage_page() {
     echo "Fetches all changes from backup folder (preferably a"
     echo "hosting service folder) to the pkb/org-roam/private"
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -h: Displays this help message"
     exit 0

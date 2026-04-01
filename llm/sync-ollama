@@ -12,7 +12,7 @@ _require_var OPENCODE_CONFIG_FILE
 __usage_page() {
     echo "Starts Ollama service, synchronizes models and updates OpenCode configuration."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -s: Only syncs models on OpenCode configuration file"
     echo "    -h: Displays this help message"

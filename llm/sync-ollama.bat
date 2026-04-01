@@ -12,7 +12,8 @@ goto :main
 :__usage_page
 echo Synchronizes Ollama models and updates OpenCode configuration.
 echo:
-echo Usage: %0 [^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -s: Only syncs models on OpenCode configuration file
 echo     -h: Displays this help message

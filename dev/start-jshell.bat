@@ -9,7 +9,8 @@ goto :main
 :__usage_page
 echo Starts jShell on a selected JDK
 echo:
-echo Usage: %0 [^<jdk_version^>^|^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<jdk_version^>^|^<option^>]*
 echo Option:
 echo     -h: Displays this help message
 goto :back

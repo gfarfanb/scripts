@@ -12,7 +12,7 @@ command = "'{}' -h"
 
 [keybindings]
 ctrl-e = "actions:execute"
-ctrl-c = "actions:copy"
+ctrl-y = "actions:copy"
 
 [actions.execute]
 description = "Execute the selected script"

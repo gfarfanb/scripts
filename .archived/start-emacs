@@ -9,7 +9,7 @@ _require_var EMACS_WAIT_SECS
 __usage_page() {
     echo "Starts Emacs editor."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -t: Emacs Client Terminal"
     echo "    -h: Displays this help message"

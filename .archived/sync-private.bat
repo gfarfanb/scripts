@@ -12,7 +12,8 @@ goto :main
 echo Fetches all changes from backup folder (preferably a
 echo hosting service folder) to the pkb/org-roam/private
 echo:
-echo Usage: %0 [^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
 goto :back

@@ -8,7 +8,7 @@ _require_var REDIS_PORT
 __usage_page() {
     echo "Starts Redis server."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -s: Stop Redis server"
     echo "    -h: Displays this help message"

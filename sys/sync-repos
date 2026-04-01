@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 __usage_page() {
     echo "Pull changes for local repos or clone if they do not exist."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -b: Backup repos as ZIP files"
     echo "    -s: Allow select a repo"

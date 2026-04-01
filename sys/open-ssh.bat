@@ -11,7 +11,8 @@ goto :main
 :__usage_page
 echo Open a SSH connection based on a known hosts
 echo:
-echo Usage: %0 [^<option^>]*
+for %%F in (%0) do set BASENAME=%%~nF
+echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
 goto :back

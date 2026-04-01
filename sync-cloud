@@ -9,7 +9,7 @@ _require_var CLOUD_REMOTE_SOURCES
 __usage_page() {
     echo "Synchronize local files from cloud providers."
     echo ;
-    echo "Usage: $0 [<option>]*"
+    echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -f: Pull data from cloud"
     echo "    -p: Push data to cloud"

@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var SCRIPTS_GAMES_HOME
 _require_var SCRIPTS_GAMES_LIBS_HOME
 
-_usage() {
+__usage_page() {
     echo "Launches a game console."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -18,7 +18,7 @@ _usage() {
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

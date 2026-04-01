@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var OUTPUT_AUDIO_FOLDER
 _require_var DOWNLOADS_HOME
 
-_usage() {
+__usage_page() {
     echo "Fetch audio on MP3 format."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -59,7 +59,7 @@ while getopts "u:s:l:mh" opt; do
             _move_outputs
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

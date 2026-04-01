@@ -5,7 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 _require_var OPENCODE_SERVER_PORT
 
-_usage() {
+__usage_page() {
     echo "Starts OpenCode server."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -17,7 +17,7 @@ _usage() {
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

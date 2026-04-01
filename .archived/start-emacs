@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 # Last assigned: 5
 _require_var EMACS_WAIT_SECS
 
-_usage() {
+__usage_page() {
     echo "Starts Emacs editor."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -24,7 +24,7 @@ while getopts "th" opt; do
             _terminal_flag=1
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

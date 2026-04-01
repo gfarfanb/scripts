@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 # Last assigned: $WORKSPACE_HOME/github/private-gpt
 _require_var PRIVATE_GPT_HOME
 
-_usage() {
+__usage_page() {
     echo "Starts LLM Server."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -18,7 +18,7 @@ _usage() {
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

@@ -1,19 +1,25 @@
 [metadata]
 name = "scripts"
-description = "A channel to select and copy a script (command)"
+description = "Browse and preview scripts"
 requirements = [ "xclip", "fd", "rg" ]
 
 [source]
-command = [ "fd . \"$SCRIPTS_HOME\" | xargs rg 'BASEDIR=\\$' -l" ]
+command = [ "fd . \"$SCRIPTS_HOME\" | xargs rg '__usage_page\\(\\)' -l" ]
 display = "{split:/:-1}"
 
 [preview]
 command = "'{}' -h"
 
 [keybindings]
-enter = "actions:execute"
+ctrl-e = "actions:execute"
+ctrl-c = "actions:copy"
 
 [actions.execute]
-description = "Copy the selected script (command)"
+description = "Execute the selected script"
+command = "'{}'"
+mode = "execute"
+
+[actions.copy]
+description = "Copy the selected script"
 command = "echo -n '{}' | xclip -sel clip"
 mode = "execute"

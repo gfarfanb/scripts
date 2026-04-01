@@ -9,7 +9,7 @@ _require_var PUBSUB_CONFIG_DB_ORIGINAL
 # Last assigned: 0.0.0.0:8085
 _require_var PUBSUB_HOST_PORT
 
-_usage() {
+__usage_page() {
     echo "Starts PubSub emulator for a specific project."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -21,13 +21,13 @@ _usage() {
 
 _option=""
 
-while getopts "hr" opt; do
+while getopts "rh" opt; do
     case "$opt" in
-        h)
-            _usage
-            ;;
         r)
             option="Restore"
+            ;;
+        h)
+            __usage_page
             ;;
     esac
 done

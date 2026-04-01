@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var REPOS_HOME
 _require_var REPOS_LIST_FILE
 
-_usage() {
+__usage_page() {
     echo "Download the repositories backup."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -81,7 +81,7 @@ while getopts "ah" opt; do
             _download_all_repos
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

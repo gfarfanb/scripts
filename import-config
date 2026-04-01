@@ -3,7 +3,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 PWD=$(pwd)
 
-_usage() {
+__usage_page() {
     echo "Imports configuration from a cloud provider."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -62,7 +62,7 @@ _trim_trailing_separator() {
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

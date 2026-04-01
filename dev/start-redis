@@ -5,7 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 _require_var REDIS_PORT
 
-_usage() {
+__usage_page() {
     echo "Starts Redis server."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -27,7 +27,7 @@ while getopts "sh" opt; do
             _stop
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

@@ -26,7 +26,7 @@ _require_var TIKA_SERVER
 _require_var DOCLING_SERVER
 _require_var DOCLING_PORT
 
-_usage() {
+__usage_page() {
     echo "Starts Open WebUI and the related services."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -269,7 +269,7 @@ while getopts "baektlsruh" opt; do
             _update_flag=1
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

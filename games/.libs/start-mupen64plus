@@ -13,7 +13,7 @@ _require_var N64_CONFIGURED_JOYSTICK_NAMES
 _require_var N64_CONFIGURED_JOYSTICK_CONFIGS
 _require_var N64_CONFIGURED_JOYSTICK_DEFAULT
 
-_usage() {
+__usage_page() {
     echo "Launches Mupen64Plus emulator."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -27,7 +27,7 @@ _usage() {
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

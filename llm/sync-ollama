@@ -10,7 +10,7 @@ _require_var SCRIPTS_LLM_PY_HOME
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 : "${OLLAMA_SERVER:=http://127.0.0.1:11434}"
 
-_usage() {
+__usage_page() {
     echo "Starts Ollama service, synchronizes models and updates OpenCode configuration."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -28,7 +28,7 @@ while getopts "sh" opt; do
             _opencode_flag=1
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

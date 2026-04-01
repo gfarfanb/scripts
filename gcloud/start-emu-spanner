@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 # Last assigned: 0.0.0.0:9010
 _require_var SPANNER_HOST_PORT
 
-_usage() {
+__usage_page() {
     echo "Starts Spanner emulator for a specific project."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -18,7 +18,7 @@ _usage() {
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

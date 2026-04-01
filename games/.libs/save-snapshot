@@ -5,7 +5,7 @@
 _require_var SNAPSHOTS_TO_KEEP
 _require_var SCRIPTS_PY_HOME
 
-_usage() {
+__usage_page() {
     echo "Create snapshots of save files."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -23,7 +23,7 @@ while getopts "rh" opt; do
             _recover_flag=1
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

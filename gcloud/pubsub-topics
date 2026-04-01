@@ -11,7 +11,7 @@ _require_var PUBSUB_TOPICS_DEFAULT_OPTION
 # Last assigned: ./.config/pubsub-topics-def
 _require_var PUBSUB_TOPICS_DEFINITION_FILE
 
-_usage() {
+__usage_page() {
     echo "Operations for PubSub topics: create, send messages, monitor messages."
     echo "   The following env variables must be set previously manually or by executing 'start-pubsub'"
     echo "   - PUBSUB_PROJECT_ID"
@@ -32,11 +32,8 @@ _option=""
 
 _sync_ops=( "Create" "Send" "Monitor" )
 
-while getopts "hcm:w" opt; do
+while getopts "cm:wh" opt; do
     case "$opt" in
-        h)
-            _usage
-            ;;
         c)
             _option="Create"
             ;;
@@ -46,6 +43,9 @@ while getopts "hcm:w" opt; do
             ;;
         w)
             _option="Monitor"
+            ;;
+        h)
+            __usage_page
             ;;
     esac
 done

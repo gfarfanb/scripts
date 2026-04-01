@@ -5,7 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 _require_var SCRIPTS_SYS_PY_HOME
 
-_usage() {
+__usage_page() {
     echo "Pull changes for local repos or clone if they do not exist."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -19,7 +19,7 @@ _usage() {
 while getopts "bsh" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
         *)
             ;;

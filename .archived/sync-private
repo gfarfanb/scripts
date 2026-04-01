@@ -7,7 +7,7 @@ _require_var SYNC_FOLDER_PRIVATE_DIR
 # Last assigned: $WORKSPACE_HOME/pkb/org-roam/private
 _require_var ORG_ROAM_PRIVATE_DIR
 
-_usage() {
+__usage_page() {
     echo "Fetches all changes from backup folder (preferably a"
     echo "hosting service folder) to the pkb/org-roam/private"
     echo ;
@@ -22,7 +22,7 @@ _push_flag=0
 while getopts "h" opt; do
     case "$opt" in
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var CLOUD_HOME
 _require_var CLOUD_REMOTE_SOURCES
 
-_usage() {
+__usage_page() {
     echo "Synchronize local files from cloud providers."
     echo ;
     echo "Usage: $0 [<option>]*"
@@ -39,7 +39,7 @@ while getopts "fpsth" opt; do
             _options="--dry-run"
             ;;
         h)
-            _usage
+            __usage_page
             ;;
     esac
 done

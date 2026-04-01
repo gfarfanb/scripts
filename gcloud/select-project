@@ -1,7 +1,15 @@
 #! /usr/bin/env bash
-BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../env-vars
+# :__usage_lib_page
+# Lists a Gcloud projects and allow to select one.
+# It exports the following environment variables:
+# - PROJECT_SELECTED
+# - PUSH_PORT_SELECTED
+#
+# Dependencies:
+#   - env-vars (as source file)
+# Usage in script:
+#   . ./select-project  # Relative source
 
 _require_var GCLOUD_DEFAULT_PROJECT_ID
 # Last assigned:

@@ -3,7 +3,6 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var SCRIPTS_DEV_LIBS_HOME
 _require_var OPEN_WEBUI_ENV
 _require_var OPEN_WEBUI_PORT
 _require_var OPEN_WEBUI_COMPOSE_FILE
@@ -44,7 +43,7 @@ __usage_page() {
     exit 0
 }
 
-. "$SCRIPTS_DEV_LIBS_HOME/docker-fn"
+. ../dev/.libs/docker-fn
 
 _select_service() {
     echo "Which service do you want to connect?" >&2

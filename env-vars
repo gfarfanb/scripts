@@ -1,5 +1,18 @@
 #! /usr/bin/env bash
 
+# :__usage_lib_page
+# Defines common environment variables,
+# imports environment variables from from $ENV_VARS_FILE file
+# and imports common functions
+#
+# Usage in script:
+#   #! /usr/bin/env bash
+#   BASEDIR=$(dirname $0); cd $BASEDIR
+#
+#   . ./env-vars  # Relative source
+#
+#   _require_var <ENVIRONMENT_VARIABLE>
+
 PWD=$(pwd)
 # Files are backed by physical storage
 TEMP_DIR=$(systemd-path temporary-large)

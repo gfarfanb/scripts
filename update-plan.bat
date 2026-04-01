@@ -6,7 +6,7 @@ call require-var UPDATE_PLAN_FILE
 
 goto main
 
-:usage
+:__usage_page
 echo Update packages and execute a plan.
 echo:
 echo Usage: %0 [^<option^>]*
@@ -15,7 +15,7 @@ echo     -h: Displays this help message
 goto back
 
 :main
-if /i "%~1"=="-h" goto usage
+if /i "%~1"=="-h" goto __usage_page
 
 setlocal enableDelayedExpansion
 

@@ -1,15 +1,21 @@
 #! /usr/bin/env bash
 
-. ../env-vars
-
-_require_var DOCKER_WAIT_SECS
-_require_var DOCKER_WAIT_TRIES
+# :__usage_lib_page
+# Defines common Docker functions
+#
+# Dependencies:
+#   - env-vars (as source file)
+# Usage in script:
+#   . ../dev/.libs/docker-fn  # Relative source
 
 _wait_until_healthy() {
     local _container=${1:-}
     local _container_id="$(docker ps -q -a -f name=$_container)"
     local _waiting_flag=0
     local _waited=0
+
+    _require_var DOCKER_WAIT_SECS
+    _require_var DOCKER_WAIT_TRIES
 
     if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
         echo ;

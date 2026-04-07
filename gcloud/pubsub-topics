@@ -13,7 +13,7 @@ _require_var PUBSUB_TOPICS_DEFINITION_FILE
 
 __usage_page() {
     echo "Operations for PubSub topics: create, send messages, monitor messages."
-    echo "   The following env variables must be set previously manually or by executing 'start-pubsub'"
+    echo "The following env variables must be set previously manually or by executing 'start-pubsub':"
     echo "   - PUBSUB_PROJECT_ID"
     echo "   - PUBSUB_PUSH_ENDPOINT"
     echo ;

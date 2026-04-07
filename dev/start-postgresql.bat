@@ -10,7 +10,7 @@ rem https://blog.marcnuri.com/windows-postgresql-without-installation-portable
 goto :main
 
 :__usage_page
-echo Starts PostgreSQL database using binaries
+echo Starts PostgreSQL database using binaries.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

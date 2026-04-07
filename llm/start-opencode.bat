@@ -8,7 +8,7 @@ call ..\.win\require-var OPENCODE_SERVER_PORT
 goto :main
 
 :__usage_page
-echo Starts OpenCode server.
+echo Starts OpenCode as server.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

@@ -9,7 +9,7 @@ call ..\.win\require-var OPEN_SSH_CLIENT
 goto :main
 
 :__usage_page
-echo Open a SSH connection based on a known hosts
+echo Open a SSH connection based on a known hosts.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

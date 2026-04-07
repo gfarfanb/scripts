@@ -10,7 +10,7 @@ call ..\.win\require-var KAFKA_REQUIRED_JDK
 goto :main
 
 :__usage_page
-echo Starts Apache Kafka using binaries
+echo Starts Apache Kafka using binaries.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

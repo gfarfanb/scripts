@@ -8,7 +8,7 @@ call ..\.win\require-var EIGHTBITDO_FIRMWARE_UPDATER_HOME
 goto :main
 
 :__usage_page
-echo Starts '8BitDo Firmware Updater' program
+echo Starts '8BitDo Firmware Updater' app using binaires.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

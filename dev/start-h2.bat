@@ -10,7 +10,7 @@ call ..\.win\require-var H2_REQUIRED_JDK
 goto :main
 
 :__usage_page
-echo Starts H2 database using binaries
+echo Starts H2 database using binaries.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

@@ -8,7 +8,7 @@ call ..\.win\require-var JD_GUI_JAR
 goto :main
 
 :__usage_page
-echo Starts JD-GUI using binaries
+echo Starts JD-GUI using binaries.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<jdk_version^>^|^<option^>]*

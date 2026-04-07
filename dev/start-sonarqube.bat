@@ -8,7 +8,7 @@ call ..\.win\require-var SONARQUBE_SERVER_HOME
 goto :main
 
 :__usage_page
-echo Starts SonarQube Server using binaries
+echo Starts SonarQube Server using binaries.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

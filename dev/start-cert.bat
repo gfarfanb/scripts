@@ -9,7 +9,7 @@ call ..\.win\require-var JDK_PEM_HOME
 goto :main
 
 :__usage_page
-echo Generates a CERT based on a PEM file and imports it
+echo Generates a CERT based on a PEM file and imports it.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<jdk_version^>^|^<option^>]*

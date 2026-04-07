@@ -10,7 +10,7 @@ goto :main
 
 :__usage_page
 echo Fetches all changes from backup folder (preferably a
-echo hosting service folder) to the pkb/org-roam/private
+echo hosting service folder) to the pkb/org-roam/private.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

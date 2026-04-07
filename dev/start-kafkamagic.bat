@@ -8,7 +8,7 @@ call ..\.win\require-var KAFKA_MAGIC_HOME
 goto :main
 
 :__usage_page
-echo Starts Kafka Magic using binaries
+echo Starts Kafka Magic using binaries.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

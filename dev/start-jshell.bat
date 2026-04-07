@@ -7,7 +7,7 @@ call ..\env-vars
 goto :main
 
 :__usage_page
-echo Starts jShell on a selected JDK
+echo Starts jShell on a selected JDK.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<jdk_version^>^|^<option^>]*

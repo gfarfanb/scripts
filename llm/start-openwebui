@@ -8,8 +8,9 @@ _require_var OPEN_WEBUI_PORT
 _require_var OPEN_WEBUI_COMPOSE_FILE
 _require_var OPEN_WEBUI_BACKUP_HOME
 _require_var OPEN_WEBUI_BACKUP_TO_KEEP
+_require_var OPEN_WEBUI_POSTGRESQL_USER
 _require_var OPEN_WEBUI_POSTGRESQL_PASSWORD
-_require_var OPEN_WEBUI_POSTGRESQL_PORT
+_require_var OPEN_WEBUI_POSTGRESQL_SERVER
 _require_var OPEN_WEBUI_DATABASE_NAME
 _require_var OPEN_WEBUI_GITHUB_CLIENT_ID
 _require_var OPEN_WEBUI_GITHUB_CLIENT_SECRET
@@ -68,7 +69,9 @@ _select_service() {
             echo "copilot-adapter"
             ;;
         3)
-            echo "postgres"
+            # echo "postgres"
+            echo "Service used externally" >&2
+            _stopped
             ;;
         4)
             echo "redis"
@@ -80,10 +83,12 @@ _select_service() {
             echo "docling-serve-$OPEN_WEBUI_ENV"
             ;;
         7)
-            echo "tika"
+            # echo "tika"
+            echo "Service used externally" >&2
+            _stopped
             ;;
         * )
-            echo "Invalid service option: $_service"
+            echo "Invalid service option: $_service" >&2
             _stopped
             ;;
     esac
@@ -100,8 +105,9 @@ _docker_compose() {
         OLLAMA_SERVER=$OLLAMA_SERVER \
         SEARXNG_PORT=$SEARXNG_PORT \
         SEARXNG_SERVER=$SEARXNG_SERVER \
+        OPEN_WEBUI_POSTGRESQL_USER=$OPEN_WEBUI_POSTGRESQL_USER \
         OPEN_WEBUI_POSTGRESQL_PASSWORD=$OPEN_WEBUI_POSTGRESQL_PASSWORD \
-        OPEN_WEBUI_POSTGRESQL_PORT=$OPEN_WEBUI_POSTGRESQL_PORT \
+        OPEN_WEBUI_POSTGRESQL_SERVER=$OPEN_WEBUI_POSTGRESQL_SERVER \
         OPEN_WEBUI_DATABASE_NAME=$OPEN_WEBUI_DATABASE_NAME \
         OPEN_WEBUI_GITHUB_CLIENT_ID=$OPEN_WEBUI_GITHUB_CLIENT_ID \
         OPEN_WEBUI_GITHUB_CLIENT_SECRET=$OPEN_WEBUI_GITHUB_CLIENT_SECRET \
@@ -201,15 +207,23 @@ _restore_openwebui() {
 }
 
 _terminal_services() {
-    _terminal_container $( _select_service )
+    local _service=$( _select_service )
 
-    _completed
+    if [ -n "$_service" ]; then
+        _terminal_container $_service
+
+        _completed
+    fi
 }
 
 _logs_services() {
-    _docker_compose logs -f $( _select_service )
+    local _service=$( _select_service )
 
-    _completed
+    if [ -n "$_service" ]; then
+        _docker_compose logs -f $_service
+
+        _completed
+    fi
 }
 
 _stop_services() {
@@ -225,15 +239,23 @@ _remove_services() {
 }
 
 _execute_services() {
-    _docker_compose run --rm $( _select_service )
+    local _service=$( _select_service )
 
-    _completed
+    if [ -n "$_service" ]; then
+        _docker_compose run --rm $_service
+
+        _completed
+    fi
 }
 
 _kill_services() {
-    _docker_compose stop $( _select_service )
+    local _service=$( _select_service )
 
-    _completed
+    if [ -n "$_service" ]; then
+        _docker_compose stop $_service
+        
+        _completed
+    fi
 }
 
 _update_flag=0

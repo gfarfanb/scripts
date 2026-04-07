@@ -54,8 +54,8 @@ _back() {
 }
 
 _completed() {
-    echo ;
-    echo "[Completed]: $0"
+    echo ; >&2
+    echo "[Completed]: $0" >&2
 
     _back
 
@@ -63,8 +63,8 @@ _completed() {
 }
 
 _stopped() {
-    echo ;
-    echo "[Process stopped]: $0"
+    echo ; >&2
+    echo "[Process stopped]: $0" >&2
 
     _back
 

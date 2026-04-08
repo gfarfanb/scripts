@@ -21,10 +21,9 @@ _require_var COPILOT_ADAPTER_API_VERSION
 _require_var OLLAMA_SERVER
 _require_var SEARXNG_PORT
 _require_var SEARXNG_SERVER
-_require_var REDIS_PORT
-_require_var TIKA_SERVER
 _require_var DOCLING_SERVER
 _require_var DOCLING_PORT
+_require_var TIKA_SERVER
 
 __usage_page() {
     echo "Starts Open WebUI and the related services."
@@ -50,11 +49,9 @@ _select_service() {
     echo "Which service do you want to connect?" >&2
     echo "1) Open WebUI (default)" >&2
     echo "2) Copilot Adapter" >&2
-    echo "3) PostgreSQL" >&2
-    echo "4) Redis" >&2
-    echo "5) SearXNG" >&2
-    echo "6) Docling" >&2
-    echo "7) Tika" >&2
+    echo "3) SearXNG" >&2
+    echo "4) Docling" >&2
+    echo "5) Tika" >&2
     read -p "service-index> " _service_index
 
     if [ -z "$_service_index" ]; then
@@ -69,20 +66,12 @@ _select_service() {
             echo "copilot-adapter"
             ;;
         3)
-            # echo "postgres"
-            echo "Service used externally" >&2
-            _stopped
-            ;;
-        4)
-            echo "redis"
-            ;;
-        5)
             echo "searxng"
             ;;
-        6)
+        4)
             echo "docling-serve-$OPEN_WEBUI_ENV"
             ;;
-        7)
+        5)
             # echo "tika"
             echo "Service used externally" >&2
             _stopped
@@ -111,14 +100,13 @@ _docker_compose() {
         OPEN_WEBUI_DATABASE_NAME=$OPEN_WEBUI_DATABASE_NAME \
         OPEN_WEBUI_GITHUB_CLIENT_ID=$OPEN_WEBUI_GITHUB_CLIENT_ID \
         OPEN_WEBUI_GITHUB_CLIENT_SECRET=$OPEN_WEBUI_GITHUB_CLIENT_SECRET \
-        REDIS_PORT=$REDIS_PORT \
         COPILOT_ADAPTER_PORT=$COPILOT_ADAPTER_PORT \
         COPILOT_ADAPTER_GITHUB_TOKEN=$GITHUB_COPILOT_TOKEN \
         COPILOT_ADAPTER_API_URL=$COPILOT_ADAPTER_API_URL \
         COPILOT_ADAPTER_API_VERSION=$COPILOT_ADAPTER_API_VERSION \
-        TIKA_SERVER=$TIKA_SERVER \
         DOCLING_SERVER=$DOCLING_SERVER \
         DOCLING_PORT=$DOCLING_PORT \
+        TIKA_SERVER=$TIKA_SERVER \
         docker compose -f $OPEN_WEBUI_COMPOSE_FILE $*
 }
 

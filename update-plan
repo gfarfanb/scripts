@@ -7,7 +7,7 @@ _require_var WORKSPACE_HOME
 _require_var UPDATE_PLAN_FILE
 
 __usage_page() {
-    echo "Update packages and execute a plan."
+    echo "Execute the update plan."
     echo ;
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
@@ -23,37 +23,18 @@ while getopts "h" opt; do
     esac
 done
 
-echo "Updating packages:"
-echo -e "$( hostnamectl | grep 'Operating System:' )"
+uname -m && cat /etc/*release
 
-if [ -n "$( type -t apt )" ]; then
+echo ;
+hostnamectl
 
+if [ -n "$( type -t sudo )" ]; then
     sudo -l 1>/dev/null
     if [ $? -ne 0 ] || ! [ "$( sudo whoami )" = "root" ]; then
         echo "Execute:"
         echo "> su \$USER"
         _stopped
     fi
-
-    echo ;
-    echo "Updating 'apt' packages"
-
-    sudo apt update
-    sudo apt upgrade -y
-
-    echo "Cleaning up 'apt' packages"
-
-    sudo apt clean all -y
-    sudo apt autoclean -y
-    sudo apt autoremove --purge -y
-fi
-
-if [ -n "$( type -t dnf )" ]; then
-    echo ;
-    echo "Updating 'dnf' packages"
-
-    sudo dnf check-update
-    sudo dnf upgrade -y
 fi
 
 _print_cmds=()

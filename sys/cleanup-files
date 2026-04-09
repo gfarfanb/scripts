@@ -1,0 +1,83 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../env-vars
+
+__usage_page() {
+    echo "Cleanup common Linux files."
+    echo ;
+    echo "Usage: $(basename $0) [<option>]*"
+    echo "Option:"
+    echo "    -h: Displays this help message"
+    exit 0
+}
+
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            __usage_page
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ -d "/home/$USER/.local/share/Trash" ]; then
+    sudo rm -rf /home/$USER/.local/share/Trash/*
+fi
+
+if [ -d "/tmp" ]; then
+    sudo find /tmp/ -type f -mtime +1 -exec sudo rm {} \;
+    sudo find /tmp/ -type f -atime +1 -exec sudo rm {} \;
+    sudo rm -rf /tmp/*
+fi
+
+if [ -f "/home/$USER/.bash_history" ]; then
+    sudo rm /home/$USER/.bash_history
+fi
+
+if [ -f "/home/$USER/.local/share/user-places.xbel.bak" ]; then
+    sudo rm /home/$USER/.local/share/user-places.xbel.bak
+fi
+
+if [ -d "/var/tmp" ]; then
+    sudo rm -rf /var/tmp/*
+fi
+
+if [ -d "/var/crash" ]; then
+    sudo rm -rf /var/crash
+fi
+
+if [ -d "/home/$USER/.cache/evolution" ]; then
+    sudo rm -rf /home/$USER/.cache/evolution/*
+fi
+
+if [ -d "/home/$USER/.cache/thumbnails" ]; then
+    sudo rm -rf /home/$USER/.cache/thumbnails/*
+fi
+
+if [ -d "/home/$USER/.cache/pip" ]; then
+    sudo rm -rf /home/$USER/.cache/pip
+fi
+
+if [ -d "/home/$USER/.cache" ]; then
+    sudo find /home/$USER/.cache/ -type f -mtime +1 -exec rm {} \;
+    sudo find /home/$USER/.cache/ -type f -atime +1 -exec rm {} \;
+fi
+
+if [ -d "/var/backups" ]; then
+    sudo find /var/backups/ -type f -mtime +1 -exec sudo rm {} \;
+    sudo find /var/backups/ -type f -atime +1 -exec sudo rm {} \;
+fi
+
+if [ -d "/var/log" ]; then
+    sudo find /var/log/ -type f -mtime +1 -exec sudo rm {} \;
+    sudo find /var/log/ -type f -atime +1 -exec sudo rm {} \;
+fi
+
+if [ -d "/var/cache/apt/archives" ]; then
+    sudo find /var/cache/apt/archives/ -type f -mtime +1 -exec sudo rm {} \;
+    sudo find /var/cache/apt/archives/ -type f -atime +1 -exec sudo rm {} \;
+fi
+
+_completed

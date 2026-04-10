@@ -51,7 +51,7 @@ echo Defender scan history cleaned
 del /s /q C:\Windows\Prefetch\* >nul 2>&1
 echo Prefetch files cleaned
 
-powershell -Command "Start-Process powershell -ArgumentList '-Command $env:REGISTRY_BACKUP_HOME=''%REGISTRY_BACKUP_HOME%''; $env:REGISTRY_BACKUP_TO_KEEP=''%REGISTRY_BACKUP_TO_KEEP%''; dotnet run $env:SCRIPTS_HOME\sys\.cs\RegistryCleaner.cs' -Verb RunAs"
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "%REGISTRY_BACKUP_HOME%" -RegistryBackupToKeep "%REGISTRY_BACKUP_TO_KEEP%"
 
 goto :completed
 

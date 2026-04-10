@@ -15,4 +15,4 @@ set __eval_bat="%TEMP%\eval-%__eval_tag%.bat"
 
 echo %* > "%__eval_bat%"
 
-endlocal & call "%__eval_bat%" & del "%__eval_bat%"
+endlocal & call "%__eval_bat%" & if exist "%__eval_bat%" del "%__eval_bat%"

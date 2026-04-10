@@ -34,50 +34,61 @@ fi
 
 if [ -f "/home/$USER/.bash_history" ]; then
     sudo rm /home/$USER/.bash_history
+    echo "Bash history cleaned"
 fi
 
 if [ -f "/home/$USER/.local/share/user-places.xbel.bak" ]; then
     sudo rm /home/$USER/.local/share/user-places.xbel.bak
+    echo "User places cleaned"
 fi
 
 if [ -d "/var/tmp" ]; then
     sudo rm -rf /var/tmp/*
+    echo "Temporary files cleaned"
 fi
 
 if [ -d "/var/crash" ]; then
     sudo rm -rf /var/crash
+    echo "Crash files cleaned"
 fi
 
 if [ -d "/home/$USER/.cache/evolution" ]; then
     sudo rm -rf /home/$USER/.cache/evolution/*
+    echo "Cache evolution files cleaned"
 fi
 
 if [ -d "/home/$USER/.cache/thumbnails" ]; then
     sudo rm -rf /home/$USER/.cache/thumbnails/*
+    echo "Cache thumbnails files cleaned"
 fi
 
 if [ -d "/home/$USER/.cache/pip" ]; then
     sudo rm -rf /home/$USER/.cache/pip
+    echo "Cache pip files cleaned"
 fi
 
 if [ -d "/home/$USER/.cache" ]; then
     sudo find /home/$USER/.cache/ -type f -mtime +1 -exec rm {} \;
     sudo find /home/$USER/.cache/ -type f -atime +1 -exec rm {} \;
+    echo "User cache files cleaned"
 fi
 
 if [ -d "/var/backups" ]; then
     sudo find /var/backups/ -type f -mtime +1 -exec sudo rm {} \;
     sudo find /var/backups/ -type f -atime +1 -exec sudo rm {} \;
+    echo "Backups files cleaned"
 fi
 
 if [ -d "/var/log" ]; then
     sudo find /var/log/ -type f -mtime +1 -exec sudo rm {} \;
     sudo find /var/log/ -type f -atime +1 -exec sudo rm {} \;
+    echo "Log files cleaned"
 fi
 
 if [ -d "/var/cache/apt/archives" ]; then
     sudo find /var/cache/apt/archives/ -type f -mtime +1 -exec sudo rm {} \;
     sudo find /var/cache/apt/archives/ -type f -atime +1 -exec sudo rm {} \;
+    echo "apt archive files cleaned"
 fi
 
 _completed

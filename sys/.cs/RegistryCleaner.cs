@@ -36,31 +36,29 @@ class RegistryCleaner
             RegistryCleaner cleaner = new RegistryCleaner();
 
             // Backup registry before scanning
-            Console.WriteLine("[*] Creating backup of registry...");
+            Console.WriteLine("[*] Creating backup of registry");
             cleaner.BackupRegistry();
             Console.WriteLine("[OK] Registry backup created");
             Console.WriteLine();
 
             // Scan for issues
-            Console.WriteLine("[*] Scanning registry...");
+            Console.WriteLine("[*] Scanning registry");
             Console.WriteLine();
             cleaner.ScanRegistry();
 
             // Show findings
             if (cleaner.toDelete.Count == 0)
             {
-                Console.WriteLine("========================================");
-                Console.WriteLine("[OK] Registry is clean!");
+                Console.WriteLine();
+                Console.WriteLine("COMPLETED: Registry is clean!");
                 Console.WriteLine("No orphaned entries found.");
-                Console.WriteLine("========================================");
                 Console.WriteLine();
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("========================================");
+            Console.WriteLine();
             Console.WriteLine("FINDINGS: {0} issues detected", cleaner.toDelete.Count);
-            Console.WriteLine("========================================");
             Console.WriteLine();
 
             foreach (string[] entry in cleaner.toDelete)
@@ -69,7 +67,6 @@ class RegistryCleaner
             }
 
             Console.WriteLine();
-            Console.WriteLine("========================================");
 
             // Confirm before deleting
             Console.WriteLine("WARNING: These entries will be deleted from your registry.");
@@ -84,7 +81,7 @@ class RegistryCleaner
             }
 
             Console.WriteLine();
-            Console.WriteLine("[*] Deleting entries...");
+            Console.WriteLine("[*] Deleting entries");
             Console.WriteLine();
 
             // Delete entries
@@ -142,9 +139,7 @@ class RegistryCleaner
             }
 
             Console.WriteLine();
-            Console.WriteLine("========================================");
             Console.WriteLine("RESULTS: {0} deleted, {1} failed", deleted, failed);
-            Console.WriteLine("========================================");
             Console.WriteLine();
 
             if (failed == 0)
@@ -162,7 +157,7 @@ class RegistryCleaner
         }
         catch (Exception ex)
         {
-            Console.WriteLine("FATAL ERROR: {0}", ex.Message);
+            Console.WriteLine("ERROR: {0}", ex.Message);
             Console.WriteLine(ex.StackTrace);
             Console.ReadKey();
         }
@@ -174,17 +169,17 @@ class RegistryCleaner
 
     private void ScanRegistry()
     {
-        Console.WriteLine("[1/3] Scanning ZONE 1: Orphaned uninstall entries...");
+        Console.WriteLine("[1/3] Scanning ZONE 1: Orphaned uninstall entries");
         ScanUninstallEntries();
         Console.WriteLine("      Found: {0}", CountEntriesInZone("HKLM"));
         Console.WriteLine();
 
-        Console.WriteLine("[2/3] Scanning ZONE 2: Broken Run/RunOnce autostart entries...");
+        Console.WriteLine("[2/3] Scanning ZONE 2: Broken Run/RunOnce autostart entries");
         ScanRunOnceEntries();
         Console.WriteLine("      Found: {0}", CountEntriesInZone("HKCU"));
         Console.WriteLine();
 
-        Console.WriteLine("[3/3] Scanning ZONE 3: Stale MRU (recently used files)...");
+        Console.WriteLine("[3/3] Scanning ZONE 3: Stale MRU (recently used files)");
         ScanMRUEntries();
         Console.WriteLine("      Found: {0}", CountEntriesInZone("MRU"));
         Console.WriteLine();

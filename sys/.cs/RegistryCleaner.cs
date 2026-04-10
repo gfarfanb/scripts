@@ -342,34 +342,78 @@ class RegistryCleaner
 
     private void BackupRegistry()
     {
-        try
+        string backupHome = Environment.GetEnvironmentVariable("REGISTRY_BACKUP_HOME");
+        string keepStr = Environment.GetEnvironmentVariable("REGISTRY_BACKUP_TO_KEEP");
+
+        if (string.IsNullOrEmpty(backupHome))
+            throw new InvalidOperationException("Environment variable REGISTRY_BACKUP_HOME is not set");
+        if (string.IsNullOrEmpty(keepStr))
+            throw new InvalidOperationException("Environment variable REGISTRY_BACKUP_TO_KEEP is not set");
+
+        if (!Directory.Exists(backupHome))
+            Directory.CreateDirectory(backupHome);
+
+        int keepCount;
+        if (!int.TryParse(keepStr, out keepCount) || keepCount < 1)
+            throw new InvalidOperationException("REGISTRY_BACKUP_TO_KEEP must be a positive integer");
+
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+
+        ExportRegistryHive("HKCU", backupHome, timestamp);
+
+        CleanupOldBackups(backupHome, keepCount);
+
+        Console.WriteLine("      Backups saved to: {0}", backupHome);
+        Console.WriteLine("      Retaining up to {0} backup(s)", keepCount);
+    }
+
+    private void ExportRegistryHive(string hive, string backupHome, string timestamp)
+    {
+        string backupPath = Path.Combine(backupHome, string.Format("Registry_Backup_{0}_{1}.reg", hive, timestamp));
+
+        ProcessStartInfo psi = new ProcessStartInfo
         {
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
-            string backupPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "Registry_Backup_" + timestamp + ".reg");
+            FileName = "reg.exe",
+            Arguments = "export \"" + hive + "\" \"" + backupPath + "\" /y",
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            WindowStyle = ProcessWindowStyle.Hidden
+        };
 
-            // Export HKCU to backup file
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = "reg.exe",
-                Arguments = "export HKCU \"" + backupPath + "\" /y",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
+        using (Process p = Process.Start(psi))
+        {
+            p.WaitForExit();
+        }
 
-            using (Process p = Process.Start(psi))
+        Console.WriteLine("      [{0}] Exported to: {1}", hive, backupPath);
+    }
+
+    private void CleanupOldBackups(string backupHome, int keepCount)
+    {
+        var backupFiles = Directory.GetFiles(backupHome, "Registry_Backup_*.reg")
+            .Select(f => new FileInfo(f))
+            .OrderByDescending(f => f.LastWriteTime)
+            .ToList();
+
+        if (backupFiles.Count <= keepCount)
+            return;
+
+        int deleted = 0;
+        foreach (var file in backupFiles.Skip(keepCount))
+        {
+            try
             {
-                p.WaitForExit();
+                file.Delete();
+                deleted++;
+                Console.WriteLine("      [CLEANUP] Removed old backup: {0}", file.Name);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("      [CLEANUP] Could not delete {0}: {1}", file.Name, ex.Message);
+            }
+        }
 
-            Console.WriteLine("      Backup saved to: {0}", backupPath);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("      WARNING: Could not create backup: {0}", ex.Message);
-        }
+        Console.WriteLine("      [CLEANUP] Deleted {0} old backup(s)", deleted);
     }
 
     private int CountEntriesInZone(string zone)

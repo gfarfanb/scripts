@@ -4,6 +4,9 @@ cd %BASEDIR%
 
 call ..\env-vars
 
+call ..\.win\require-var REGISTRY_BACKUP_HOME
+call ..\.win\require-var REGISTRY_BACKUP_TO_KEEP
+
 goto :main
 
 rem Based on https://github.com/Leedeo/Leedeo-Cleaner/blob/main/MainWindow.cs
@@ -48,7 +51,7 @@ echo Defender scan history cleaned
 del /s /q C:\Windows\Prefetch\* >nul 2>&1
 echo Prefetch files cleaned
 
-powershell -Command "Start-Process powershell -ArgumentList '-Command dotnet run $env:SCRIPTS_HOME\sys\.cs\RegistryCleaner.cs' -Verb RunAs"
+powershell -Command "Start-Process powershell -ArgumentList '-Command $env:REGISTRY_BACKUP_HOME=''%REGISTRY_BACKUP_HOME%''; $env:REGISTRY_BACKUP_TO_KEEP=''%REGISTRY_BACKUP_TO_KEEP%''; dotnet run $env:SCRIPTS_HOME\sys\.cs\RegistryCleaner.cs' -Verb RunAs"
 
 goto :completed
 

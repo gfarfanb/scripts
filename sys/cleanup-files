@@ -4,7 +4,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ../env-vars
 
 __usage_page() {
-    echo "Cleanup common Linux files."
+    echo "Cleanup common Linux temporary/cached files."
     echo ;
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"

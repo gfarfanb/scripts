@@ -3,7 +3,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var OUTPUT_AUDIO_FOLDER
+_require_var YT_DLP_OUTPUT_AUDIO_FOLDER
 _require_var DOWNLOADS_HOME
 
 __usage_page() {
@@ -20,8 +20,8 @@ __usage_page() {
 }
 
 _move_outputs() {
-    if [ -n "$(find $OUTPUT_AUDIO_FOLDER -name '*.zip')" ]; then
-        rsync -av --remove-source-files $OUTPUT_AUDIO_FOLDER/*.zip "$DOWNLOADS_HOME"
+    if [ -n "$(find $YT_DLP_OUTPUT_AUDIO_FOLDER -name '*.zip')" ]; then
+        rsync -av --remove-source-files $YT_DLP_OUTPUT_AUDIO_FOLDER/*.zip "$DOWNLOADS_HOME"
         echo "ZIP files moved to: $DOWNLOADS_HOME"
     else
         echo "ZIP files not found"
@@ -33,11 +33,9 @@ _download_audio() {
     local _url=${1:-}
 
     if [ $_playlist_flag -eq 1 ]; then
-        # youtube-dl
-        /usr/local/bin/yt-dlp -x --audio-format mp3 --audio-quality 4 --playlist-start $_playlist_start --rm-cache-dir $_url
+        yt-dlp -x --audio-format mp3 --audio-quality 4 --playlist-start $_playlist_start --rm-cache-dir $_url
     else
-        # youtube-dl
-        /usr/local/bin/yt-dlp -x --audio-format mp3 --audio-quality 4 --rm-cache-dir $_url
+        yt-dlp -x --audio-format mp3 --audio-quality 4 --rm-cache-dir $_url
     fi
 }
 
@@ -64,11 +62,11 @@ while getopts "u:s:l:mh" opt; do
     esac
 done
 
-if [ ! -d "$OUTPUT_AUDIO_FOLDER" ]; then
-    mkdir -p "$OUTPUT_AUDIO_FOLDER"
+if [ ! -d "$YT_DLP_OUTPUT_AUDIO_FOLDER" ]; then
+    mkdir -p "$YT_DLP_OUTPUT_AUDIO_FOLDER"
 fi
 
-cd "$OUTPUT_AUDIO_FOLDER"
+cd "$YT_DLP_OUTPUT_AUDIO_FOLDER"
 
 if [ -z "$_list_file" ]; then
     _download_audio $_src_url

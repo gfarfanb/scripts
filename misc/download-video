@@ -1,0 +1,75 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../env-vars
+
+_require_var YT_DLP_OUTPUT_AUDIO_FOLDER
+_require_var YT_DLP_COOKIES_DB_PARENT
+_require_var TEMP_DIR
+
+__usage_page() {
+    echo "Fetch video on MP4 format."
+    echo ;
+    echo "Usage: $(basename $0) [<option>]*"
+    echo "Option:"
+    echo "    -u <URL>:      Resource URL"
+    echo "    -h:            Displays this help message"
+    exit 0
+}
+
+_cleanup() {
+    rm -f $_tmp_file
+    exit 0
+}
+trap _cleanup EXIT SIGINT SIGTSTP
+
+_create_cookies() {
+    local _sql_file=$( ls -t $YT_DLP_COOKIES_DB_PARENT/*/cookies.sqlite | head -1 )
+
+    if [ -z "$_sql_file" ]; then
+        echo "SQLite file not found"
+        _stopped
+    fi
+
+    if [ ! -r "$_sql_file" ]; then
+        echo "File $_sql_file is not readable"
+        _stopped
+    fi
+
+    local _tmp_file="$STEMP_DIR/cookies.sqlite.XXXXXXXXXX"
+    cat "$_sql_file" >> $_tmp_file
+
+    sqlite3 -separator $'\t' $_tmp_file "select host, case substr(host,1,1)='.' when 0 then 'FALSE' else 'TRUE' end, path, case isSecure when 0 then 'FALSE' else 'TRUE' end, expiry, name, value from moz_cookies mc where mc.host = '.youtube.com'" > "$STEMP_DIR/netscape-cookies.txt"
+}
+
+_download_video() {
+    local _url=${1:-}
+
+    echo "Cookies: $STEMP_DIR/netscape-cookies.txt"
+
+    yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]" --cookies "$STEMP_DIR/netscape-cookies.txt" --rm-cache-dir $_url
+}
+
+while getopts "u:h" opt; do
+    case "$opt" in
+        u)
+            _src_url="$OPTARG"
+            ;;
+        h)
+            __usage_page
+            ;;
+    esac
+done
+
+if [ ! -d "$YT_DLP_OUTPUT_AUDIO_FOLDER" ]; then
+    mkdir -p "$YT_DLP_OUTPUT_AUDIO_FOLDER"
+fi
+
+cd "$YT_DLP_OUTPUT_AUDIO_FOLDER"
+
+_create_cookies
+_download_video $_src_url
+
+echo "Downloaded: $_src_url"
+
+_completed

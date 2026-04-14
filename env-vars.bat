@@ -14,7 +14,7 @@ rem
 rem   call .\.win\require-var <ENVIRONMENT_VARIABLE>
 
 set "TEMP_DIR=%TEMP%"
-set "STEMP_DIR=%TEMP%"
+set "SESSION_TEMP_DIR=%TEMP%"
 set "USER_HOME=%USERPROFILE%"
 
 if "%ENV_VARS_FILE%"=="" (

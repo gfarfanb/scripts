@@ -3,7 +3,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var YT_DLP_OUTPUT_AUDIO_FOLDER
+_require_var YT_DLP_OUTPUT_FOLDER
 _require_var YT_DLP_COOKIES_DB_PARENT
 _require_var TEMP_DIR
 
@@ -12,48 +12,72 @@ __usage_page() {
     echo ;
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
-    echo "    -u <URL>:      Resource URL"
+    echo "    -y <URL>:      YouTube resource URL"
     echo "    -h:            Displays this help message"
     exit 0
 }
 
-_cleanup() {
-    rm -f $_tmp_file
-    exit 0
-}
-trap _cleanup EXIT SIGINT SIGTSTP
-
-_create_cookies() {
+_create_youtube_cookies() {
     local _sql_file=$( ls -t $YT_DLP_COOKIES_DB_PARENT/*/cookies.sqlite | head -1 )
 
     if [ -z "$_sql_file" ]; then
-        echo "SQLite file not found"
+        echo "SQLite file not found" >&2
         _stopped
     fi
 
     if [ ! -r "$_sql_file" ]; then
-        echo "File $_sql_file is not readable"
+        echo "File $_sql_file is not readable" >&2
         _stopped
     fi
 
-    local _tmp_file="$STEMP_DIR/cookies.sqlite.XXXXXXXXXX"
+    local _tmp_file=$( mktemp "$SESSION_TEMP_DIR/cookies.sqlite.XXXXXXXXXX" )
     cat "$_sql_file" >> $_tmp_file
 
-    sqlite3 -separator $'\t' $_tmp_file "select host, case substr(host,1,1)='.' when 0 then 'FALSE' else 'TRUE' end, path, case isSecure when 0 then 'FALSE' else 'TRUE' end, expiry, name, value from moz_cookies mc where mc.host = '.youtube.com'" > "$STEMP_DIR/netscape-cookies.txt"
+    local _sql="select host as domain,"
+    _sql+=" case substr(host,1,1)='.' when 0 then 'false' else 'true' end as subdomains,"
+    _sql+=" path,"
+    _sql+=" case isSecure when 0 then 'false' else 'true' end as secure,"
+    _sql+=" expiry,"
+    _sql+=" name,"
+    _sql+=" value"
+    _sql+=" from moz_cookies mc"
+    _sql+=" where mc.host = '.youtube.com';"
+
+    sqlite3 -json $_tmp_file "$_sql" > "$SESSION_TEMP_DIR/json-cookies.json"
+
+    rm -f $_tmp_file
+
+    $(command -v python3 || command -v python) "$SCRIPTS_HOME/misc/.py/netscape_cookies.py" \
+        -j "$SESSION_TEMP_DIR/json-cookies.json" \
+        -n "$SESSION_TEMP_DIR/netscape-cookies.txt"
+
+    rm -f "$SESSION_TEMP_DIR/json-cookies.json"
+
+    echo "$SESSION_TEMP_DIR/netscape-cookies.txt"
 }
 
 _download_video() {
     local _url=${1:-}
+    local _cookies=${2:-}
 
-    echo "Cookies: $STEMP_DIR/netscape-cookies.txt"
+    if [ ! -d "$YT_DLP_OUTPUT_FOLDER" ]; then
+        mkdir -p "$YT_DLP_OUTPUT_FOLDER"
+    fi
 
-    yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]" --cookies "$STEMP_DIR/netscape-cookies.txt" --rm-cache-dir $_url
+    cd "$YT_DLP_OUTPUT_FOLDER"
+
+    yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]" --cookies "$_cookies" --rm-cache-dir "$_url"
+
+    echo "Downloaded: $_url" >&2
 }
 
-while getopts "u:h" opt; do
+_cookies_file=""
+
+while getopts "y:h" opt; do
     case "$opt" in
-        u)
+        y)
             _src_url="$OPTARG"
+            _cookies_file=$( _create_youtube_cookies )
             ;;
         h)
             __usage_page
@@ -61,15 +85,6 @@ while getopts "u:h" opt; do
     esac
 done
 
-if [ ! -d "$YT_DLP_OUTPUT_AUDIO_FOLDER" ]; then
-    mkdir -p "$YT_DLP_OUTPUT_AUDIO_FOLDER"
-fi
-
-cd "$YT_DLP_OUTPUT_AUDIO_FOLDER"
-
-_create_cookies
-_download_video $_src_url
-
-echo "Downloaded: $_src_url"
+_download_video "$_src_url" "$_cookies_file"
 
 _completed

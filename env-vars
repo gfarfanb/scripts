@@ -17,7 +17,7 @@ PWD=$(pwd)
 # Files are backed by physical storage
 TEMP_DIR=$(systemd-path temporary-large)
 # Files are flushed out on each reboot
-STEMP_DIR=$(systemd-path temporary)
+SESSION_TEMP_DIR=$(systemd-path temporary)
 # User profile
 USER_HOME=$HOME
 

@@ -68,6 +68,8 @@ _download_video() {
 
     yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]" --cookies "$_cookies" --rm-cache-dir "$_url"
 
+    rm -f "$_cookies"
+
     echo "Downloaded: $_url" >&2
 }
 

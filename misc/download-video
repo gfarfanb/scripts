@@ -12,9 +12,11 @@ __usage_page() {
     echo ;
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
-    echo "    -y <URL>:      YouTube resource URL"
-    echo "    -c:            Attach cookies to request"
-    echo "    -h:            Displays this help message"
+    echo "    -y <URL>:          YouTube resource URL"
+    echo "    -r <resolution>:   Video resolution, currently"
+    echo "                         supported: sd, hd (default), full-hd"
+    echo "    -c:                Attach cookies to request"
+    echo "    -h:                Displays this help message"
     exit 0
 }
 
@@ -70,10 +72,29 @@ _create_cookies() {
     esac
 }
 
+_get_resolution() {
+    local _resolution=${1:-}
+
+    case "$_resolution" in
+        sd)
+            echo "480"
+            ;;
+        hd)
+            echo "720"
+            ;;
+        full-hd)
+            echo "1080"
+            ;;
+        *)
+            echo "720"
+            ;;
+    esac
+}
+
 _download_video() {
     local _url=${1:-}
-    local _source=${2:-}
-    local _cookies=$( _create_cookies "$_source" )
+    local _resolution=$( _get_resolution ${2:-} )
+    local _cookies=$( _create_cookies ${3:-} )
 
     echo "$_cookies"
 
@@ -84,9 +105,9 @@ _download_video() {
     cd "$YT_DLP_OUTPUT_FOLDER"
 
     if [ -f "$_cookies" ]; then
-        echo yt-dlp --format "mp4" --cookies "$_cookies" --rm-cache-dir "$_url"
+        yt-dlp -S "res:$_resolution" --recode-video "mp4" --cookies "$_cookies" --rm-cache-dir "$_url"
     else
-        echo yt-dlp --format "mp4" --rm-cache-dir "$_url"
+        yt-dlp -S "res:$_resolution" --recode-video "mp4" --rm-cache-dir "$_url"
     fi
 
     echo ;
@@ -96,14 +117,17 @@ _download_video() {
 }
 
 _cookies_flag=0
+_resolution=""
 _source=""
 
-while getopts "y:ch" opt; do
+while getopts "y:r:ch" opt; do
     case "$opt" in
         y)
             _src_url="$OPTARG"
             _source="youtube"
-            
+            ;;
+        r)
+            _resolution="$OPTARG"
             ;;
         c)
             _cookies_flag=1
@@ -118,6 +142,6 @@ if [ $_cookies_flag -ne 1 ]; then
     _source=""
 fi
 
-_download_video "$_src_url" "$_source"
+_download_video "$_src_url" "$_resolution" "$_source"
 
 _completed

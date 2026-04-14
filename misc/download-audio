@@ -79,6 +79,7 @@ _pack_mp3s() {
         echo "ZIP generated: $_package"
 
         rm -f *.mp3
+
         echo "MP3 files were cleaned"
     else
         echo "MP3 files not found"

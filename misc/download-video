@@ -13,6 +13,7 @@ __usage_page() {
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -y <URL>:      YouTube resource URL"
+    echo "    -c:            Attach cookies to request"
     echo "    -h:            Displays this help message"
     exit 0
 }
@@ -56,9 +57,25 @@ _create_youtube_cookies() {
     echo "$SESSION_TEMP_DIR/netscape-cookies.txt"
 }
 
+_create_cookies() {
+    local _source=${1:-}
+
+    case "$_source" in
+        youtube)
+            echo $( _create_youtube_cookies )
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
 _download_video() {
     local _url=${1:-}
-    local _cookies=${2:-}
+    local _source=${2:-}
+    local _cookies=$( _create_cookies "$_source" )
+
+    echo "$_cookies"
 
     if [ ! -d "$YT_DLP_OUTPUT_FOLDER" ]; then
         mkdir -p "$YT_DLP_OUTPUT_FOLDER"
@@ -66,20 +83,30 @@ _download_video() {
 
     cd "$YT_DLP_OUTPUT_FOLDER"
 
-    yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]" --cookies "$_cookies" --rm-cache-dir "$_url"
+    if [ -f "$_cookies" ]; then
+        echo yt-dlp --format "mp4" --cookies "$_cookies" --rm-cache-dir "$_url"
+    else
+        echo yt-dlp --format "mp4" --rm-cache-dir "$_url"
+    fi
+
+    echo ;
+    [ $? -eq 0 ] && echo "Downloaded: $_url" >&2 || echo "Unable to download: $_url" >&2
 
     rm -f "$_cookies"
-
-    echo "Downloaded: $_url" >&2
 }
 
-_cookies_file=""
+_cookies_flag=0
+_source=""
 
-while getopts "y:h" opt; do
+while getopts "y:ch" opt; do
     case "$opt" in
         y)
             _src_url="$OPTARG"
-            _cookies_file=$( _create_youtube_cookies )
+            _source="youtube"
+            
+            ;;
+        c)
+            _cookies_flag=1
             ;;
         h)
             __usage_page
@@ -87,6 +114,10 @@ while getopts "y:h" opt; do
     esac
 done
 
-_download_video "$_src_url" "$_cookies_file"
+if [ $_cookies_flag -ne 1 ]; then
+    _source=""
+fi
+
+_download_video "$_src_url" "$_source"
 
 _completed

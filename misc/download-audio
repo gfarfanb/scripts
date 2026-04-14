@@ -39,7 +39,8 @@ _download_audio() {
         yt-dlp -x --audio-format mp3 --audio-quality 4 --rm-cache-dir "$_url"
     fi
 
-    echo "Downloaded: $_src_url" >&2
+    echo ;
+    [ $? -eq 0 ] && echo "Downloaded: $_url" >&2 || echo "Unable to download: $_url" >&2
 }
 
 _download_resource() {

@@ -5,7 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 _require_var YT_DLP_OUTPUT_FOLDER
 _require_var YT_DLP_COOKIES_DB_PARENT
-_require_var TEMP_DIR
+_require_var SESSION_TEMP_DIR
 
 __usage_page() {
     echo "Fetch video on MP4 format."

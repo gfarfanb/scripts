@@ -15,6 +15,7 @@ using Microsoft.Win32;
 // or anything under HKLM\SYSTEM.
 // =============================================================================
 
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 class RegistryCleaner
 {
     private List<string[]> toDelete = new List<string[]>();
@@ -71,9 +72,9 @@ class RegistryCleaner
             // Confirm before deleting
             Console.WriteLine("WARNING: These entries will be deleted from your registry.");
             Console.Write("Continue with cleanup? (Y/N): ");
-            string confirm = Console.ReadLine();
+            string? confirm = Console.ReadLine();
 
-            if (confirm.ToUpper() != "Y")
+            if (!string.Equals(confirm, "Y", StringComparison.OrdinalIgnoreCase))
             {
                 Console.WriteLine("Cleanup cancelled by user.");
                 Console.ReadKey();
@@ -310,7 +311,7 @@ class RegistryCleaner
 
                         try
                         {
-                            object val = key.GetValue(valueName);
+                            object? val = key.GetValue(valueName);
                             // C# 5 compatible type check — no pattern matching
                             string strVal = val as string;
                             if (strVal != null)

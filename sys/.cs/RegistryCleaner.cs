@@ -102,7 +102,7 @@ class RegistryCleaner
                     if (string.IsNullOrEmpty(valName))
                     {
                         // Delete entire subkey (orphaned uninstall entry)
-                        string parent = Path.GetDirectoryName(keyPath);
+                        string? parent = Path.GetDirectoryName(keyPath);
                         string child = Path.GetFileName(keyPath);
                         if (parent == null) { failed++; continue; }
 
@@ -215,13 +215,13 @@ class RegistryCleaner
                                 if (sub == null) continue;
 
                                 // Skip Windows system components and update entries — never touch these
-                                object sysComp = sub.GetValue("SystemComponent");
+                                object? sysComp = sub.GetValue("SystemComponent");
                                 if (sysComp != null && sysComp.ToString() == "1") continue;
                                 if (sub.GetValue("ReleaseType") != null) continue;
 
-                                string uninstStr = (sub.GetValue("UninstallString") ?? "").ToString().Trim('"', ' ');
-                                string displayIcon = (sub.GetValue("DisplayIcon") ?? "").ToString().Split(',')[0].Trim('"', ' ');
-                                string displayName = (sub.GetValue("DisplayName") ?? subName).ToString();
+                                string uninstStr = ((sub.GetValue("UninstallString") ?? "").ToString() ?? "").Trim('"', ' ');
+                                string displayIcon = ((sub.GetValue("DisplayIcon") ?? "").ToString() ?? "").Split(',')[0].Trim('"', ' ');
+                                string displayName = ((sub.GetValue("DisplayName") ?? subName).ToString()) ?? subName;
 
                                 // Skip MSI-managed entries — they may not have a direct exe path
                                 if (uninstStr.StartsWith("MsiExec", StringComparison.OrdinalIgnoreCase)) continue;
@@ -267,7 +267,7 @@ class RegistryCleaner
                     {
                         try
                         {
-                            string raw = (key.GetValue(valueName) ?? "").ToString();
+                            string raw = (key.GetValue(valueName) ?? "").ToString() ?? "";
                             // Extract executable path — strip quotes and arguments
                             string exePath = raw.Trim().TrimStart('"');
                             int endQuote = exePath.IndexOf('"');
@@ -313,7 +313,7 @@ class RegistryCleaner
                         {
                             object? val = key.GetValue(valueName);
                             // C# 5 compatible type check — no pattern matching
-                            string strVal = val as string;
+                            string? strVal = val as string;
                             if (strVal != null)
                             {
                                 string filePath = strVal.Trim();
@@ -338,8 +338,8 @@ class RegistryCleaner
 
     private void BackupRegistry()
     {
-        string backupHome = Environment.GetEnvironmentVariable("REGISTRY_BACKUP_HOME");
-        string keepStr = Environment.GetEnvironmentVariable("REGISTRY_BACKUP_TO_KEEP");
+        string? backupHome = Environment.GetEnvironmentVariable("REGISTRY_BACKUP_HOME");
+        string? keepStr = Environment.GetEnvironmentVariable("REGISTRY_BACKUP_TO_KEEP");
 
         if (string.IsNullOrEmpty(backupHome))
             throw new InvalidOperationException("Environment variable REGISTRY_BACKUP_HOME is not set");
@@ -376,9 +376,9 @@ class RegistryCleaner
             WindowStyle = ProcessWindowStyle.Hidden
         };
 
-        using (Process p = Process.Start(psi))
+        using (Process? p = Process.Start(psi))
         {
-            p.WaitForExit();
+            p?.WaitForExit();
         }
 
         Console.WriteLine("      [{0}] Exported to: {1}", hive, backupPath);

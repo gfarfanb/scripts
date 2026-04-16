@@ -3,7 +3,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var YT_DLP_OUTPUT_FOLDER
+_require_var YT_DLP_VIDEO_OUTPUT_FOLDER
 _require_var YT_DLP_COOKIES_DB_PARENT
 _require_var SESSION_TEMP_DIR
 
@@ -96,13 +96,7 @@ _download_video() {
     local _resolution=$( _get_resolution ${2:-} )
     local _cookies=$( _create_cookies ${3:-} )
 
-    echo "$_cookies"
-
-    if [ ! -d "$YT_DLP_OUTPUT_FOLDER" ]; then
-        mkdir -p "$YT_DLP_OUTPUT_FOLDER"
-    fi
-
-    cd "$YT_DLP_OUTPUT_FOLDER"
+    cd "$YT_DLP_VIDEO_OUTPUT_FOLDER"
 
     if [ -f "$_cookies" ]; then
         yt-dlp -S "res:$_resolution" --recode-video "mp4" --cookies "$_cookies" --rm-cache-dir "$_url"

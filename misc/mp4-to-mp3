@@ -3,7 +3,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var DOWNLOADS_HOME
+_require_var OUTPUT_AUDIO_HOME
 
 __usage_page() {
     echo "Converts MP4 files to MP3."
@@ -11,13 +11,27 @@ __usage_page() {
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -i: Sets the MP4 location/file"
-    echo "    -o: Sets the MP3 output location. Default: DOWNLOADS_HOME"
+    echo "    -o: Sets the MP3 output location. Default: 'OUTPUT_AUDIO_HOME'"
     echo "    -h: Displays this help message"
     exit 0
 }
 
+_convert() {
+    local _mp4=${1:-}
+    local _filename=$(basename -- "$_mp4")
+    local _name="${_filename%.*}"
+    local _output="$_mp3_output/$_name.mp3"
+
+    echo ;
+
+    ffmpeg -y -loglevel warning -i "$_mp4" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "$_output"
+
+    echo "Input: $_mp4"
+    echo "Output: $_output"
+}
+
 _mp4_location=""
-_mp3_output="$DOWNLOADS_HOME"
+_mp3_output="$OUTPUT_AUDIO_HOME"
 
 while getopts "i:o:h" opt; do
     case "$opt" in
@@ -32,19 +46,6 @@ while getopts "i:o:h" opt; do
             ;;
     esac
 done
-
-_convert() {
-    local _mp4=${1:-}
-    local _filename=$(basename -- "$_mp4")
-    local _name="${_filename%.*}"
-    local _output="$_mp3_output/$_name.mp3"
-
-    ffmpeg -y -loglevel warning -i "$_mp4" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "$_output"
-
-    echo "Input: $_mp4"
-    echo "Output: $_output"
-    echo ;
-}
 
 if [ -d "$_mp4_location" ]; then
     echo "Reading: $_mp4_location"

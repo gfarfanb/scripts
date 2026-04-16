@@ -51,6 +51,10 @@ if not "%STORAGE_HOME%" == "" (
         mkdir "%STORAGE_HOME%\llm"
         echo Created directory '%STORAGE_HOME%\models'
     )
+    if not exist "%STORAGE_HOME%\devices" (
+        mkdir "%STORAGE_HOME%\devices"
+        echo Created directory '%STORAGE_HOME%\devices'
+    )
 )
 if not "%CLOUD_HOME%" == "" (
     if not exist "%CLOUD_HOME%" (
@@ -65,16 +69,63 @@ if not "%REPOS_HOME%" == "" (
     )
 )
 if not "%MEDIA_HOME%" == "" (
-    if not exist "%MEDIA_HOME%\dlp" (
-        mkdir "%MEDIA_HOME%\dlp"
-        echo Created directory '%MEDIA_HOME%\dlp'
+    if not exist "%MEDIA_HOME%" (
+        mkdir "%MEDIA_HOME%"
+        echo Created directory '%MEDIA_HOME%'
     )
-    
+)
+if not "%YT_DLP_HOME%" == "" (
+    if not exist "%YT_DLP_HOME%" (
+        mkdir "%YT_DLP_HOME%"
+        echo Created directory '%YT_DLP_HOME%'
+    )
+)
+if not "%YT_DLP_AUDIO_OUTPUT_FOLDER%" == "" (
+    if not exist "%YT_DLP_AUDIO_OUTPUT_FOLDER%" (
+        mkdir "%YT_DLP_AUDIO_OUTPUT_FOLDER%"
+        echo Created directory '%YT_DLP_AUDIO_OUTPUT_FOLDER%'
+    )
+)
+if not "%YT_DLP_VIDEO_OUTPUT_FOLDER%" == "" (
+    if not exist "%YT_DLP_VIDEO_OUTPUT_FOLDER%" (
+        mkdir "%YT_DLP_VIDEO_OUTPUT_FOLDER%"
+        echo Created directory '%YT_DLP_VIDEO_OUTPUT_FOLDER%'
+    )
 )
 if not "%ROMS_HOME%" == "" (
     if not exist "%ROMS_HOME%" (
         mkdir "%ROMS_HOME%"
         echo Created directory '%ROMS_HOME%'
+    )
+)
+if not "%OUTPUT_HOME%" == "" (
+    if not exist "%OUTPUT_HOME%" (
+        mkdir "%OUTPUT_HOME%"
+        echo Created directory '%OUTPUT_HOME%'
+    )
+)
+if not "%OUTPUT_AUDIO_HOME%" == "" (
+    if not exist "%OUTPUT_AUDIO_HOME%" (
+        mkdir "%OUTPUT_AUDIO_HOME%"
+        echo Created directory '%OUTPUT_AUDIO_HOME%'
+    )
+)
+if not "%OUTPUT_PARSED_HOME%" == "" (
+    if not exist "%OUTPUT_PARSED_HOME%" (
+        mkdir "%OUTPUT_PARSED_HOME%"
+        echo Created directory '%OUTPUT_PARSED_HOME%'
+    )
+)
+if not "%OUTPUT_TRANSCRIPTION_HOME%" == "" (
+    if not exist "%OUTPUT_TRANSCRIPTION_HOME%" (
+        mkdir "%OUTPUT_TRANSCRIPTION_HOME%"
+        echo Created directory '%OUTPUT_TRANSCRIPTION_HOME%'
+    )
+)
+if not "%OUTPUT_WEB_HOME%" == "" (
+    if not exist "%OUTPUT_WEB_HOME%" (
+        mkdir "%OUTPUT_WEB_HOME%"
+        echo Created directory '%OUTPUT_WEB_HOME%'
     )
 )
 

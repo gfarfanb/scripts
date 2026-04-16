@@ -23,10 +23,14 @@ while getopts "h" opt; do
     esac
 done
 
-uname -m && cat /etc/*release
+if [ -n "$( type -t uname )" ]; then
+    uname -m && cat /etc/*release
+fi
 
-echo ;
-hostnamectl
+if [ -n "$( type -t hostnamectl )" ]; then
+    echo ;
+    hostnamectl
+fi
 
 if [ -n "$( type -t sudo )" ]; then
     sudo -l 1>/dev/null

@@ -22,6 +22,8 @@ if /i "%~1"=="-h" goto :__usage_page
 
 setlocal enableDelayedExpansion
 
+systeminfo
+
 set /a _cmd_idx=1
 
 for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (

@@ -16,8 +16,53 @@ __usage_page() {
     echo "    -r <resolution>:   Video resolution, currently"
     echo "                         supported: sd, hd (default), full-hd"
     echo "    -c:                Attach cookies to request"
+    echo "    -p:                Pack MP4 files into a ZIP file and delete MP4 files"
+    echo "    -m:                Move all ZIP files to 'DOWLOADS_HOME' location"
     echo "    -h:                Displays this help message"
     exit 0
+}
+
+_pack_videos() {
+    cd "$YT_DLP_VIDEO_OUTPUT_FOLDER"
+
+    if [ -n "$(find . -name '*.mp4')" ]; then
+        local _last_zip_file="$(ls | grep .*\\.zip | sort -V | tail -1)"
+        local _video_part="video"
+        local _extension_part=".zip"
+        local _audio_length=${#_video_part}
+        local _extension_length=${#_extension_part}
+        local _counter=0
+
+        if [ -n "$_last_zip_file" ]; then
+            _last_zip_file_length=${#_last_zip_file}
+            _counter=${_last_zip_file:$_audio_length:$(($_last_zip_file_length-$_audio_length-$_extension_length))}
+            _counter=$(($_counter+1))
+        fi
+
+        local _package=$_video_part$_counter$_extension_part
+
+        zip -r $_package *.mp4
+        echo "ZIP generated: $_package"
+
+        rm -f *.mp4
+
+        echo "MP4 files were cleaned"
+    else
+        echo "MP4 files not found"
+    fi
+
+    _completed
+}
+
+_move_outputs() {
+    if [ -n "$(find $YT_DLP_VIDEO_OUTPUT_FOLDER -name '*.zip')" ]; then
+        rsync -av --remove-source-files $YT_DLP_VIDEO_OUTPUT_FOLDER/*.zip "$DOWNLOADS_HOME"
+        echo "ZIP files moved to: $DOWNLOADS_HOME"
+    else
+        echo "ZIP files not found"
+    fi
+
+    _completed
 }
 
 _create_youtube_cookies() {
@@ -114,7 +159,7 @@ _cookies_flag=0
 _resolution=""
 _source=""
 
-while getopts "y:r:ch" opt; do
+while getopts "y:r:cpmh" opt; do
     case "$opt" in
         y)
             _src_url="$OPTARG"
@@ -125,6 +170,12 @@ while getopts "y:r:ch" opt; do
             ;;
         c)
             _cookies_flag=1
+            ;;
+        p)
+            _pack_videos
+            ;;
+        m)
+            _move_outputs
             ;;
         h)
             __usage_page

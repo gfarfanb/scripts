@@ -14,7 +14,7 @@ __usage_page() {
     echo "    -u <URL>:      Resource URL"
     echo "    -s <index>:    Playlist start index"
     echo "    -l <location>: File for a list of URLs"
-    echo "    -p:            Pack MP3 files into a ZIP file and delete the MP3's"
+    echo "    -p:            Pack MP3 files into a ZIP file and delete MP3 files"
     echo "    -m:            Move all ZIP files to 'DOWLOADS_HOME' location"
     echo "    -h:            Displays this help message"
     exit 0

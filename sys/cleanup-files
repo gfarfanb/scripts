@@ -32,10 +32,10 @@ if [ -d "/tmp" ]; then
     sudo rm -rf /tmp/*
 fi
 
-if [ -f "/home/$USER/.bash_history" ]; then
-    sudo rm /home/$USER/.bash_history
-    echo "Bash history cleaned"
-fi
+# if [ -f "/home/$USER/.bash_history" ]; then
+#     sudo rm /home/$USER/.bash_history
+#     echo "Bash history cleaned"
+# fi
 
 if [ -f "/home/$USER/.local/share/user-places.xbel.bak" ]; then
     sudo rm /home/$USER/.local/share/user-places.xbel.bak

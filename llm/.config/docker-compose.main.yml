@@ -32,7 +32,6 @@ services:
       - DATABASE_POOL_RECYCLE=1800
       - VECTOR_DB=pgvector
       - PGVECTOR_DB_URL=postgresql://${OPEN_WEBUI_POSTGRESQL_USER}:${OPEN_WEBUI_POSTGRESQL_PASSWORD}@${OPEN_WEBUI_POSTGRESQL_SERVER}/${OPEN_WEBUI_DATABASE_NAME}
-      # - CONTENT_EXTRACTION_ENGINE=tika
       - CONTENT_EXTRACTION_ENGINE=docling
       - DOCLING_ASYNC=true
       - DOCLING_SERVER_URL=${DOCLING_SERVER}
@@ -88,12 +87,6 @@ services:
       - UVICORN_WORKERS=1
     network_mode: host
     restart: unless-stopped
-
-  # tika:
-  #   image: apache/tika:latest-full
-  #   container_name: tika
-  #   network_mode: host
-  #   restart: unless-stopped
 
 volumes:
   open_webui_main_data:

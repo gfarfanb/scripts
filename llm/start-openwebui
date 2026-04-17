@@ -199,9 +199,9 @@ _terminal_services() {
 
     if [ -n "$_service" ]; then
         _terminal_container $_service
-
-        _completed
     fi
+
+    _completed
 }
 
 _logs_services() {
@@ -209,9 +209,9 @@ _logs_services() {
 
     if [ -n "$_service" ]; then
         _docker_compose logs -f $_service
-
-        _completed
     fi
+
+    _completed
 }
 
 _stop_services() {
@@ -231,9 +231,9 @@ _execute_services() {
 
     if [ -n "$_service" ]; then
         _docker_compose run --rm $_service
-
-        _completed
     fi
+
+    _completed
 }
 
 _kill_services() {
@@ -241,9 +241,9 @@ _kill_services() {
 
     if [ -n "$_service" ]; then
         _docker_compose stop $_service
-        
-        _completed
     fi
+
+    _completed
 }
 
 _update_flag=0

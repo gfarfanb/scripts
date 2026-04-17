@@ -44,7 +44,7 @@ if [ -n "$ROMS_HOME" ]; then mkdir -vp "$ROMS_HOME"; fi
 if [ -n "$OUTPUT_HOME" ]; then mkdir -vp "$OUTPUT_HOME"; fi
 if [ -n "$OUTPUT_AUDIO_HOME" ]; then mkdir -vp "$OUTPUT_AUDIO_HOME"; fi
 if [ -n "$OUTPUT_PARSED_HOME" ]; then mkdir -vp "$OUTPUT_PARSED_HOME"; fi
-if [ -n "$OUTPUT_TRANSCRIPTION_HOME" ]; then mkdir -vp "$OUTPUT_TRANSCRIPTION_HOME"; fi
+if [ -n "$OUTPUT_TRANSCRIPTS_HOME" ]; then mkdir -vp "$OUTPUT_TRANSCRIPTS_HOME"; fi
 if [ -n "$OUTPUT_WEB_HOME" ]; then mkdir -vp "$OUTPUT_WEB_HOME"; fi
 
 _completed

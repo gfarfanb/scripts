@@ -1,10 +1,10 @@
 services:
 
-  open-webui-cuda:
-    image: ghcr.io/open-webui/open-webui:cuda
-    container_name: open-webui-cuda
+  open-webui-main:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui-main
     volumes:
-      - open_webui_cuda_data:/app/backend/data
+      - open_webui_main_data:/app/backend/data
     environment:
       - ENV=dev
       - PORT=${OPEN_WEBUI_PORT}
@@ -33,27 +33,50 @@ services:
       - VECTOR_DB=pgvector
       - PGVECTOR_DB_URL=postgresql://${OPEN_WEBUI_POSTGRESQL_USER}:${OPEN_WEBUI_POSTGRESQL_PASSWORD}@${OPEN_WEBUI_POSTGRESQL_SERVER}/${OPEN_WEBUI_DATABASE_NAME}
       - CONTENT_EXTRACTION_ENGINE=docling
+      # - CONTENT_EXTRACTION_ENGINE=tika
       - DOCLING_ASYNC=true
       - DOCLING_SERVER_URL=${DOCLING_SERVER}
       - TIKA_SERVER_URL=${TIKA_SERVER}
     network_mode: host
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    depends_on:
+      - postgres
+
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg18-trixie
+    container_name: postgres
+    hostname: postgres
+    network_mode: host
+    restart: unless-stopped
+    command: postgres -c shared_buffers=256MB -c work_mem=16MB -c maintenance_work_mem=128MB -c effective_cache_size=512MB -c max_connections=100
+    environment:
+      - PGPORT=${OPEN_WEBUI_POSTGRESQL_PORT}
+      - POSTGRES_USER=${OPEN_WEBUI_POSTGRESQL_USER}
+      - POSTGRES_PASSWORD=${OPEN_WEBUI_POSTGRESQL_PASSWORD}
+      - POSTGRES_DB=${OPEN_WEBUI_DATABASE_NAME}
+      - POSTGRES_MULTIPLE_DATABASES=langflow,linkwarden,n8n
+    volumes:
+      - postgres_data:/var/lib/postgresql
 
   copilot-adapter:
-    image: gfarfanb/copilot-adapter:1.0.0-beta.6
+    image: gfarfanb/copilot-adapter:1.0.0-beta.5
     container_name: copilot-adapter
     environment:
       - SERVER_PORT=${COPILOT_ADAPTER_PORT}
+      - REDIS_HOST=localhost
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DATABASE=0
       - GITHUB_COPILOT_TOKEN=${COPILOT_ADAPTER_GITHUB_TOKEN}
       - COPILOT_API_URL=${COPILOT_ADAPTER_API_URL}
       - COPILOT_API_VERSION=${COPILOT_ADAPTER_API_VERSION}
+    network_mode: host
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:8.6.2-alpine
+    container_name: redis
     network_mode: host
     restart: unless-stopped
 
@@ -80,9 +103,9 @@ services:
         max-size: 1m
         max-file: 1
 
-  docling-serve-cuda:
-    image: quay.io/docling-project/docling-serve-cu128:latest
-    container_name: docling-serve-cuda
+  docling-serve-main:
+    image: quay.io/docling-project/docling-serve:latest
+    container_name: docling-serve-main
     environment:
       - UVICORN_PORT=${DOCLING_PORT}
       - DOCLING_SERVE_ENABLE_UI=true
@@ -94,13 +117,13 @@ services:
       - UVICORN_WORKERS=1
     network_mode: host
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+
+  tika:
+    image: apache/tika:latest-full
+    container_name: tika
+    network_mode: host
+    restart: unless-stopped
 
 volumes:
-  open_webui_cuda_data:
+  open_webui_main_data:
+  postgres_data:

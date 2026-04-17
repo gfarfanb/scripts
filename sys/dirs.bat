@@ -116,10 +116,10 @@ if not "%OUTPUT_PARSED_HOME%" == "" (
         echo Created directory '%OUTPUT_PARSED_HOME%'
     )
 )
-if not "%OUTPUT_TRANSCRIPTION_HOME%" == "" (
-    if not exist "%OUTPUT_TRANSCRIPTION_HOME%" (
-        mkdir "%OUTPUT_TRANSCRIPTION_HOME%"
-        echo Created directory '%OUTPUT_TRANSCRIPTION_HOME%'
+if not "%OUTPUT_TRANSCRIPTS_HOME%" == "" (
+    if not exist "%OUTPUT_TRANSCRIPTS_HOME%" (
+        mkdir "%OUTPUT_TRANSCRIPTS_HOME%"
+        echo Created directory '%OUTPUT_TRANSCRIPTS_HOME%'
     )
 )
 if not "%OUTPUT_WEB_HOME%" == "" (

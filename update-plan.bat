@@ -29,7 +29,7 @@ set /a _cmd_idx=1
 for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
     call .\.win\eval set "_cmd=%%l"
 
-    echo !_cmd! | findstr /r "^p:*" >nul
+    echo !_cmd! | findstr /r /i "^p:.*" >nul
 
     if !errorlevel! equ 0 (
         set "_cmd=!_cmd:~2!"

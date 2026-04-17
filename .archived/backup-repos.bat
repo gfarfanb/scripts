@@ -32,7 +32,7 @@ goto :selectrepo
 
 :allrepos
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
-    echo %%i | findstr /R "^p:*" >nul
+    echo %%i | findstr /r /i "^p:.*" >nul
 
     if !errorlevel! neq 0 (
         set "__repo_zip=%%i.zip"
@@ -52,7 +52,7 @@ echo:
 echo Choose a repo to backup:
 set /a _repo_idx=1
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
-    echo %%i | findstr /R "^p:*" >nul
+    echo %%i | findstr /r /i "^p:.*" >nul
 
     if !errorlevel! neq 0 (
         echo !_repo_idx!^) %%i
@@ -65,7 +65,7 @@ set /P _selected_idx="repo-index> "
 set /a _repo_idx=1
 set _repo_flag=false
 for /F "tokens=1,2" %%i in (%REPOS_LIST_FILE%) do (
-    echo %%i | findstr /R "^p:*" >nul
+    echo %%i | findstr /r /i "^p:.*" >nul
 
     if !errorlevel! neq 0 (
         if "%_selected_idx%"=="!_repo_idx!" (

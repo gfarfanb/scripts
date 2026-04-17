@@ -28,7 +28,7 @@ for /f "tokens=*" %%l in (%REPOS_DEF_FILE%) do (
 
     set _execute_flag=true
 
-    echo !_repo! | findstr /r "^p:*" >nul
+    echo !_repo! | findstr /r /i "^p:.*" >nul
 
     if !errorlevel! equ 0 (
         set "_repo=!_repo:~2!"

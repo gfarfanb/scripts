@@ -21,6 +21,7 @@ _require_var COPILOT_ADAPTER_API_VERSION
 _require_var OLLAMA_SERVER
 _require_var SEARXNG_PORT
 _require_var SEARXNG_SERVER
+_require_var OPEN_WEBUI_SEARXNG_SECRET
 _require_var DOCLING_SERVER
 _require_var DOCLING_PORT
 _require_var TIKA_SERVER
@@ -73,7 +74,7 @@ _select_service() {
             ;;
         5)
             # echo "tika"
-            echo "Service used externally" >&2
+            echo "Service disabled: 'tika'" >&2
             _stopped
             ;;
         * )
@@ -94,6 +95,7 @@ _docker_compose() {
         OLLAMA_SERVER=$OLLAMA_SERVER \
         SEARXNG_PORT=$SEARXNG_PORT \
         SEARXNG_SERVER=$SEARXNG_SERVER \
+        SEARXNG_SECRET=$OPEN_WEBUI_SEARXNG_SECRET \
         OPEN_WEBUI_POSTGRESQL_USER=$OPEN_WEBUI_POSTGRESQL_USER \
         OPEN_WEBUI_POSTGRESQL_PASSWORD=$OPEN_WEBUI_POSTGRESQL_PASSWORD \
         OPEN_WEBUI_POSTGRESQL_SERVER=$OPEN_WEBUI_POSTGRESQL_SERVER \
@@ -123,7 +125,7 @@ _start_openwebui() {
         _update_container open-webui-$OPEN_WEBUI_ENV
         _update_container docling-serve-$OPEN_WEBUI_ENV
         _update_container searxng
-        _update_container tika
+        echo "Service disabled, skipped: '> _update_container tika'"
 
         _wait_until_healthy open-webui-$OPEN_WEBUI_ENV
     fi

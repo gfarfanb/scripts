@@ -58,6 +58,7 @@ services:
     environment:
       - SEARXNG_PORT=${SEARXNG_PORT}
       - SEARXNG_HOST=${SEARXNG_SERVER}
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
     network_mode: host
     restart: unless-stopped
     cap_drop:

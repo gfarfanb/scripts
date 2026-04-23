@@ -10,27 +10,27 @@ call ..\.win\require-var OPENCODE_CONFIG_FILE
 goto :main
 
 :__usage_page
-echo Synchronizes Ollama models and updates OpenCode configuration.
+echo Synchronizes Ollama models and updates OpenCode/Pi configuration.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
-echo     -s: Only syncs models on OpenCode configuration file
+echo     -s: Only syncs models on OpenCode/Pi configuration file
 echo     -h: Displays this help message
 goto :back
 
 
 :main
-if /i "%~1"=="-s" goto :opencode
+if /i "%~1"=="-s" goto :sync
 if /i "%~1"=="-h" goto :__usage_page
-goto :sync
+goto :pull
 
-:sync
-python ".\.py\ollama_models.py" -a opencode
+:pull
+python ".\.py\ollama_models.py" -a opencode -a pi
 goto :completed
 
-:opencode
-python ".\.py\ollama_models.py" -a opencode --sync
+:sync
+python ".\.py\ollama_models.py" -a opencode -a pi --sync
 goto :completed
 
 

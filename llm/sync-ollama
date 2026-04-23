@@ -10,21 +10,21 @@ _require_var OPENCODE_CONFIG_FILE
 : "${OLLAMA_SERVER:=http://127.0.0.1:11434}"
 
 __usage_page() {
-    echo "Starts Ollama service, synchronizes models and updates OpenCode configuration."
+    echo "Starts Ollama service, synchronizes models and updates OpenCode/Pi configuration."
     echo ;
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
-    echo "    -s: Only syncs models on OpenCode configuration file"
+    echo "    -s: Only syncs models on OpenCode/Pi configuration file"
     echo "    -h: Displays this help message"
     exit 0
 }
 
-_opencode_flag=0
+_sync_flag=0
 
 while getopts "sh" opt; do
     case "$opt" in
         s)
-            _opencode_flag=1
+            _sync_flag=1
             ;;
         h)
             __usage_page
@@ -36,10 +36,10 @@ if ! [ "$( systemctl is-active ollama )" = "active" ]; then
     ollama serve
 fi
 
-if ! [ $_opencode_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "./.py/ollama_models.py" -a opencode
+if ! [ $_sync_flag -eq 1 ]; then
+    $(command -v python3 || command -v python) "./.py/ollama_models.py" -a opencode -a pi
 else
-    $(command -v python3 || command -v python) "./.py/ollama_models.py" -a opencode --sync
+    $(command -v python3 || command -v python) "./.py/ollama_models.py" -a opencode -a pi --sync
 fi
 
 _completed

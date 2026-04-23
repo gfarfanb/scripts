@@ -20,6 +20,7 @@ import env_vars # pyright: ignore[reportMissingImports]
 ollama_host = env_vars.env_value('OLLAMA_SERVER')
 ollama_models_def = env_vars.env_value('OLLAMA_MODELS_DEF_FILE')
 opencode_config_file = env_vars.env_value('OPENCODE_CONFIG_FILE')
+pi_config_file = env_vars.env_value('PI_CONFIG_FILE')
 
 logger = logging.getLogger()
 
@@ -240,13 +241,15 @@ def sync_opencode():
                 model=model,
                 msg=err.args[0]))
 
+    base_url = "{host}/v1".format(host=ollama_host.rstrip('/'))
+
     data['provider']['ollama'] = {
-        'models': models_config,
         'name': 'Ollama (local)',
         'npm': '@ai-sdk/openai-compatible',
         'options': {
-            'baseURL': "{host}/v1".format(host=ollama_host)
-        }
+            'baseURL': base_url
+        },
+        'models': models_config
     }
 
     with open(opencode_config_file, 'w') as f:
@@ -284,13 +287,8 @@ def __get_opencode_spec(model, hub):
             'input': inputs,
             'output': [ 'text' ]
         },
-        'cost': {
-            'input': 0,
-            'output': 0
-        },
         'limit': {
-            'context': context_length,
-            'output': 0
+            'context': context_length
         }
     }
 
@@ -317,6 +315,106 @@ def __get_opencode_spec(model, hub):
     return opencode_spec
 
 
+def sync_pi():
+    if not isfile(pi_config_file):
+        is_create = True
+        data = {
+            'providers': {}
+        }
+    else:
+        is_create = False
+        with open(pi_config_file, 'r') as f:
+            data = json.load(f)
+
+    model_defs, _ = __get_model_defs()
+    models_config = []
+
+    for model_def in model_defs:
+        model, model_name = __get_model(model_def)
+
+        if not __required_pi(model_def):
+            logger.debug("Model [{model}] not required for PI".format(model=model))
+            continue
+
+        try:
+            model_base = {
+                'id': model,
+                'name': model_name
+            }
+            model_base = { **model_base, **__get_pi_spec(model=model,
+                                                         hub=model_def['hub'])}
+            models_config.append(model_base)
+
+            logger.info("Model [{model}] added to Pi configuration".format(model=model))
+        except KeyError as err:
+            logger.debug("No PI configuration defined for model [{model}] - {msg}".format(
+                model=model,
+                msg=err.args[0]))
+
+    base_url = "{host}/v1".format(host=ollama_host.rstrip('/'))
+
+    data['providers']['ollama'] = {
+        'baseUrl': base_url,
+        'api': 'openai-completions',
+        'apiKey': 'ollama',
+        'models': models_config
+    }
+
+    with open(pi_config_file, 'w') as f:
+        json.dump(data, f, indent=2)
+
+    if is_create:
+        logger.info("Created file {file}".format(file=pi_config_file))
+    else:
+        logger.info("Updated file {file}".format(file=pi_config_file))
+
+
+def __get_pi_spec(model, hub):
+    payload = { 'model': model }
+    json_payload = json.dumps(payload)
+    response = requests.post("{host}/api/show".format(host=ollama_host), data=json_payload)
+    model_details = response.json()
+    family = model_details['details']['family']
+    capabilities = model_details['capabilities']
+    context_length = model_details['model_info']["{f}.context_length".format(f=family)]
+    embedding_length = model_details['model_info']["{f}.embedding_length".format(f=family)]
+    inputs = []
+
+    if 'completion' in capabilities:
+        inputs.append('text')
+
+    if 'vision' in capabilities:
+        inputs.append('image')
+
+    pi_spec = {
+        'reasoning': 'thinking' in capabilities,
+        'input': inputs,
+        'contextWindow': context_length
+    }
+
+    model_spec = """
+        Model
+          name             {name}
+          hub              {hub}
+          architecture     {architecture}
+          parameters       {parameters}
+          context length   {contextLength}
+          embedding length {embeddingLength}
+          quantization     {quantization}
+          capabilities     {capabilities}""".format(
+            name=model,
+            hub=hub,
+            architecture=model_details['model_info']['general.architecture'],
+            parameters=model_details['details']['parameter_size'],
+            contextLength=context_length,
+            embeddingLength=embedding_length,
+            quantization=model_details['details']['quantization_level'],
+            capabilities=capabilities)
+    logger.info(model_spec)
+
+    return pi_spec
+
+
 def __get_ollama_basename(ollama_def):
     try:
         return ollama_def['info']['basename']
@@ -338,6 +436,13 @@ def __required_opencode(model_def):
         return False
 
 
+def __required_pi(model_def):
+    try:
+        return model_def[model_def['hub']]['info']['pi']
+    except KeyError:
+        return False
+
+
 def __get_or_default(json, key, default=None):
     try:
         return json[key]
@@ -352,9 +457,9 @@ def main():
             level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-a', '--agent', default='opencode', required=False,
-                            choices=[ 'opencode' ],
-                            help='Coding agent to synchronize models')
+        parser.add_argument('-a', '--agent', action='append', default=None, required=False,
+                            choices=[ 'opencode', 'pi' ],
+                            help='Coding agent to synchronize models; repeat the option to target multiple agents')
         parser.add_argument('-s', '--sync', action='store_true',
                             help='Only synchronizes models with configuration file')
         args = parser.parse_args()
@@ -363,11 +468,16 @@ def main():
             pull_models()
             cleanup_models()
 
-        match args.agent:
-            case 'opencode':
-                sync_opencode()
-            case _:
-                raise ValueError("Invalid agent: {agent}".format(agent=args.agent))
+        agents = args.agent if args.agent else []
+
+        for agent in agents:
+            match agent:
+                case 'opencode':
+                    sync_opencode()
+                case 'pi':
+                    sync_pi()
+                case _:
+                    raise ValueError("Invalid agent: {agent}".format(agent=agent))
     except BaseException as err:
         logger.error(err.args[0])
 

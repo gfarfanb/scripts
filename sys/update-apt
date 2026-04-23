@@ -32,7 +32,7 @@ _update() {
 }
 
 _cleanup() {
-    if [ -n "$( type -t apt-get )" ]; then
+    if [ -n "$( type -t apt )" ]; then
         echo "Cleaning up 'apt' packages"
 
         sudo apt remove -y
@@ -46,9 +46,9 @@ _cleanup() {
         echo ;
         echo "Cleaning up 'apt-get' packages"
 
-        sudo apt-get clean
-        sudo apt-get autoclean
-        sudo apt-get autoremove
+        sudo apt-get clean -y
+        sudo apt-get autoclean -y
+        sudo apt-get autoremove -y
     fi
 }
 

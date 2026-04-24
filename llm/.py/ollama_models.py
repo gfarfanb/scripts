@@ -288,7 +288,8 @@ def __get_opencode_spec(model, hub):
             'output': [ 'text' ]
         },
         'limit': {
-            'context': context_length
+            'context': context_length,
+            'output': 0
         }
     }
 

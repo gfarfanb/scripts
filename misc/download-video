@@ -13,6 +13,7 @@ __usage_page() {
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -y <URL>:          YouTube resource URL"
+    echo "    -a:                Get available formats for the video"
     echo "    -r <resolution>:   Video resolution, numeric"
     echo "    -c:                Attach cookies to request"
     echo "    -l <location>:     File for a list of URLs"
@@ -145,6 +146,17 @@ _select_resolution() {
     esac
 }
 
+_available_formats() {
+    local _url=${1:-}
+    local _cookies=${2:-}
+
+    if [ -f "$_cookies" ]; then
+        yt-dlp --list-formats --cookies "$_cookies" --rm-cache-dir "$_url"
+    else
+        yt-dlp --list-formats --rm-cache-dir "$_url"
+    fi
+}
+
 _download_video() {
     local _url=${1:-}
     local _resolution=${2:-}
@@ -185,16 +197,20 @@ _download_resource() {
 
 _src_url=""
 _list_file=""
+_available_flag=0
 _cookies_flag=0
 _resolution=""
 _source=""
 _cookies_file=""
 
-while getopts "y:r:cl:pmh" opt; do
+while getopts "y:ar:cl:pmh" opt; do
     case "$opt" in
         y)
             _src_url="$OPTARG"
             _source="youtube"
+            ;;
+        a)
+            _available_flag=1
             ;;
         r)
             _resolution="$OPTARG"
@@ -219,6 +235,12 @@ done
 
 if [ $_cookies_flag -eq 1 ]; then
     _cookies_file=$( _create_cookies "$_source" )
+fi
+
+if [ $_available_flag -eq 1 ]; then
+    _available_formats "$_src_url" "$_cookies_file"
+
+    _completed
 fi
 
 _download_resource "$_src_url" "$_list_file" "$_resolution" "$_cookies_file"

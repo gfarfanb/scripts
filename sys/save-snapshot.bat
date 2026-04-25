@@ -3,7 +3,8 @@ set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
 call ..\env-vars
-call ..\.win\require-var SNAPSHOTS_TO_KEEP
+
+if not defined SNAPSHOTS_TO_KEEP set "SNAPSHOTS_TO_KEEP=1"
 
 goto :main
 
@@ -26,7 +27,7 @@ goto :snapshot
 
 
 :snapshot
-python ".\.py\file_snapshot.py" -d "%_saves_home%"
+python ".\.py\file_snapshot.py" -d "%_saves_home%" -k %SNAPSHOTS_TO_KEEP%
 goto :completed
 
 :getsnapshot

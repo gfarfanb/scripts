@@ -54,7 +54,7 @@ _back() {
 }
 
 _completed() {
-    echo ; >&2
+    echo >&2
     echo "[Completed]: $0" >&2
 
     _back
@@ -63,12 +63,12 @@ _completed() {
 }
 
 _stopped() {
-    echo ; >&2
+    echo >&2
     echo "[Process stopped]: $0" >&2
 
     _back
 
-    exit 0
+    exit 1
 }
 
 _trim_separator() {

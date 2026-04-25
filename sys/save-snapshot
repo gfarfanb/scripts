@@ -3,7 +3,8 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../env-vars
 
-_require_var SNAPSHOTS_TO_KEEP
+# http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+: "${SNAPSHOTS_TO_KEEP:=1}"
 
 __usage_page() {
     echo "Create snapshots of save files."
@@ -31,7 +32,7 @@ done
 _saves_home="$1"
 
 if ! [ $_recover_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -d "$_saves_home"
+    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -d "$_saves_home" -k $SNAPSHOTS_TO_KEEP
 else
     $(command -v python3 || command -v python) "./.py/file_snapshot.py" -d "$_saves_home" --recover
 fi

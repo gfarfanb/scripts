@@ -458,11 +458,11 @@ def main():
             level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-a', '--agent', action='append', default=None, required=False,
+        parser.add_argument('-a', '--agent', action='append', required=False,
                             choices=[ 'opencode', 'pi' ],
                             help='Coding agent to synchronize models; repeat the option to target multiple agents')
-        parser.add_argument('-s', '--sync', action='store_true',
-                            help='Only synchronizes models with configuration file')
+        parser.add_argument('-c', '--config', action='store_true',
+                            help='Only synchronizes models with specified agent configuration files')
         args = parser.parse_args()
 
         if not args.sync:

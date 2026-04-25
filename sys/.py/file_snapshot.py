@@ -13,8 +13,6 @@ import logging
 sys.path.append(environ['PYLIBSPATH'])
 import env_vars # pyright: ignore[reportMissingImports]
 
-number_to_keep = int(env_vars.env_value('SNAPSHOTS_TO_KEEP'))
-
 logger = logging.getLogger()
 
 
@@ -86,7 +84,7 @@ def recover_snapshot(files_home, snapshots_home, snapshot_file_names):
         copyfile(snapshot, join(files_home, file))
 
 
-def cleanup_snapshots(snapshots_home, snapshot_file_names):
+def cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep):
     for n in snapshot_file_names:
         snapshots = sorted(
             list( f for f in listdir(join(snapshots_home)) if splitext(basename(f))[0] == n ),
@@ -149,7 +147,7 @@ def select_snapshot(file_name, snapshots_home):
         return None
 
 
-def execute_snapshot(files_home):
+def execute_snapshot(files_home, number_to_keep):
     names = names_without_ext(files_home)
 
     if len(names) < 1:
@@ -165,7 +163,7 @@ def execute_snapshot(files_home):
     snapshots_home = get_snapshot_dir(files_home)
     snapshot_file_names = create_snapshot(files_home, file_name, snapshots_home)
 
-    cleanup_snapshots(snapshots_home, snapshot_file_names)
+    cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep)
 
 
 def execute_recover(files_home):
@@ -202,6 +200,8 @@ def main():
                             help='Source files directory')
         parser.add_argument('-r', '--recover', action='store_true',
                             help='Enables recover snapshot files')
+        parser.add_argument('-k', '--keep', type=int, default=1,
+                            help='Number of the snapshots to keep')
         args = parser.parse_args()
 
         if not args.directory:
@@ -210,7 +210,8 @@ def main():
         if args.recover:
             execute_recover(files_home=args.directory)
         else:
-            execute_snapshot(files_home=args.directory)
+            execute_snapshot(files_home=args.directory,
+                             number_to_keep=args.keep)
     except BaseException as err:
         logger.error(err.args[0])
 

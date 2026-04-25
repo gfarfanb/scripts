@@ -6,6 +6,7 @@ call ..\env-vars
 call ..\.win\require-var OLLAMA_SERVER
 call ..\.win\require-var OLLAMA_MODELS_DEF_FILE
 call ..\.win\require-var OPENCODE_CONFIG_FILE
+call ..\.win\require-var PI_CONFIG_FILE
 
 goto :main
 
@@ -15,7 +16,7 @@ echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
-echo     -s: Only syncs models on OpenCode/Pi configuration file
+echo     -c: Only syncs models on OpenCode/Pi configuration file
 echo     -h: Displays this help message
 goto :back
 
@@ -30,7 +31,7 @@ python ".\.py\ollama_models.py" -a opencode -a pi
 goto :completed
 
 :sync
-python ".\.py\ollama_models.py" -a opencode -a pi --sync
+python ".\.py\ollama_models.py" -a opencode -a pi --config
 goto :completed
 
 

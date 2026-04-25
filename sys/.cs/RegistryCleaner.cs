@@ -71,7 +71,7 @@ class RegistryCleaner
 
             // Confirm before deleting
             Console.WriteLine("WARNING: These entries will be deleted from your registry.");
-            Console.Write("Continue with cleanup? (Y/N): ");
+            Console.Write("Continue with cleanup? [Y/N]: ");
             string? confirm = Console.ReadLine();
 
             if (!string.Equals(confirm, "Y", StringComparison.OrdinalIgnoreCase))

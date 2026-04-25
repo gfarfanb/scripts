@@ -31,6 +31,7 @@ _download_all_repos() {
 _select_repo() {
     cd "$REPOS_HOME"
 
+    echo ;
     echo "Choose a repo to backup:"
     _repo_idx=1
     while IFS= read -r line || [ -n "$line" ]; do

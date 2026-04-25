@@ -41,10 +41,10 @@ _validate_dir() {
         echo "Directory does not exist: $_dir"
         _yesno=$( _yes_prompt "Do you want to create it?" )
         case $_yesno in
-            [Yy]* )
+            [Yy]*)
                 mkdir -p "$_dir"
             ;;
-            * )
+            *)
                 _stopped
             ;;
         esac

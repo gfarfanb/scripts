@@ -12,7 +12,8 @@ __usage_page() {
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -u <URL>:      Resource URL"
-    echo "    -s <index>:    Playlist start index"
+    echo "    -s <source>:   Source site, default: 'YouTube'"
+    echo "    -i <index>:    Playlist start index"
     echo "    -l <location>: File for a list of URLs"
     echo "    -p:            Pack MP3 files into a ZIP file and delete MP3 files"
     echo "    -m:            Move all ZIP files to 'DOWLOADS_HOME' location"
@@ -21,7 +22,9 @@ __usage_page() {
 }
 
 _pack_audios() {
-    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER"
+    local _source=${1:-}
+
+    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
 
     if [ -n "$(find . -name '*.mp3')" ]; then
         local _last_zip_file="$(ls | grep .*\\.zip | sort -V | tail -1)"
@@ -40,24 +43,32 @@ _pack_audios() {
         local _package=$_audio_part$_counter$_extension_part
 
         zip -r $_package *.mp3
-        echo "ZIP generated: $_package"
+        echo "ZIP generated '$_package' in: $YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
 
-        rm -f *.mp3
-
-        echo "MP3 files were cleaned"
+        read -p "Remove packed MP3? y/n> " _yesno
+        case $_yesno in
+            [Yy]*)
+                rm -f *.mp3
+                echo "MP3 files were cleaned"
+            ;;
+        esac
     else
-        echo "MP3 files not found"
+        echo "MP3 files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
     fi
 
     _completed
 }
 
 _move_outputs() {
-    if [ -n "$(find $YT_DLP_AUDIO_OUTPUT_FOLDER -name '*.zip')" ]; then
+    local _source=${1:-}
+
+    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
+
+    if [ -n "$(find . -name '*.zip')" ]; then
         rsync -av --remove-source-files $YT_DLP_AUDIO_OUTPUT_FOLDER/*.zip "$DOWNLOADS_HOME"
         echo "ZIP files moved to: $DOWNLOADS_HOME"
     else
-        echo "ZIP files not found"
+        echo "ZIP files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
     fi
 
     _completed
@@ -65,12 +76,17 @@ _move_outputs() {
 
 _download_audio() {
     local _url=${1:-}
-    local _start_in=${2:--1}
+    local _source=${2:-}
+    local _start_in=${3:--1}
 
     if [ $_start_in -gt 0 ]; then
-        yt-dlp -x --audio-format mp3 --audio-quality 4 --playlist-start $_start_in --rm-cache-dir "$_url"
+        yt-dlp -x --audio-format mp3 --audio-quality 4 -P "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source" \
+            --playlist-start $_start_in --rm-cache-dir \
+            -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     else
-        yt-dlp -x --audio-format mp3 --audio-quality 4 --rm-cache-dir "$_url"
+        yt-dlp -x --audio-format mp3 --audio-quality 4 -P "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source" \
+            --rm-cache-dir \
+            -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     fi
 
     echo ;
@@ -80,9 +96,8 @@ _download_audio() {
 _download_resource() {
     local _url=${1:-}
     local _list=${2:-}
-    local _start_in=${3:--1}
-
-    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER"
+    local _source=${3:-}
+    local _start_in=${4:--1}
 
     if [ -z "$_list" ]; then
         _download_audio "$_url" $_start_in
@@ -100,23 +115,28 @@ _download_resource() {
 _playlist_start=-1
 _src_url=""
 _list_file=""
+_source="YouTube"
+_operation=""
 
-while getopts "u:s:l:pmh" opt; do
+while getopts "u:s:i:l:pmh" opt; do
     case "$opt" in
         u)
             _src_url="$OPTARG"
             ;;
         s)
+            _source="$OPTARG"
+            ;;
+        i)
             _playlist_start=$OPTARG
             ;;
         l)
             _list_file="$OPTARG"
             ;;
         p)
-            _pack_audios
+            _operation=_pack_audios
             ;;
         m)
-            _move_outputs
+            _operation=_move_outputs
             ;;
         h)
             __usage_page
@@ -124,6 +144,17 @@ while getopts "u:s:l:pmh" opt; do
     esac
 done
 
-_download_resource "$_src_url" "$_list_file" $_playlist_start
+if [ -n "$_operation" ]; then
+    eval "$_operation $_source"
+
+    _completed
+fi
+
+echo ;
+echo "Tip: If URL has '&' params, remove if don't needed or use any of the alternatives:"
+echo "  quote: $0 -u '...&<param>=<value>'"
+echo "  escape: $0 -u ...\\&<param>=<value>"
+
+_download_resource "$_src_url" "$_list_file" "$_source" $_playlist_start
 
 _completed

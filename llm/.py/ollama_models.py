@@ -465,7 +465,7 @@ def main():
                             help='Only synchronizes models with specified agent configuration files')
         args = parser.parse_args()
 
-        if not args.sync:
+        if not args.config:
             pull_models()
             cleanup_models()
 

@@ -22,7 +22,7 @@ goto :back
 
 
 :main
-if /i "%~1"=="-s" goto :sync
+if /i "%~1"=="-c" goto :sync
 if /i "%~1"=="-h" goto :__usage_page
 goto :pull
 

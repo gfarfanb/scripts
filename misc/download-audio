@@ -22,53 +22,53 @@ __usage_page() {
 }
 
 _pack_audios() {
-    local _source=${1:-}
+    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER"
 
-    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
+    local _mp3_files=$(find . -name '*.mp3' -type f)
 
-    if [ -n "$(find . -name '*.mp3')" ]; then
-        local _last_zip_file="$(ls | grep .*\\.zip | sort -V | tail -1)"
-        local _audio_part="audio"
-        local _extension_part=".zip"
-        local _audio_length=${#_audio_part}
-        local _extension_length=${#_extension_part}
+    if [ -n "$_mp3_files" ]; then
         local _counter=0
+        
+        while IFS= read -r _zip_file; do
+            if [ -n "$_zip_file" ]; then
+                local _basename_zip=$(basename "$_zip_file")
+                if [[ "$_basename_zip" =~ ^audio([0-9]+)\.zip$ ]]; then
+                    local _num="${BASH_REMATCH[1]}"
+                    if [ "$_num" -ge "$_counter" ]; then
+                        _counter=$(( _num + 1 ))
+                    fi
+                fi
+            fi
+        done < <(find . -name 'audio*.zip' -type f | sort -V)
 
-        if [ -n "$_last_zip_file" ]; then
-            _last_zip_file_length=${#_last_zip_file}
-            _counter=${_last_zip_file:$_audio_length:$(($_last_zip_file_length-$_audio_length-$_extension_length))}
-            _counter=$(($_counter+1))
-        fi
+        local _package="audio${_counter}.zip"
 
-        local _package=$_audio_part$_counter$_extension_part
+        zip -r $_package . -i *.mp3
+        echo "ZIP generated '$_package' in: $YT_DLP_AUDIO_OUTPUT_FOLDER"
 
-        zip -r $_package *.mp3
-        echo "ZIP generated '$_package' in: $YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
-
-        read -p "Remove packed MP3? y/n> " _yesno
+        read -p "Remove packed MP3 files? y/n> " _yesno
         case $_yesno in
             [Yy]*)
-                rm -f *.mp3
+                find . -name '*.mp3' -type f -delete
+                find . -type d -empty -delete
                 echo "MP3 files were cleaned"
             ;;
         esac
     else
-        echo "MP3 files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
+        echo "MP3 files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER"
     fi
 
     _completed
 }
 
 _move_outputs() {
-    local _source=${1:-}
-
-    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
+    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER"
 
     if [ -n "$(find . -name '*.zip')" ]; then
         rsync -av --remove-source-files $YT_DLP_AUDIO_OUTPUT_FOLDER/*.zip "$DOWNLOADS_HOME"
         echo "ZIP files moved to: $DOWNLOADS_HOME"
     else
-        echo "ZIP files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
+        echo "ZIP files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER"
     fi
 
     _completed

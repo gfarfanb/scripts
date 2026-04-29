@@ -79,18 +79,31 @@ _download_audio() {
     local _source=${2:-}
     local _start_in=${3:--1}
 
+    cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
+
     if [ $_start_in -gt 0 ]; then
-        yt-dlp -x --audio-format mp3 --audio-quality 4 -P "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source" \
-            --playlist-start $_start_in --rm-cache-dir \
+        yt-dlp -x --audio-format mp3 --audio-quality 4 \
+            --playlist-start $_start_in \
+            --restrict-filenames --windows-filenames \
+            --rm-cache-dir --no-overwrites \
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     else
-        yt-dlp -x --audio-format mp3 --audio-quality 4 -P "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source" \
-            --rm-cache-dir \
+        yt-dlp -x --audio-format mp3 --audio-quality 4 \
+            --restrict-filenames --windows-filenames \
+            --rm-cache-dir --no-overwrites \
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     fi
 
-    echo ;
-    [ $? -eq 0 ] && echo "Downloaded: $_url" >&2 || echo "Unable to download: $_url" >&2
+    if [ $? -eq 0 ]; then
+        local _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )
+
+        echo >&2
+        echo "Downloaded: $_url" >&2
+        echo "Output file: $_recent_file" >&2
+    else
+        echo >&2
+        echo "Unable to download: $_url" >&2
+    fi
 }
 
 _download_resource() {

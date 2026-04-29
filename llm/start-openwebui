@@ -46,44 +46,7 @@ __usage_page() {
 
 . ../dev/.libs/docker-fn
 
-_select_service() {
-    echo >&2
-    echo "Which service do you want to connect?" >&2
-    echo "1) Open WebUI (default)" >&2
-    echo "2) Copilot Adapter" >&2
-    echo "3) SearXNG" >&2
-    echo "4) Docling" >&2
-    echo "5) Tika" >&2
-    read -p "service-index> " _service_index
-
-    if [ -z "$_service_index" ]; then
-        _service_index=1
-    fi
-
-    case "$_service_index" in
-        1)
-            echo "open-webui-$OPEN_WEBUI_ENV"
-            ;;
-        2)
-            echo "copilot-adapter"
-            ;;
-        3)
-            echo "searxng"
-            ;;
-        4)
-            echo "docling-serve-$OPEN_WEBUI_ENV"
-            ;;
-        5)
-            # echo "tika"
-            echo "Service disabled: 'tika'" >&2
-            _stopped
-            ;;
-        *)
-            echo "Invalid service option: $_service" >&2
-            _stopped
-            ;;
-    esac
-}
+_default_compose_service_name=open-webui-$OPEN_WEBUI_ENV
 
 _start_ollama() {
     if ! [ "$( systemctl is-active ollama )" = "active" ]; then
@@ -197,58 +160,6 @@ _restore_openwebui() {
     _completed
 }
 
-_terminal_services() {
-    local _service=$( _select_service )
-
-    if [ -n "$_service" ]; then
-        _terminal_container $_service
-    fi
-
-    _completed
-}
-
-_logs_services() {
-    local _service=$( _select_service )
-
-    if [ -n "$_service" ]; then
-        _docker_compose logs -f $_service
-    fi
-
-    _completed
-}
-
-_stop_services() {
-    _docker_compose stop
-
-    _completed
-}
-
-_remove_services() {
-    _docker_compose down
-
-    _completed
-}
-
-_execute_services() {
-    local _service=$( _select_service )
-
-    if [ -n "$_service" ]; then
-        _docker_compose run --rm $_service
-    fi
-
-    _completed
-}
-
-_kill_services() {
-    local _service=$( _select_service )
-
-    if [ -n "$_service" ]; then
-        _docker_compose stop $_service
-    fi
-
-    _completed
-}
-
 _update_flag=0
 
 while getopts "baektlsruh" opt; do
@@ -260,22 +171,22 @@ while getopts "baektlsruh" opt; do
             _restore_openwebui
             ;;
         e)
-            _execute_services
+            _run_compose_service
             ;;
         k)
-            _kill_services
+            _stop_compose_service
             ;;
         t)
-            _terminal_services
+            _terminal_compose_service
             ;;
         l)
-            _logs_services
+            _logs_compose_service
             ;;
         s)
-            _stop_services
+            _stop_compose
             ;;
         r)
-            _remove_services
+            _remove_compose
             ;;
         u)
             _update_flag=1

@@ -7,15 +7,21 @@
 #   - env-vars # Imported as source file
 # Usage in script:
 #   . ../dev/.libs/docker-fn  # Relative source
+#   _default_compose_service_index=<n>  # Set to change default service index
+#   _default_compose_service_name=<service_name>  # Set to change default service name
+#   _docker_wait_secs=<n>  # Set to change default waiting time in seconds
+#   _docker_wait_tries=<n>  # Set to change default waiting tries
+
+: "${_default_compose_service_index:=-1}"
+: "${_default_compose_service_name:=}"
+: "${_docker_wait_secs:=5}"
+: "${_docker_wait_tries:=24}"
 
 _wait_until_healthy() {
     local _container=${1:-}
     local _container_id="$(docker ps -q -a -f name=$_container)"
     local _waiting_flag=0
     local _waited=0
-
-    _require_var DOCKER_WAIT_SECS
-    _require_var DOCKER_WAIT_TRIES
 
     if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
         echo ;
@@ -24,11 +30,11 @@ _wait_until_healthy() {
             echo "Waiting for $_container to run..."
 
             if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
-                sleep $DOCKER_WAIT_SECS
+                sleep $_docker_wait_secs
                 let "_waited+=1"
 
-                if [ $_waited -eq $DOCKER_WAIT_TRIES ]; then
-                    echo "Waited $(($DOCKER_WAIT_SECS * $DOCKER_WAIT_TRIES)) seconds, $_container is still not running."
+                if [ $_waited -eq $_docker_wait_tries ]; then
+                    echo "Waited $(($_docker_wait_secs * $_docker_wait_tries)) seconds, $_container is still not running."
                     exit 1
                 fi
             else
@@ -45,6 +51,7 @@ _update_container() {
         echo "Attempting to update $_container ..."
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once $_container
     else
+        echo ;
         echo "Container not found $_container"
     fi
 }
@@ -56,6 +63,7 @@ _restart_container() {
         echo "Attempting to restart  $_container ..."
         docker container restart $_container
     else
+        echo ;
         echo "Container not found $_container"
     fi
 }
@@ -67,6 +75,7 @@ _stop_container() {
         echo "Stopping $_container ..."
         docker container stop $_container
     else
+        echo ;
         echo "Container not found $_container"
     fi
 }
@@ -78,6 +87,7 @@ _remove_container() {
         echo "Removing $_container ..."
         docker rm -f $_container
     else
+        echo ;
         echo "Container not found $_container"
     fi
 }
@@ -89,6 +99,111 @@ _terminal_container() {
         echo "Entering $_container ..."
         docker exec -it $_container /bin/bash
     else
+        echo ;
         echo "Container not found $_container"
+    fi
+}
+
+_docker_compose() {
+    echo >&2
+    echo "Define a '_docker_compose' function in the script" >&2
+    echo >&2
+    echo "_docker_compose() {" >&2
+    echo "    <ENV_VAR>=<value> \\" >&2
+    echo "        docker compose -f <docker_compose_file> $*" >&2
+    echo "}" >&2
+    _stopped
+}
+
+_stop_compose() {
+    _docker_compose stop
+    _completed
+}
+
+_remove_compose() {
+    _docker_compose down
+    _completed
+}
+
+_select_compose_service() {
+    local _services=($( _docker_compose config --services ))
+    local _default_index=$_default_compose_service_index
+    local _index=0
+
+    _services=($( printf "%s\n" "${_services[@]}" | sort ))
+
+    echo >&2
+    echo "Select a service from compose?" >&2
+
+    for _service in "${_services[@]}"; do
+        if [[ $_index -eq $_default_index ]]; then
+            echo "$((_index+1))) $_service (default)" >&2
+        elif [ "$_service" = "$_default_compose_service_name" ]; then
+            echo "$((_index+1))) $_service (default)" >&2
+            _default_index=$_index
+        else
+            echo "$((_index+1))) $_service" >&2
+        fi
+        _index=$((_index+1))
+    done
+
+    read -p "service-index> " _service_index
+
+    if [ -z "$_service_index" ]; then
+        _service_index=$_default_index
+    else
+        _service_index=$((_service_index-1))
+    fi
+
+    _service="${_services[$_service_index]}"
+
+    if [ -z "$_service" ]; then
+        echo "Invalid service option" >&2
+    else
+        echo $_service
+    fi
+}
+
+_run_compose_service() {
+    local _service=$( _select_compose_service )
+
+    if [ -n "$_service" ]; then
+        _docker_compose run --rm $_service
+        _completed
+    else
+        _stopped
+    fi
+}
+
+_stop_compose_service() {
+    local _service=$( _select_compose_service )
+
+    if [ -n "$_service" ]; then
+        _docker_compose stop $_service
+        _completed
+    else
+        _stopped
+    fi
+}
+
+_terminal_compose_service() {
+    local _service=$( _select_compose_service )
+
+    if [ -n "$_service" ]; then
+        _terminal_container $_service
+        _completed
+    else
+        _stopped
+    fi
+}
+
+_logs_compose_service() {
+    local _service=$( _select_compose_service )
+
+    if [ -n "$_service" ]; then
+        _docker_compose logs -f $_service
+        _completed
+    else
+        _stopped
     fi
 }

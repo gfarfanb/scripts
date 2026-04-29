@@ -18,8 +18,63 @@ __usage_page() {
     echo "    -r <resolution>:   Video resolution, numeric"
     echo "    -c:                Attach cookies to request"
     echo "    -l <location>:     File for a list of URLs"
+    echo "    -p:                Pack MP4 files into a ZIP file and delete MP4 files"
+    echo "    -m:                Move all ZIP files to 'DOWNLOADS_HOME' location"
     echo "    -h:                Displays this help message"
     exit 0
+}
+
+_pack_videos() {
+    cd "$YT_DLP_VIDEO_OUTPUT_FOLDER"
+
+    local _mp4_files=$(find . -name '*.mp4' -type f)
+
+    if [ -n "$_mp4_files" ]; then
+        local _counter=0
+        
+        while IFS= read -r _zip_file; do
+            if [ -n "$_zip_file" ]; then
+                local _basename_zip=$(basename "$_zip_file")
+                if [[ "$_basename_zip" =~ ^video([0-9]+)\.zip$ ]]; then
+                    local _num="${BASH_REMATCH[1]}"
+                    if [ "$_num" -ge "$_counter" ]; then
+                        _counter=$(( _num + 1 ))
+                    fi
+                fi
+            fi
+        done < <(find . -name 'video*.zip' -type f | sort -V)
+
+        local _package="video${_counter}.zip"
+
+        zip -r $_package . -i *.mp4
+        echo "ZIP generated '$_package' in: $YT_DLP_VIDEO_OUTPUT_FOLDER"
+
+        read -p "Remove packed MP4 files? y/n> " _yesno
+        case $_yesno in
+            [Yy]*)
+                find . -name '*.mp4' -type f -delete
+                find . -type d -empty -delete
+                echo "MP4 files were cleaned"
+            ;;
+        esac
+    else
+        echo "MP4 files not found in: $YT_DLP_VIDEO_OUTPUT_FOLDER"
+    fi
+
+    _completed
+}
+
+_move_outputs() {
+    cd "$YT_DLP_VIDEO_OUTPUT_FOLDER"
+
+    if [ -n "$(find . -name '*.zip')" ]; then
+        rsync -av --remove-source-files $YT_DLP_VIDEO_OUTPUT_FOLDER/*.zip "$DOWNLOADS_HOME"
+        echo "ZIP files moved to: $DOWNLOADS_HOME"
+    else
+        echo "ZIP files not found in: $YT_DLP_VIDEO_OUTPUT_FOLDER"
+    fi
+
+    _completed
 }
 
 _create_youtube_cookies() {
@@ -167,8 +222,9 @@ _cookies_flag=0
 _resolution=""
 _source="YouTube"
 _cookies_file=""
+_operation=""
 
-while getopts "u:s:ar:cl:h" opt; do
+while getopts "u:s:ar:cl:pmh" opt; do
     case "$opt" in
         u)
             _src_url="$OPTARG"
@@ -188,6 +244,12 @@ while getopts "u:s:ar:cl:h" opt; do
         l)
             _list_file="$OPTARG"
             ;;
+        p)
+            _operation=_pack_videos
+            ;;
+        m)
+            _operation=_move_outputs
+            ;;
         h)
             __usage_page
             ;;
@@ -200,6 +262,12 @@ fi
 
 if [ $_available_flag -eq 1 ]; then
     _available_formats "$_src_url" "$_cookies_file"
+
+    _completed
+fi
+
+if [ -n "$_operation" ]; then
+    eval "$_operation $_source"
 
     _completed
 fi

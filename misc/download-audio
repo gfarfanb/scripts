@@ -24,7 +24,7 @@ __usage_page() {
 . ./.libs/url-source
 
 _hosts_db_file="$HOSTS_DB_FILE"
-
+_default_quality=4
 
 _pack_audios() {
     cd "$YT_DLP_AUDIO_OUTPUT_FOLDER"
@@ -79,28 +79,47 @@ _move_outputs() {
     _completed
 }
 
+_select_quality() {
+    read -p "Enter quality: 0=best to 10=worst (default $_default_quality)> " _quality
+
+    if [ -z "$_quality" ]; then
+        _quality=$_default_quality
+    fi
+
+    if [ $_quality -lt 0 ] || [ $_quality -gt 10 ]; then
+        echo "Invalid quality value: $_quality" >&2
+        _stopped
+    fi
+
+    echo $_quality
+}
+
 _download_audio() {
     local _url=${1:-}
-    local _start_in=${2:--1}
+    local _quality=${2:-}
+    local _start_in=${3:--1}
     local _source=$( _get_source "$_url" )
 
     cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
 
     if [ $_start_in -gt 0 ]; then
-        yt-dlp -x --audio-format mp3 --audio-quality 4 \
+        yt-dlp -x --audio-format mp3 --audio-quality $_quality \
             --playlist-start $_start_in \
             --restrict-filenames --windows-filenames \
             --rm-cache-dir --no-overwrites \
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     else
-        yt-dlp -x --audio-format mp3 --audio-quality 4 \
+        yt-dlp -x --audio-format mp3 --audio-quality $_quality \
             --restrict-filenames --windows-filenames \
             --rm-cache-dir --no-overwrites \
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     fi
 
-    if [ $? -eq 0 ]; then
-        local _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )
+    local _recent_file=""
+    local _exit=$?
+
+    if [ $_exit -eq 0 ]; then
+        _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )
 
         echo >&2
         echo "Downloaded: $_url" >&2
@@ -109,18 +128,23 @@ _download_audio() {
         echo >&2
         echo "Unable to download: $_url" >&2
     fi
+
+    _log_download "$_url" "AUDIO" $_exit \
+        "quality=$_quality start-in=$_start_in" \
+        "$_recent_file"
 }
 
 _download_resource() {
     local _url=${1:-}
     local _list=${2:-}
-    local _start_in=${3:--1}
+    local _quality=${3:-}
+    local _start_in=${4:--1}
 
     if [ -z "$_list" ]; then
-        _download_audio "$_url" $_start_in
+        _download_audio "$_url" $_quality $_start_in
     else
         while IFS= read -r line || [ -n "$line" ]; do
-            _download_audio "$line"
+            _download_audio "$line" $_quality
         done < $_list
 
         echo ;
@@ -129,6 +153,7 @@ _download_resource() {
     fi
 }
 
+_quality=-1
 _playlist_start=-1
 _src_url=""
 _list_file=""
@@ -141,9 +166,11 @@ while getopts "u:i:l:pmh" opt; do
             ;;
         i)
             _playlist_start=$OPTARG
+            _quality=$_default_quality
             ;;
         l)
             _list_file="$OPTARG"
+            _quality=$_default_quality
             ;;
         p)
             _pack_audios
@@ -162,6 +189,10 @@ echo "Tip: If URL has '&' params, remove if don't needed or use any of the alter
 echo "  quote: $0 -u '...&<param>=<value>'"
 echo "  escape: $0 -u ...\\&<param>=<value>"
 
-_download_resource "$_src_url" "$_list_file" $_playlist_start
+if [ $_quality -eq -1 ]; then
+    _quality=$( _select_quality )
+else
+
+_download_resource "$_src_url" "$_list_file" $_quality $_playlist_start
 
 _completed

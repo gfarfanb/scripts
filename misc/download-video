@@ -186,8 +186,11 @@ _download_video() {
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     fi
 
-    if [ $? -eq 0 ]; then
-        local _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )
+    local _recent_file=""
+    local _exit=$?
+
+    if [ $_exit -eq 0 ]; then
+        _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )
 
         echo >&2
         echo "Downloaded: $_url" >&2
@@ -196,6 +199,10 @@ _download_video() {
         echo >&2
         echo "Unable to download: $_url" >&2
     fi
+
+    _log_download "$_url" "VIDEO" $_exit \
+        "resolution=$_resolution cookies=$_cookies" \
+        "$_recent_file"
 }
 
 _download_resource() {

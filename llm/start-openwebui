@@ -48,6 +48,7 @@ __usage_page() {
 
 _default_compose_service_name=open-webui-$OPEN_WEBUI_ENV
 
+
 _start_ollama() {
     if ! [ "$( systemctl is-active ollama )" = "active" ]; then
         ollama serve

@@ -3,6 +3,8 @@
 # __usage_lib_page:
 # Defines common Docker functions
 #
+# Dependencies:
+#   - env-vars # Imported as source file
 # Usage in script:
 #   . ../dev/.libs/docker-fn  # Relative source
 #   _default_compose_service_index=<n>  # Set to change default service index

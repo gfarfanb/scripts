@@ -1,0 +1,50 @@
+#! /usr/bin/env bash
+
+# __usage_lib_page:
+# Gets source and cookies host from a URL
+#
+# Dependencies:
+#   - env-vars # Imported as source file
+# Usage in script:
+#   . ./.libs/url-source  # Relative source
+#   _hosts_db_file=<hosts_db_file>  # Set hosts database file
+
+: "${_hosts_db_file:=}"
+
+_get_source() {
+    local _url=${1:-}
+    local _host=$( echo "$_url" | awk -F/ '{print $3}' )
+
+    if ! [ -f "$_hosts_db_file" ]; then
+        echo "Database file not found, define it by setting '_hosts_db_file'" >&2
+        _stopped
+    fi
+
+    local _result=$( sqlite3 "$_hosts_db_file" "SELECT source FROM url_mappings WHERE host='$_host';" )
+
+    if [ -z "$_result" ]; then
+        echo "Source not found for: $_host" >&2
+        _stopped
+    else
+        echo "$_result"
+    fi
+}
+
+_get_cookies_host() {
+    local _url=${1:-}
+    local _host=$( echo "$_url" | awk -F/ '{print $3}' )
+
+    if ! [ -f "$_hosts_db_file" ]; then
+        echo "Database file not found, define it by setting '_hosts_db_file'" >&2
+        _stopped
+    fi
+
+    local _result=$( sqlite3 "$_hosts_db_file" "SELECT cookies_host FROM url_mappings WHERE host='$_host';" )
+
+    if [ -z "$_result" ]; then
+        echo "Cookies host not found for: $_host" >&2
+        _stopped
+    else
+        echo "$_result"
+    fi
+}

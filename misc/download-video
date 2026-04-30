@@ -6,6 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var YT_DLP_VIDEO_OUTPUT_FOLDER
 _require_var YT_DLP_COOKIES_DB_PARENT
 _require_var SESSION_TEMP_DIR
+_require_var HOSTS_DB_FILE
 
 __usage_page() {
     echo "Fetch video on MP4 format."
@@ -13,7 +14,6 @@ __usage_page() {
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -u <URL>:          Resource URL"
-    echo "    -s <source>:       Source site, default: 'YouTube'"
     echo "    -a:                Get available formats for the video"
     echo "    -r <resolution>:   Video resolution, numeric"
     echo "    -c:                Attach cookies to request"
@@ -23,6 +23,11 @@ __usage_page() {
     echo "    -h:                Displays this help message"
     exit 0
 }
+
+. ./.libs/url-source
+
+_hosts_db_file="$HOSTS_DB_FILE"
+
 
 _pack_videos() {
     cd "$YT_DLP_VIDEO_OUTPUT_FOLDER"
@@ -77,7 +82,9 @@ _move_outputs() {
     _completed
 }
 
-_create_youtube_cookies() {
+_create_cookies() {
+    local _url=${1:-}
+    local _host=$( _get_cookies_host "$_url" )
     local _sql_file=$( ls -t $YT_DLP_COOKIES_DB_PARENT/*/cookies.sqlite | head -1 )
 
     if [ -z "$_sql_file" ]; then
@@ -101,7 +108,7 @@ _create_youtube_cookies() {
     _sql+=" name,"
     _sql+=" value"
     _sql+=" from moz_cookies mc"
-    _sql+=" where mc.host = '.youtube.com';"
+    _sql+=" where mc.host = '$_host';"
 
     sqlite3 -json $_tmp_file "$_sql" > "$SESSION_TEMP_DIR/json-cookies.json"
 
@@ -114,19 +121,6 @@ _create_youtube_cookies() {
     rm -f "$SESSION_TEMP_DIR/json-cookies.json"
 
     echo "$SESSION_TEMP_DIR/netscape-cookies.txt"
-}
-
-_create_cookies() {
-    local _source=${1:-}
-
-    case "$_source" in
-        YouTube)
-            echo $( _create_youtube_cookies )
-            ;;
-        *)
-            echo ""
-            ;;
-    esac
 }
 
 _select_resolution() {
@@ -167,13 +161,15 @@ _available_formats() {
     else
         yt-dlp --list-formats --rm-cache-dir "$_url"
     fi
+
+    rm -f "$_cookies"
 }
 
 _download_video() {
     local _url=${1:-}
     local _resolution=${2:-}
-    local _source=${3:-}
-    local _cookies=${4:-}
+    local _cookies=${3:-}
+    local _source=$( _get_source "$_url" )
 
     cd "$YT_DLP_VIDEO_OUTPUT_FOLDER/$_source"
 
@@ -206,18 +202,17 @@ _download_resource() {
     local _url=${1:-}
     local _list=${2:-}
     local _res=${3:-}
-    local _source=${4:-}
-    local _cookies=${5:-}
+    local _cookies=${4:-}
 
     if [ -z "$_res" ]; then
         _res=$( _select_resolution )
     fi
 
     if [ -z "$_list" ]; then
-        _download_video "$_url" "$_res" "$_source" "$_cookies"
+        _download_video "$_url" "$_res" "$_cookies"
     else
         while IFS= read -r line || [ -n "$line" ]; do
-            _download_video "$line" "$_res" "$_source" "$_cookies"
+            _download_video "$line" "$_res" "$_cookies"
         done < $_list
 
         echo ;
@@ -229,21 +224,16 @@ _download_resource() {
 }
 
 _src_url=""
-_list_file=""
 _available_flag=0
-_cookies_flag=0
 _resolution=""
-_source="YouTube"
+_cookies_flag=0
 _cookies_file=""
-_operation=""
+_list_file=""
 
-while getopts "u:s:ar:cl:pmh" opt; do
+while getopts "u:ar:cl:pmh" opt; do
     case "$opt" in
         u)
             _src_url="$OPTARG"
-            ;;
-        s)
-            _source="$OPTARG"
             ;;
         a)
             _available_flag=1
@@ -258,10 +248,10 @@ while getopts "u:s:ar:cl:pmh" opt; do
             _list_file="$OPTARG"
             ;;
         p)
-            _operation=_pack_videos
+            _pack_videos
             ;;
         m)
-            _operation=_move_outputs
+            _move_outputs
             ;;
         h)
             __usage_page
@@ -270,17 +260,11 @@ while getopts "u:s:ar:cl:pmh" opt; do
 done
 
 if [ $_cookies_flag -eq 1 ]; then
-    _cookies_file=$( _create_cookies "$_source" )
+    _cookies_file=$( _create_cookies "$_src_url" )
 fi
 
 if [ $_available_flag -eq 1 ]; then
     _available_formats "$_src_url" "$_cookies_file"
-
-    _completed
-fi
-
-if [ -n "$_operation" ]; then
-    eval "$_operation $_source"
 
     _completed
 fi
@@ -290,6 +274,6 @@ echo "Tip: If URL has '&' params, remove if don't needed or use any of the alter
 echo "  quote: $0 -u '...&<param>=<value>'"
 echo "  escape: $0 -u ...\\&<param>=<value>"
 
-_download_resource "$_src_url" "$_list_file" "$_resolution" "$_cookies_file" "$_source"
+_download_resource "$_src_url" "$_list_file" "$_resolution" "$_cookies_file"
 
 _completed

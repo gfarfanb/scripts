@@ -5,6 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 _require_var YT_DLP_AUDIO_OUTPUT_FOLDER
 _require_var DOWNLOADS_HOME
+_require_var HOSTS_DB_FILE
 
 __usage_page() {
     echo "Fetch audio on MP3 format."
@@ -12,7 +13,6 @@ __usage_page() {
     echo "Usage: $(basename $0) [<option>]*"
     echo "Option:"
     echo "    -u <URL>:      Resource URL"
-    echo "    -s <source>:   Source site, default: 'YouTube'"
     echo "    -i <index>:    Playlist start index"
     echo "    -l <location>: File for a list of URLs"
     echo "    -p:            Pack MP3 files into a ZIP file and delete MP3 files"
@@ -20,6 +20,11 @@ __usage_page() {
     echo "    -h:            Displays this help message"
     exit 0
 }
+
+. ./.libs/url-source
+
+_hosts_db_file="$HOSTS_DB_FILE"
+
 
 _pack_audios() {
     cd "$YT_DLP_AUDIO_OUTPUT_FOLDER"
@@ -76,8 +81,8 @@ _move_outputs() {
 
 _download_audio() {
     local _url=${1:-}
-    local _source=${2:-}
-    local _start_in=${3:--1}
+    local _start_in=${2:--1}
+    local _source=$( _get_source "$_url" )
 
     cd "$YT_DLP_AUDIO_OUTPUT_FOLDER/$_source"
 
@@ -109,8 +114,7 @@ _download_audio() {
 _download_resource() {
     local _url=${1:-}
     local _list=${2:-}
-    local _source=${3:-}
-    local _start_in=${4:--1}
+    local _start_in=${3:--1}
 
     if [ -z "$_list" ]; then
         _download_audio "$_url" $_start_in
@@ -128,16 +132,12 @@ _download_resource() {
 _playlist_start=-1
 _src_url=""
 _list_file=""
-_source="YouTube"
 _operation=""
 
-while getopts "u:s:i:l:pmh" opt; do
+while getopts "u:i:l:pmh" opt; do
     case "$opt" in
         u)
             _src_url="$OPTARG"
-            ;;
-        s)
-            _source="$OPTARG"
             ;;
         i)
             _playlist_start=$OPTARG
@@ -146,10 +146,10 @@ while getopts "u:s:i:l:pmh" opt; do
             _list_file="$OPTARG"
             ;;
         p)
-            _operation=_pack_audios
+            _pack_audios
             ;;
         m)
-            _operation=_move_outputs
+            _move_outputs
             ;;
         h)
             __usage_page
@@ -157,17 +157,11 @@ while getopts "u:s:i:l:pmh" opt; do
     esac
 done
 
-if [ -n "$_operation" ]; then
-    eval "$_operation $_source"
-
-    _completed
-fi
-
 echo ;
 echo "Tip: If URL has '&' params, remove if don't needed or use any of the alternatives:"
 echo "  quote: $0 -u '...&<param>=<value>'"
 echo "  escape: $0 -u ...\\&<param>=<value>"
 
-_download_resource "$_src_url" "$_list_file" "$_source" $_playlist_start
+_download_resource "$_src_url" "$_list_file" $_playlist_start
 
 _completed

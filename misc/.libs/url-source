@@ -50,6 +50,40 @@ _get_cookies_host() {
     fi
 }
 
+_execute_cmd() {
+    local _sentence=${1:-}
+    local _details=${2:-}
+    local _cmd="${_sentence,,}"
+
+    [ -z "$_details" ] && _details="" || _details="($_details)"
+
+    case "$_cmd" in 
+        *insert*)
+            _cmd=Insert
+            ;;
+        *update*)
+            _cmd=Update
+            ;;
+        *delete*)
+            _cmd=Delete
+            ;;
+        *)
+            echo "Invalid command definition: '$_sentence'" >&2
+            _stopped
+            ;;
+    esac
+
+    sqlite3 "$_hosts_db_file" "$_sentence"
+
+    local _exit=$?
+
+    if [ $_exit -eq 0 ]; then
+        echo "$_cmd $_details: db=success($_exit)" >&2
+    else
+        echo "$_cmd $_details: db=error($_exit)" >&2
+    fi
+}
+
 _log_download() {
     _check_db
 
@@ -64,6 +98,7 @@ _log_download() {
     [ -z "$_details" ] && _details="null" || _details="'$_details'"
     [ -z "$_output" ] && _output="null" || _output="'$_output'"
 
+    local _cmd_msg="format=$_format, status=$_status, details=$_details, output=$_output"
     local _query="SELECT id FROM downloads WHERE url = '$_url'"
     local _id=$( sqlite3 "$_hosts_db_file" "$_query" )
 
@@ -77,17 +112,13 @@ _log_download() {
         _update+=" last_dl_ts = CURRENT_TIMESTAMP "
         _update+=" WHERE id = '$_id'; "
 
-        sqlite3 "$_hosts_db_file" "$_update"
-
-        [ $? -eq 0 ] && echo "Updated '$_url': success ($?)" >&2 || echo "Updated '$_url': error ($?)"
+        _execute_cmd "$_update" "$_cmd_msg"
     else
         local _insert=" INSERT INTO downloads(url, host, format, details, output_file, last_dl_status) "
         _insert+=" VALUES( "
         _insert+="'$_url', '$_host', '$_format', $_details, $_output, $_status"
         _insert+=" ); "
 
-        sqlite3 "$_hosts_db_file" "$_insert"
-
-        [ $? -eq 0 ] && echo "Inserted '$_url': success ($?)" >&2 || echo "Inserted '$_url': error ($?)"
+        _execute_cmd "$_insert" "$_cmd_msg"
     fi
 }

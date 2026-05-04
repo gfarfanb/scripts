@@ -26,8 +26,17 @@ _transcribe() {
 
     transcribe-anything "$_resource" --output_dir "$_output"
 
-    echo "Resource: $_resource"
-    echo "Output: $_output"
+    echo >&2
+    echo "Resource: $_resource" >&2
+    echo "Output: $_output" >&2
+
+    read -p "Remove resource? y/n> " _yesno
+    case $_yesno in
+        [Yy]*)
+            rm -rf "$_resource"
+            echo "Resource cleaned" >&2
+        ;;
+    esac
 }
 
 _resource=""

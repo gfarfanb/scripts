@@ -29,4 +29,5 @@ CREATE INDEX idx_downloads_source ON downloads(host);
 INSERT INTO url_mappings VALUES
     ('youtu.be', 'YouTube', '.youtube.com'),
     ('youtube.com', 'YouTube', '.youtube.com'),
-    ('www.youtube.com', 'YouTube', '.youtube.com');
+    ('www.youtube.com', 'YouTube', '.youtube.com'),
+    ('music.youtube.com', 'YouTube', '.youtube.com');

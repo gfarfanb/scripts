@@ -186,8 +186,8 @@ _download_video() {
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     fi
 
-    local _recent_file=""
     local _exit=$?
+    local _recent_file=""
 
     if [ $_exit -eq 0 ]; then
         _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )

@@ -80,6 +80,7 @@ _move_outputs() {
 }
 
 _select_quality() {
+    echo  >&2
     read -p "Enter quality: 0=best to 10=worst (default $_default_quality)> " _quality
 
     if [ -z "$_quality" ]; then
@@ -115,8 +116,8 @@ _download_audio() {
             -o "%(uploader)s/%(title)s.%(ext)s" "$_url"
     fi
 
-    local _recent_file=""
     local _exit=$?
+    local _recent_file=""
 
     if [ $_exit -eq 0 ]; then
         _recent_file=$( fd -t f . -x stat -c "%y %n" {} \; | sort -r | head -1 )
@@ -191,7 +192,7 @@ echo "  escape: $0 -u ...\\&<param>=<value>"
 
 if [ $_quality -eq -1 ]; then
     _quality=$( _select_quality )
-else
+fi
 
 _download_resource "$_src_url" "$_list_file" $_quality $_playlist_start
 

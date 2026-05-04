@@ -3,8 +3,6 @@
 # __usage_lib_page:
 # Gets source and cookies host from a URL
 #
-# Dependencies:
-#   - env-vars # Imported as source file
 # Usage in script:
 #   . ./.libs/url-source  # Relative source
 #   _hosts_db_file=<hosts_db_file>  # Set hosts database file
@@ -14,7 +12,7 @@
 _check_db() {
     if ! [ -f "$_hosts_db_file" ]; then
         echo "Database file not found, define it by setting '_hosts_db_file'" >&2
-        _stopped
+        exit 1
     fi
 }
 
@@ -28,7 +26,7 @@ _get_source() {
 
     if [ -z "$_result" ]; then
         echo "Source not found for: $_host" >&2
-        _stopped
+        exit 1
     else
         echo "$_result"
     fi
@@ -44,7 +42,7 @@ _get_cookies_host() {
 
     if [ -z "$_result" ]; then
         echo "Cookies host not found for: $_host" >&2
-        _stopped
+        exit 1
     else
         echo "$_result"
     fi
@@ -69,7 +67,7 @@ _execute_cmd() {
             ;;
         *)
             echo "Invalid command definition: '$_sentence'" >&2
-            _stopped
+            exit 1
             ;;
     esac
 

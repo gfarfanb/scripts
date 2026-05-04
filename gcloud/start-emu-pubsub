@@ -8,6 +8,14 @@ _require_var TEMP_DIR
 _require_var PUBSUB_CONFIG_DB_ORIGINAL
 # Last assigned: 0.0.0.0:8085
 _require_var PUBSUB_HOST_PORT
+_require_var GCLOUD_DEFAULT_PROJECT_ID
+# Last assigned:
+# GCLOUD_PROJECT_IDS=()
+# GCLOUD_PROJECT_IDS+=( "project_name:project_id:project_port" )
+#   project_name: Project name
+#   project_id: Project ID
+#   project_port: PubSub push endpoint port (e.g. 3000)
+_require_var GCLOUD_PROJECT_IDS
 
 __usage_page() {
     echo "Starts PubSub emulator for a specific project."
@@ -32,7 +40,7 @@ while getopts "rh" opt; do
     esac
 done
 
-. ./select-project
+. ./.libs/select-project
 
 _require_var PUSH_PORT_SELECTED
 

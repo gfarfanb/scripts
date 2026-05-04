@@ -3,8 +3,6 @@
 # __usage_lib_page:
 # Defines common Docker functions
 #
-# Dependencies:
-#   - env-vars # Imported as source file
 # Usage in script:
 #   . ../dev/.libs/docker-fn  # Relative source
 #   _default_compose_service_index=<n>  # Set to change default service index
@@ -24,17 +22,17 @@ _wait_until_healthy() {
     local _waited=0
 
     if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
-        echo ;
+        echo >&2
 
         while [ $_waiting_flag -eq 0 ]; do
-            echo "Waiting for $_container to run..."
+            echo "Waiting for $_container to run..." >&2
 
             if ! [ "$(docker inspect --format='{{.State.Health.Status}}' $_container_id)" = "healthy" ]; then
                 sleep $_docker_wait_secs
                 let "_waited+=1"
 
                 if [ $_waited -eq $_docker_wait_tries ]; then
-                    echo "Waited $(($_docker_wait_secs * $_docker_wait_tries)) seconds, $_container is still not running."
+                    echo "Waited $(($_docker_wait_secs * $_docker_wait_tries)) seconds, $_container is still not running." >&2
                     exit 1
                 fi
             else
@@ -48,11 +46,13 @@ _update_container() {
     local _container=${1:-}
 
     if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
-        echo "Attempting to update $_container ..."
+        echo "Attempting to update $_container ..." >&2
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once $_container
+        echo "$0:container/update:$_container"
     else
         echo ;
-        echo "Container not found $_container"
+        echo "Container not found $_container" >&2
+        exit 1
     fi
 }
 
@@ -60,11 +60,13 @@ _restart_container() {
     local _container=${1:-}
 
     if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
-        echo "Attempting to restart  $_container ..."
+        echo "Attempting to restart  $_container ..." >&2
         docker container restart $_container
+        echo "$0:container/restart:$_container"
     else
         echo ;
-        echo "Container not found $_container"
+        echo "Container not found $_container" >&2
+        exit 1
     fi
 }
 
@@ -72,11 +74,13 @@ _stop_container() {
     local _container=${1:-}
 
     if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
-        echo "Stopping $_container ..."
+        echo "Stopping $_container ..." >&2
         docker container stop $_container
+        echo "$0:container/stop:$_container"
     else
-        echo ;
-        echo "Container not found $_container"
+        echo >&2
+        echo "Container not found $_container" >&2
+        exit 1
     fi
 }
 
@@ -84,11 +88,13 @@ _remove_container() {
     local _container=${1:-}
 
     if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
-        echo "Removing $_container ..."
+        echo "Removing $_container ..." >&2
         docker rm -f $_container
+        echo "$0:container/rm:$_container"
     else
-        echo ;
-        echo "Container not found $_container"
+        echo >&2
+        echo "Container not found $_container" >&2
+        exit 1
     fi
 }
 
@@ -96,11 +102,13 @@ _terminal_container() {
     local _container=${1:-}
 
     if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
-        echo "Entering $_container ..."
+        echo "Entering $_container ..." >&2
         docker exec -it $_container /bin/bash
+        echo "$0:container/exec:$_container"
     else
-        echo ;
-        echo "Container not found $_container"
+        echo >&2
+        echo "Container not found $_container" >&2
+        exit 1
     fi
 }
 
@@ -112,17 +120,19 @@ _docker_compose() {
     echo "    <ENV_VAR>=<value> \\" >&2
     echo "        docker compose -f <docker_compose_file> $*" >&2
     echo "}" >&2
-    _stopped
+    exit 1
 }
 
 _stop_compose() {
     _docker_compose stop
-    _completed
+    echo >&2
+    echo "$0:compose/stop"
 }
 
 _remove_compose() {
     _docker_compose down
-    _completed
+    echo >&2
+    echo "$0:compose/down"
 }
 
 _select_compose_service() {
@@ -159,6 +169,7 @@ _select_compose_service() {
 
     if [ -z "$_service" ]; then
         echo "Invalid service option" >&2
+        exit 1
     else
         echo $_service
     fi
@@ -169,9 +180,11 @@ _run_compose_service() {
 
     if [ -n "$_service" ]; then
         _docker_compose run --rm $_service
-        _completed
+
+        echo >&2
+        echo "$0:compose/run:$_service"
     else
-        _stopped
+        exit 1
     fi
 }
 
@@ -180,9 +193,11 @@ _stop_compose_service() {
 
     if [ -n "$_service" ]; then
         _docker_compose stop $_service
-        _completed
+
+        echo >&2
+        echo "$0:compose/stop:$_service"
     else
-        _stopped
+        exit 1
     fi
 }
 
@@ -191,9 +206,11 @@ _terminal_compose_service() {
 
     if [ -n "$_service" ]; then
         _terminal_container $_service
-        _completed
+
+        echo >&2
+        echo "$0:compose/terminal:$_service"
     else
-        _stopped
+        exit 1
     fi
 }
 
@@ -202,8 +219,10 @@ _logs_compose_service() {
 
     if [ -n "$_service" ]; then
         _docker_compose logs -f $_service
-        _completed
+
+        echo >&2
+        echo "$0:compose/logs:$_service"
     else
-        _stopped
+        exit 1
     fi
 }

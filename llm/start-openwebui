@@ -173,21 +173,27 @@ while getopts "baektlsruh" opt; do
             ;;
         e)
             _run_compose_service
+            _completed
             ;;
         k)
             _stop_compose_service
+            _completed
             ;;
         t)
             _terminal_compose_service
+            _completed
             ;;
         l)
             _logs_compose_service
+            _completed
             ;;
         s)
             _stop_compose
+            _completed
             ;;
         r)
             _remove_compose
+            _completed
             ;;
         u)
             _update_flag=1

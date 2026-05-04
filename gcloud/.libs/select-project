@@ -6,20 +6,10 @@
 #   - PROJECT_SELECTED
 #   - PUSH_PORT_SELECTED
 #
-# Dependencies:
-#   - env-vars (as source file)
 # Usage in script:
-#   . ./select-project  # Relative source
+#   . ./.libs/select-project  # Relative source
 
-_require_var GCLOUD_DEFAULT_PROJECT_ID
-# Last assigned:
-# GCLOUD_PROJECT_IDS=()
-# GCLOUD_PROJECT_IDS+=( "project_name:project_id:project_port" )
-#   project_name: Project name
-#   project_id: Project ID
-#   project_port: PubSub push endpoint port (e.g. 3000)
-_require_var GCLOUD_PROJECT_IDS
-
+echo ;
 echo "Select a project:"
 
 for _idx in "${!GCLOUD_PROJECT_IDS[@]}"; do
@@ -49,7 +39,7 @@ fi
 
 if [ -z "$_project_selected" ]; then
     echo "Invalid project index"
-    _stopped
+    exit 1
 else
     _project_id_selected=$( cut -d : -f 2 <<< "$_project_selected" )
     _push_port_selected=$( cut -d : -f 3 <<< "$_project_selected" )

@@ -49,18 +49,18 @@ _pack_audios() {
         local _package="audio${_counter}.zip"
 
         zip -r $_package . -i *.mp3
-        echo "ZIP generated '$_package' in: $YT_DLP_AUDIO_OUTPUT_FOLDER"
+        echo "ZIP generated '$_package' in: $YT_DLP_AUDIO_OUTPUT_FOLDER" >&2
 
         read -p "Remove packed MP3 files? y/n> " _yesno
         case $_yesno in
             [Yy]*)
                 find . -name '*.mp3' -type f -delete
                 find . -type d -empty -delete
-                echo "MP3 files were cleaned"
+                echo "MP3 files were cleaned" >&2
             ;;
         esac
     else
-        echo "MP3 files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER"
+        echo "MP3 files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER" >&2
     fi
 
     _completed
@@ -71,9 +71,9 @@ _move_outputs() {
 
     if [ -n "$(find . -name '*.zip')" ]; then
         rsync -av --remove-source-files $YT_DLP_AUDIO_OUTPUT_FOLDER/*.zip "$DOWNLOADS_HOME"
-        echo "ZIP files moved to: $DOWNLOADS_HOME"
+        echo "ZIP files moved to: $DOWNLOADS_HOME" >&2
     else
-        echo "ZIP files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER"
+        echo "ZIP files not found in: $YT_DLP_AUDIO_OUTPUT_FOLDER" >&2
     fi
 
     _completed
@@ -148,8 +148,8 @@ _download_resource() {
             _download_audio "$line" $_quality
         done < $_list
 
-        echo ;
-        cat $_list
+        echo >&2
+        cat $_list >&2
         rm -f $_list
     fi
 }
@@ -185,10 +185,10 @@ while getopts "u:i:l:pmh" opt; do
     esac
 done
 
-echo ;
-echo "Tip: If URL has '&' params, remove if don't needed or use any of the alternatives:"
-echo "  quote: $0 -u '...&<param>=<value>'"
-echo "  escape: $0 -u ...\\&<param>=<value>"
+echo >&2
+echo "Tip: If URL has '&' params, remove if don't needed or use any of the alternatives:" >&2
+echo "  quote: $0 -u '...&<param>=<value>'" >&2
+echo "  escape: $0 -u ...\\&<param>=<value>" >&2
 
 if [ $_quality -eq -1 ]; then
     _quality=$( _select_quality )

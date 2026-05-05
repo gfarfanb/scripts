@@ -32,7 +32,7 @@ while getopts "sh" opt; do
     esac
 done
 
-echo "Starting Redis server..."
+echo "Starting Redis server..." >&2
 sudo sysctl vm.overcommit_memory=1
 
 redis-server --port $REDIS_PORT --daemonize yes

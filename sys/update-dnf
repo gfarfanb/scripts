@@ -14,8 +14,8 @@ __usage_page() {
 
 _update() {
     if [ -n "$( type -t dnf )" ]; then
-        echo ;
-        echo "Updating 'dnf' packages"
+        echo >&2
+        echo "Updating 'dnf' packages" >&2
 
         sudo dnf check-update
         sudo dnf upgrade -y

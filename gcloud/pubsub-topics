@@ -62,10 +62,10 @@ _create_topics() {
             _topic="${TOPIC_DEFINITION_NAME[$_idx]}"
             _dead_letter="$_topic-DEAD_LETTER"
 
-            echo "Creating topic [$_topic] for project [$_project]"
+            echo "Creating topic [$_topic] for project [$_project]" >&2
             python publisher.py "$_project" create "$_topic"
 
-            echo "Creating dead-letter [$_dead_letter] for project [$_project]"
+            echo "Creating dead-letter [$_dead_letter] for project [$_project]" >&2
             python publisher.py "$_project" create "$_dead_letter"
 
             for _pull_idx in "${!TOPIC_DEFINITION_PULL_SUBS[@]}"; do
@@ -74,7 +74,7 @@ _create_topics() {
                 _pull_name=$( cut -d : -f 2 <<< "$_pull" )
 
                 if [ "$_topic_idx" = "$_idx" ]; then
-                    echo "Creating pull subscription [$_pull_name] for topic [$_project/$_topic]"
+                    echo "Creating pull subscription [$_pull_name] for topic [$_project/$_topic]" >&2
                     python subscriber.py "$_project" create-with-dead-letter-policy "$_topic" "$_pull_name" "$_dead_letter"
                 fi
             done
@@ -85,7 +85,7 @@ _create_topics() {
                 _push_name=$( cut -d : -f 2 <<< "$_push" )
 
                 if [ "$_topic_idx" = "$_idx" ]; then
-                    echo "Creating push subscription [$_push_name] for topic [$_project/$_topic]"
+                    echo "Creating push subscription [$_push_name] for topic [$_project/$_topic]" >&2
                     python subscriber.py "$_project" create-push "$_topic" "$_push_name" $PUBSUB_PUSH_ENDPOINT
                 fi
             done
@@ -98,24 +98,24 @@ _send_message() {
     # the fork file can be found in https://github.com/gfarfanb/dev-training/blob/main/Python/GCP/PubSub/publisher.py
 
     if [ -z "$_message_to_send" ]; then
-        echo "Defines a message with option: $0 -m <message>"
+        echo "Defines a message with option: $0 -m <message>" >&2
         _stopped
     fi
 
-    echo "Select a topic:"
+    echo "Select a topic:" >&2
     for _idx in "${!TOPIC_DEFINITION_NAME[@]}"; do
         _project="${TOPIC_DEFINITION_PROJECT[$_idx]}"
 
         if [ "$_project" = "$PUBSUB_PROJECT_ID" ]; then
             _topic="${TOPIC_DEFINITION_NAME[$_idx]}"
 
-            echo "$((_idx+1))) $_topic"
+            echo "$((_idx+1))) $_topic" >&2
         fi
     done
     read -p "topic-index> " _topic_index
 
     if [ -z "$_topic_index" ]; then
-        echo "Invalid topic index"
+        echo "Invalid topic index" >&2
         _stopped
     fi
 
@@ -142,16 +142,16 @@ _monitor_messages() {
         fi
     done
 
-    echo "Select a pull subscription:"
+    echo "Select a pull subscription:" >&2
     for _idx in "${!_pull_subs[@]}"; do
         _pull="${_pull_subs[$_idx]}"
 
-        echo "$((_idx+1))) $_pull"
+        echo "$((_idx+1))) $_pull" >&2
     done
     read -p "pull-subscription-index> " _pull_index
 
     if [ -z "$_pull_index" ]; then
-        echo "Invalid pull subscription index"
+        echo "Invalid pull subscription index" >&2
         _stopped
     fi
 

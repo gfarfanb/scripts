@@ -26,8 +26,8 @@ _convert() {
 
     ffmpeg -y -loglevel warning -i "$_mp4" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "$_output"
 
-    echo "Input: $_mp4"
-    echo "Output: $_output"
+    echo "Input: $_mp4" >&2
+    echo "Output: $_output" >&2
 }
 
 _mp4_location=""
@@ -48,8 +48,8 @@ while getopts "i:o:h" opt; do
 done
 
 if [ -d "$_mp4_location" ]; then
-    echo "Reading: $_mp4_location"
-    echo ;
+    echo "Reading: $_mp4_location" >&2
+    echo >&2
 
     for _mp4 in "$_mp4_location"/*.mp4 ; do
         _convert "$_mp4"
@@ -57,7 +57,7 @@ if [ -d "$_mp4_location" ]; then
 elif [ -f "$_mp4_location" ]; then
     _convert "$_mp4_location"
 else
-    echo "Invalid MP4 location/file: $_mp4_location"
+    echo "Invalid MP4 location/file: $_mp4_location" >&2
     _stopped
 fi
 

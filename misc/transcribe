@@ -59,7 +59,7 @@ done
 if [ -f "$_resource" ]; then
     _transcribe "$_resource" "$_output"
 else
-    echo "Invalid resource: $_resource"
+    echo "Invalid resource: $_resource" >&2
     _stopped
 fi
 

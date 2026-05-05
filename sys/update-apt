@@ -15,16 +15,16 @@ __usage_page() {
 
 _update() {
     if [ -n "$( type -t apt )" ]; then
-        echo ;
-        echo "Updating 'apt' packages"
+        echo >&2
+        echo "Updating 'apt' packages" >&2
 
         sudo apt update
         sudo apt upgrade -y
     fi
 
     if [ -n "$( type -t apt-get )" ]; then
-        echo ;
-        echo "Updating 'apt-get' packages"
+        echo >&2
+        echo "Updating 'apt-get' packages" >&2
 
         sudo apt-get update
         sudo apt-get upgrade -y
@@ -33,7 +33,7 @@ _update() {
 
 _cleanup() {
     if [ -n "$( type -t apt )" ]; then
-        echo "Cleaning up 'apt' packages"
+        echo "Cleaning up 'apt' packages" >&2
 
         sudo apt remove -y
         sudo apt clean -y
@@ -43,8 +43,8 @@ _cleanup() {
     fi
 
     if [ -n "$( type -t apt-get )" ]; then
-        echo ;
-        echo "Cleaning up 'apt-get' packages"
+        echo >&2
+        echo "Cleaning up 'apt-get' packages" >&2
 
         sudo apt-get clean -y
         sudo apt-get autoclean -y

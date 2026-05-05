@@ -47,16 +47,16 @@ done
 _sync_ops=( "Pull" "Push" )
 
 if [ -z "$_sync_op" ]; then
-    echo "Select an operation:"
+    echo "Select an operation:" >&2
     for _idx in "${!_sync_ops[@]}"; do
         _op="${_sync_ops[$_idx]}"
 
-        echo "$((_idx+1))) $_op"
+        echo "$((_idx+1))) $_op" >&2
     done
     read -p "operation-index> " _op_index
 
     if [ -z "$_op_index" ]; then
-        echo "Invalid operation index"
+        echo "Invalid operation index" >&2
         _stopped
     fi
 
@@ -73,14 +73,14 @@ for _src in "${CLOUD_REMOTE_SOURCES[@]}"; do
     _path=$( _trim_separator "$_path" )
 
     if [ $_push_flag -eq 1 ]; then
-        echo "Pushing changes to '$_config:$_path'"
+        echo "Pushing changes to '$_config:$_path'" >&2
         rclone copy "$_options" "$_cloud_home/$_config/$_path" $_config:$_path
 
         if [ $_sync_flag -eq 1 ]; then
             rclone sync "$_options" "$_cloud_home/$_config/$_path" $_config:$_path
         fi
     else
-        echo "Pulling changes from '$_config:$_path'"
+        echo "Pulling changes from '$_config:$_path'" >&2
         rclone copy "$_options" $_config:$_path "$_cloud_home/$_config/$_path"
 
         if [ $_sync_flag -eq 1 ]; then

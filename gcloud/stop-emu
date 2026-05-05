@@ -37,14 +37,14 @@ _kill_pids() {
                 sleep 1
                 let "waited+=1"
                 if [ $waited -eq 120 ]; then
-                    echo -e "\nWaited two minutes, $pid is not responding to stop requests."
+                    echo -e "\nWaited two minutes, $pid is not responding to stop requests." >&2
                     exit 1
                 fi
             done
-            echo -e "\nStopped '$_name' running with PID $pid"
+            echo -e "\nStopped '$_name' running with PID $pid" >&2
         done
     else
-        echo "Service '$_name' is not running"
+        echo "Service '$_name' is not running" >&2
     fi
 }
 

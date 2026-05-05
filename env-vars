@@ -42,8 +42,8 @@ _require_var() {
   local _val=$(eval "$_val_cmd")
 
   if [ -z "$_val" ]; then
-    echo "Undefined environment variable: $_var"
-    exit 0
+    echo "Undefined environment variable: $_var" >&2
+    exit 1
   fi
 }
 
@@ -84,7 +84,7 @@ _kill_process() {
     local _all_pids=$( ps -ef | grep "$_name" | grep -v grep | awk '{print $2}' )
 
     if [ -n "$_all_pids" ]; then
-        echo "Stopping process '$_name'..."
+        echo "Stopping process '$_name'..." >&2
 
         for pid in $_all_pids; do
             sudo kill -9 $pid
@@ -93,13 +93,13 @@ _kill_process() {
                 sleep 1
                 let "waited+=1"
                 if [ $waited -eq 120 ]; then
-                    echo -e "\nWaited two minutes, $pid is not responding to stop '$_name'"
+                    echo -e "\nWaited two minutes, $pid is not responding to stop '$_name'" >&2
                     exit 1
                 fi
             done
-            echo -e "\nStopped '$_name' running with PID $pid"
+            echo -e "\nStopped '$_name' running with PID $pid" >&2
         done
     else
-        echo "Process '$_name' is not running"
+        echo "Process '$_name' is not running" >&2
     fi
 }

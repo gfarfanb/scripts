@@ -50,7 +50,6 @@ _update_container() {
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once $_container
         echo "$0:container/update:$_container"
     else
-        echo ;
         echo "Container not found $_container" >&2
         exit 1
     fi
@@ -64,7 +63,6 @@ _restart_container() {
         docker container restart $_container
         echo "$0:container/restart:$_container"
     else
-        echo ;
         echo "Container not found $_container" >&2
         exit 1
     fi
@@ -78,7 +76,6 @@ _stop_container() {
         docker container stop $_container
         echo "$0:container/stop:$_container"
     else
-        echo >&2
         echo "Container not found $_container" >&2
         exit 1
     fi
@@ -92,7 +89,6 @@ _remove_container() {
         docker rm -f $_container
         echo "$0:container/rm:$_container"
     else
-        echo >&2
         echo "Container not found $_container" >&2
         exit 1
     fi
@@ -106,7 +102,6 @@ _terminal_container() {
         docker exec -it $_container /bin/bash
         echo "$0:container/exec:$_container"
     else
-        echo >&2
         echo "Container not found $_container" >&2
         exit 1
     fi

@@ -90,19 +90,19 @@ _start_openwebui() {
         _update_container open-webui-$OPEN_WEBUI_ENV
         _update_container docling-serve-$OPEN_WEBUI_ENV
         _update_container searxng
-        echo "Service disabled, skipped: '> _update_container tika'"
+        echo "Service disabled, skipped: '> _update_container tika'" >&2
 
         _wait_until_healthy open-webui-$OPEN_WEBUI_ENV
     fi
 
-    echo ;
-    echo "> http://localhost:$OPEN_WEBUI_PORT"
+    echo >&2
+    echo "> http://localhost:$OPEN_WEBUI_PORT" >&2
 
     _completed
 }
 
 _backup_openwebui() {
-    echo "Creating backup for open-webui-$OPEN_WEBUI_ENV..."
+    echo "Creating backup for open-webui-$OPEN_WEBUI_ENV..." >&2
 
     docker run --rm -v open-webui-$OPEN_WEBUI_ENV:/data -v $OPEN_WEBUI_BACKUP_HOME:/backup \
         alpine tar czf /backup/openwebui-$(date +%Y%m%d).tar.gz data
@@ -119,14 +119,14 @@ _backup_openwebui() {
 }
 
 _restore_openwebui() {
-    echo "Restoring backup for open-webui-$OPEN_WEBUI_ENV..."
+    echo "Restoring backup for open-webui-$OPEN_WEBUI_ENV..." >&2
 
     _backups=( $( ls "$OPEN_WEBUI_BACKUP_HOME" -t ) )
     _length=${#_backups[@]}
     _last=$((_length-1))
 
-    echo ;
-    echo "Select a backup to recover:"
+    echo >&2
+    echo "Select a backup to recover:" >&2
     for _idx in "${!_backups[@]}"; do
         _backup="${_backups[$_idx]}"
 

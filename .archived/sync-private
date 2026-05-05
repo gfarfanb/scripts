@@ -29,16 +29,16 @@ done
 
 _sync_ops=( "Pull" "Push" )
 
-echo "Select an operation:"
+echo "Select an operation:" >&2
 for _idx in "${!_sync_ops[@]}"; do
     _op="${_sync_ops[$_idx]}"
 
-    echo "$((_idx+1))) $_op"
+    echo "$((_idx+1))) $_op" >&2
 done
 read -p "operation-index> " _op_index
 
 if [ -z "$_op_index" ]; then
-    echo "Invalid operation index"
+    echo "Invalid operation index" >&2
     _stopped
 fi
 
@@ -49,10 +49,10 @@ if [ "$_sync_op" = "Push" ]; then
 fi
 
 if [ $_push_flag -eq 1 ]; then
-    echo "Pushing changes to '$SYNC_FOLDER_PRIVATE_DIR'"
+    echo "Pushing changes to '$SYNC_FOLDER_PRIVATE_DIR'" >&2
     rsync -av "$ORG_ROAM_PRIVATE_DIR"/*.org "$SYNC_FOLDER_PRIVATE_DIR"
 else
-    echo "Pulling changes from '$SYNC_FOLDER_PRIVATE_DIR'"
+    echo "Pulling changes from '$SYNC_FOLDER_PRIVATE_DIR'" >&2
     rsync -av "$SYNC_FOLDER_PRIVATE_DIR"/*.org "$ORG_ROAM_PRIVATE_DIR"
 fi
 

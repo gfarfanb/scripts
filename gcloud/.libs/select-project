@@ -9,8 +9,8 @@
 # Usage in script:
 #   . ./.libs/select-project  # Relative source
 
-echo ;
-echo "Select a project:"
+echo >&2
+echo "Select a project:" >&2
 
 for _idx in "${!GCLOUD_PROJECT_IDS[@]}"; do
     _project="${GCLOUD_PROJECT_IDS[$_idx]}"
@@ -38,7 +38,7 @@ if [ -n "$_project_index" ]; then
 fi
 
 if [ -z "$_project_selected" ]; then
-    echo "Invalid project index"
+    echo "Invalid project index" >&2
     exit 1
 else
     _project_id_selected=$( cut -d : -f 2 <<< "$_project_selected" )

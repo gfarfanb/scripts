@@ -22,7 +22,7 @@ _transcribe() {
     local _output=${2:-}
     local _output="$_output/$_filename"
 
-    echo ;
+    echo >&2
 
     transcribe-anything "$_resource" --output_dir "$_output"
 

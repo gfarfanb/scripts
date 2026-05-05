@@ -23,7 +23,7 @@ done
 _prop_name=${1:-}
 
 if [ -n "$_prop_name" ]; then
-    _prop_value=$( eval "echo \$$_prop_name" )
+    _prop_value=$( eval "echo \$$_prop_name >&2" )
     echo "$_prop_value"
     exit 0
 fi
@@ -36,36 +36,36 @@ for _idx in "${!_all_props[@]}"; do
     _prop_value=$( eval "echo \$$_prop_name" )
 
     if [ -z "$_prop_value" ]; then
-        echo "$((_idx+1))) $_prop_name <empty>"
+        echo "$((_idx+1))) $_prop_name <empty>" >&2
     else
-        echo "$((_idx+1))) $_prop_name"
+        echo "$((_idx+1))) $_prop_name" >&2
     fi
 done
 read -p "env-index> " _prop_index
 
 if [ -z "$_prop_index" ]; then
-    echo "Invalid environment variable index"
+    echo "Invalid environment variable index" >&2
     _stopped
 fi
 
 _prop_name="${_all_props[$((_prop_index-1))]}"
 
 if [ -z "$_prop_name" ]; then
-    echo "Invalid environment variable index"
+    echo "Invalid environment variable index" >&2
     _stopped
 fi
 
-echo ;
+echo >&2
 
 _prop_value=$( eval "echo \$$_prop_name" )
 
 if [ -z "$_prop_value" ]; then
-    echo "$_prop_name=<empty>"
+    echo "$_prop_name=<empty>" >&2
 else
-    echo "$_prop_name=$_prop_value"
+    echo "$_prop_name=$_prop_value" >&2
 fi
 
 echo -n "$_prop_value" | xclip -sel clip
-echo Copied!!
+echo Copied!! >&2
 
 _completed

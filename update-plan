@@ -28,15 +28,15 @@ if [ -n "$( type -t uname )" ]; then
 fi
 
 if [ -n "$( type -t hostnamectl )" ]; then
-    echo ;
+    echo >&2
     hostnamectl
 fi
 
 if [ -n "$( type -t sudo )" ]; then
     sudo -l 1>/dev/null
     if [ $? -ne 0 ] || ! [ "$( sudo whoami )" = "root" ]; then
-        echo "Execute:"
-        echo "> su \$USER"
+        echo "Execute:" >&2
+        echo "> su \$USER" >&2
         _stopped
     fi
 fi
@@ -52,19 +52,19 @@ if [ -f "$UPDATE_PLAN_FILE" ]; then
             _cmd=$( echo "$_cmd" | cut -b 3- )
             _print_cmds+=( "$_cmd" )
         else
-            echo ;
-            echo "Executing: [$_cmd]"
+            echo >&2
+            echo "Executing: [$_cmd]" >&2
             eval "$_cmd"
         fi
     done < $UPDATE_PLAN_FILE
 fi
 
 if [ ${#_print_cmds[*]} -gt 0 ]; then
-    echo ;
-    echo "Execute these update commands if needed:"
+    echo >&2
+    echo "Execute these update commands if needed:" >&2
 
     for _cmd in "${_print_cmds[@]}"; do
-        echo "> $_cmd"
+        echo "> $_cmd" >&2
     done
 fi
 

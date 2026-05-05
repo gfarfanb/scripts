@@ -45,8 +45,8 @@ if [ -n "$( type -t git )" ] && [ -f "$REPOS_DEF_FILE" ]; then
                 cd ..
                 rm -r "$_repo_name"
 
-                echo ;
-                echo "Cloning $_repo_name ..."
+                echo >&2
+                echo "Cloning $_repo_name ..." >&2
 
                 git clone https://$_username/$_repo_name.git
 
@@ -54,15 +54,15 @@ if [ -n "$( type -t git )" ] && [ -f "$REPOS_DEF_FILE" ]; then
             fi
 
             if [ -h "$_location" ]; then
-                echo ;
-                echo "'$_location' is a symlink"
+                echo >&2
+                echo "'$_location' is a symlink" >&2
                 continue
             fi
 
             cd "$_location"
 
-            echo ;
-            echo "Updating $_repo_name ..."
+            echo >&2
+            echo "Updating $_repo_name ..." >&2
 
             git checkout $_branch
             git pull origin $_branch
@@ -71,8 +71,8 @@ if [ -n "$( type -t git )" ] && [ -f "$REPOS_DEF_FILE" ]; then
 fi
 
 if [ ${#_print_repos[*]} -gt 0 ]; then
-    echo ;
-    echo "Update these repos if needed:"
+    echo >&2
+    echo "Update these repos if needed:" >&2
 
     for _repo in "${_print_repos[@]}"; do
         echo "> $_repo"

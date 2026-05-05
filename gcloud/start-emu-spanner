@@ -46,7 +46,7 @@ mkdir -vp "$SPANNER_TMP_HOME"
 gcloud emulators spanner env-init > $SPANNER_ENVS
 
 echo "export SPANNER_PROJECT_ID=$PROJECT_SELECTED" >> $SPANNER_ENVS
-echo ;
-echo "source $SPANNER_ENVS"
+echo >&2
+echo "source $SPANNER_ENVS" >&2
 
 _completed

@@ -20,7 +20,7 @@ while getopts "h" opt; do
     esac
 done
 
-echo "Creating directories"
+echo "Creating directories" >&2
 
 if [ -n "$EXECS_HOME" ]; then sudo mkdir -vp "$EXECS_HOME"; fi
 if [ -n "$WORKSPACE_HOME" ]; then

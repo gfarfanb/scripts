@@ -31,8 +31,8 @@ _download_all_repos() {
 _select_repo() {
     cd "$REPOS_HOME"
 
-    echo ;
-    echo "Choose a repo to backup:"
+    echo >&2
+    echo "Choose a repo to backup:" >&2
     _repo_idx=1
     while IFS= read -r line || [ -n "$line" ]; do
         line=$( echo "${line//[$'\t\r\n']}" )
@@ -61,7 +61,7 @@ _select_repo() {
     done < $REPOS_LIST_FILE
 
     if [ "$_repo_flag" = "false" ]; then
-        echo "Invalid repo index"
+        echo "Invalid repo index" >&2
         _stopped
     fi
 }
@@ -70,9 +70,9 @@ _download_repo() {
     local _repo_zip=${1:-}
     local _repo_url=${2:-}
 
-    echo ;
-    echo "Output: $_repo_zip"
-    echo "URL: $_repo_url"
+    echo >&2
+    echo "Output: $_repo_zip" >&2
+    echo "URL: $_repo_url" >&2
     curl -L --create-dirs -o "${_repo_zip}.zip" "$_repo_url"
 }
 

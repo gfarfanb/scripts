@@ -93,11 +93,13 @@ _kill_process() {
                 sleep 1
                 let "waited+=1"
                 if [ $waited -eq 120 ]; then
-                    echo -e "\nWaited two minutes, $pid is not responding to stop '$_name'" >&2
+                    echo >&2
+                    echo "Waited two minutes, $pid is not responding to stop '$_name'" >&2
                     exit 1
                 fi
             done
-            echo -e "\nStopped '$_name' running with PID $pid" >&2
+            echo >&2
+            echo "Stopped '$_name' running with PID $pid" >&2
         done
     else
         echo "Process '$_name' is not running" >&2

@@ -37,18 +37,20 @@ _kill_pids() {
                 sleep 1
                 let "waited+=1"
                 if [ $waited -eq 120 ]; then
-                    echo -e "\nWaited two minutes, $pid is not responding to stop requests." >&2
+                    echo >&2
+                    echo "Waited two minutes, $pid is not responding to stop requests." >&2
                     exit 1
                 fi
             done
-            echo -e "\nStopped '$_name' running with PID $pid" >&2
+            echo >&2
+            echo "Stopped '$_name' running with PID $pid" >&2
         done
     else
         echo "Service '$_name' is not running" >&2
     fi
 }
 
-echo "Select a gcloud emulator:"
+echo "Select a gcloud emulator:" >&2
 for _idx in "${!GCLOUD_EMULATORS[@]}"; do
     _service="${GCLOUD_EMULATORS[$_idx]}"
     _name=$( cut -d : -f 2 <<< "$_service" )
@@ -63,7 +65,7 @@ read -p "emu-index> " _emu_index
 _emu_selected="${GCLOUD_EMULATORS[$((_emu_index-1))]}"
 
 if [ -z "$_emu_selected" ]; then
-    echo "Invalid emulator index"
+    echo "Invalid emulator index" >&2
     _stopped
 fi
 

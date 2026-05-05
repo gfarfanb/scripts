@@ -22,7 +22,7 @@ _convert() {
     local _name="${_filename%.*}"
     local _output="$_mp3_output/$_name.mp3"
 
-    echo ;
+    echo >&2
 
     ffmpeg -y -loglevel warning -i "$_mp4" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "$_output"
 

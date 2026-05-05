@@ -16,17 +16,17 @@ _append_env_vars() {
     local _env_vars="${1:-}/env-vars"
     if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
         if [ -f "$_env_vars" ]; then
-            echo 'env-vars' file found, adding environment variable to ~/.bashrc
-            echo "ENV_VARS_FILE=\"$_env_vars\""
+            echo 'env-vars' file found, adding environment variable to ~/.bashrc >&2
+            echo "ENV_VARS_FILE=\"$_env_vars\"" >&2
             sed -i "$ a\\\nexport ENV_VARS_FILE=\"$_env_vars\"" ~/.bashrc
         fi
     fi
 }
 
 _yes_prompt() {
-    echo "${1:-}"
-    echo "y) Yes (default)"
-    echo "n) No"
+    echo "${1:-}" >&2
+    echo "y) Yes (default)" >&2
+    echo "n) No" >&2
     read -p "y/n> " _yesno
     if [ -z "$_yesno" ]; then
         _yesno=y
@@ -37,8 +37,8 @@ _yes_prompt() {
 _validate_dir() {
     local _dir=${1:-}
     if [ ! -d "$_dir" ]; then
-        echo ;
-        echo "Directory does not exist: $_dir"
+        echo >&2
+        echo "Directory does not exist: $_dir" >&2
         _yesno=$( _yes_prompt "Do you want to create it?" )
         case $_yesno in
             [Yy]*)
@@ -67,21 +67,22 @@ while getopts "h" opt; do
     esac
 done
 
-echo "Enter the cloud directory for:"
-echo -e "\t$( hostnamectl | grep 'Operating System:' )"
+echo "Enter the cloud directory for:" >&2
+echo >&2
+echo "$( hostnamectl | grep 'Operating System:' )" >&2
 read -p "cloud-directory> " CLOUD_DIRECTORY
 eval "CLOUD_DIRECTORY=\$( _trim_trailing_separator \"$CLOUD_DIRECTORY\" )"
 
-echo ;
-echo "Enter the rclone config:"
+echo >&2
+echo "Enter the rclone config:" >&2
 read -p "rclone-config> " RCLONE_CONFIG
 
 CLOUD_DIRECTORY="$CLOUD_DIRECTORY/$RCLONE_CONFIG"
 
 _validate_dir "$CLOUD_DIRECTORY"
 
-echo ;
-echo "Enter the backup directory for:"
+echo >&2
+echo "Enter the backup directory for:" >&2
 read -p 'backup-directory> ' BACKUP_DIRECTORY
 eval "BACKUP_DIRECTORY=\$( _trim_separator \"$BACKUP_DIRECTORY\" )"
 
@@ -92,23 +93,23 @@ _validate_dir "$BACKUP_HOME"
 if [ -z "$( ls -A $BACKUP_HOME )" ]; then
     rclone copy -P $RCLONE_CONFIG:$BACKUP_DIRECTORY $BACKUP_HOME
 
-    echo ;
-    echo "Imported source: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
-    echo "Destination: $BACKUP_HOME"
+    echo >&2
+    echo "Imported source: $RCLONE_CONFIG:$BACKUP_DIRECTORY" >&2
+    echo "Destination: $BACKUP_HOME" >&2
 
     _append_env_vars "$BACKUP_HOME"
 else
     rclone sync -P $RCLONE_CONFIG:$BACKUP_DIRECTORY $BACKUP_HOME
 
-    echo ;
-    echo "Synchronized source: $RCLONE_CONFIG:$BACKUP_DIRECTORY"
-    echo "Destination: $BACKUP_HOME"
+    echo >&2
+    echo "Synchronized source: $RCLONE_CONFIG:$BACKUP_DIRECTORY" >&2
+    echo "Destination: $BACKUP_HOME" >&2
 
     _append_env_vars "$BACKUP_HOME"
 fi
 
-echo ;
-echo "[Completed]: $0"
+echo >&2
+echo "[Completed]: $0" >&2
 
 cd $PWD
 exit 0

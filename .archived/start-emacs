@@ -32,25 +32,25 @@ done
 _emacs_pid=$( pidof -x emacs )
 
 if [ -z "$_emacs_pid" ]; then
-    echo "Launching 'Emacs Server'"
+    echo "Launching 'Emacs Server'" >&2
     emacs --daemon &
     sleep $EMACS_WAIT_SECS
 else
-    echo "'Emacs Server' running at: $_emacs_pid"
+    echo "'Emacs Server' running at: $_emacs_pid" >&2
 fi
 
 _emacsclient_pid=$( pidof -x  emacsclient )
 
 if [ -z "$_emacsclient_pid" ]; then
     if [ $_terminal_flag -eq 1 ]; then
-        echo "Launching 'Emacs Client Terminal'"
+        echo "Launching 'Emacs Client Terminal'" >&2
         emacsclient -t
     else
-        echo "Launching 'Emacs Client'"
+        echo "Launching 'Emacs Client'" >&2
         emacsclient -c -a 'emacs'
     fi
 else
-    echo "'Emacs Client' running at: $_emacsclient_pid"
+    echo "'Emacs Client' running at: $_emacsclient_pid" >&2
 fi
 
 _completed

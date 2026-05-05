@@ -154,15 +154,15 @@ _launch_celeste64() {
     bash ../sys/save-snapshot "$CELESTE_64_BACKUP_HOME"
 }
 
-echo "Select a console:"
-echo "1) Zelda 64: Recompiled"
-echo "2) 1964 GEPD Edition"
-echo "3) GameCube/Wii [Dolphin]"
-echo "4) Nintendo 64 [Mupen64Plus]"
-echo "5) GBA/GBC/GB [mGBA]"
-echo "6) 3DS [Azahar]"
-echo "7) SNES [Snes9x]"
-echo "8) Celeste 64: Fragments of the Mountain"
+echo "Select a console:" >&2
+echo "1) Zelda 64: Recompiled" >&2
+echo "2) 1964 GEPD Edition" >&2
+echo "3) GameCube/Wii [Dolphin]" >&2
+echo "4) Nintendo 64 [Mupen64Plus]" >&2
+echo "5) GBA/GBC/GB [mGBA]" >&2
+echo "6) 3DS [Azahar]" >&2
+echo "7) SNES [Snes9x]" >&2
+echo "8) Celeste 64: Fragments of the Mountain" >&2
 read -p "console-index> " _console_index
 
 case "$_console_index" in
@@ -191,7 +191,7 @@ case "$_console_index" in
         _launch_celeste64 "$@"
         ;;
     *)
-        echo "Invalid console index"
+        echo "Invalid console index" >&2
         _stopped
         ;;
 esac

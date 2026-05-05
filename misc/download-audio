@@ -8,16 +8,18 @@ _require_var DOWNLOADS_HOME
 _require_var HOSTS_DB_FILE
 
 __usage_page() {
-    echo "Fetch audio on MP3 format."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -u <URL>:      Resource URL"
-    echo "    -i <index>:    Playlist start index"
-    echo "    -l <location>: File for a list of URLs"
-    echo "    -p:            Pack MP3 files into a ZIP file and delete MP3 files"
-    echo "    -m:            Move all ZIP files to 'DOWLOADS_HOME' location"
-    echo "    -h:            Displays this help message"
+    cat << EOF
+Fetch audio on MP3 format.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -u <URL>:      Resource URL
+    -i <index>:    Playlist start index
+    -l <location>: File for a list of URLs
+    -p:            Pack MP3 files into a ZIP file and delete MP3 files
+    -m:            Move all ZIP files to 'DOWLOADS_HOME' location
+    -h:            Displays this help message
+EOF
     exit 0
 }
 

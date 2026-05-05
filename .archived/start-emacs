@@ -7,12 +7,14 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var EMACS_WAIT_SECS
 
 __usage_page() {
-    echo "Starts Emacs editor."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -t: Emacs Client Terminal"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Starts Emacs editor.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -t: Emacs Client Terminal
+    -h: Displays this help message
+EOF
     exit 0
 }
 

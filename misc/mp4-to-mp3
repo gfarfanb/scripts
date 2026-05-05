@@ -6,13 +6,15 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var OUTPUT_AUDIO_HOME
 
 __usage_page() {
-    echo "Converts MP4 files to MP3."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -i: Sets the MP4 location/file"
-    echo "    -o: Sets the MP3 output location. Default: 'OUTPUT_AUDIO_HOME'"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Converts MP4 files to MP3.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -i: Sets the MP4 location/file
+    -o: Sets the MP3 output location. Default: 'OUTPUT_AUDIO_HOME'
+    -h: Displays this help message
+EOF
     exit 0
 }
 

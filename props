@@ -4,11 +4,13 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ./env-vars
 
 __usage_page() {
-    echo "Show the environment variables defined in the 'env-vars' file."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Show the environment variables defined in the 'env-vars' file.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -h: Displays this help message
+EOF
     exit 0
 }
 

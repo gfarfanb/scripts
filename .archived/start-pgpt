@@ -7,11 +7,13 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var PRIVATE_GPT_HOME
 
 __usage_page() {
-    echo "Starts LLM Server."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Starts LLM Server.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -h: Displays this help message
+EOF
     exit 0
 }
 

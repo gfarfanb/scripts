@@ -7,11 +7,13 @@ _require_var WORKSPACE_HOME
 _require_var UPDATE_PLAN_FILE
 
 __usage_page() {
-    echo "Execute the update plan."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Execute the update plan.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -h: Displays this help message
+EOF
     exit 0
 }
 

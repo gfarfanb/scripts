@@ -12,18 +12,20 @@ _require_var PUBSUB_TOPICS_DEFAULT_OPTION
 _require_var PUBSUB_TOPICS_DEFINITION_FILE
 
 __usage_page() {
-    echo "Operations for PubSub topics: create, send messages, monitor messages."
-    echo "The following env variables must be set previously manually or by executing 'start-pubsub':"
-    echo "   - PUBSUB_PROJECT_ID"
-    echo "   - PUBSUB_PUSH_ENDPOINT"
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -c:           Creates topics for selected project"
-    echo "    -m <message>: Sends a message to a selected topic"
-    echo "                    'message' argument can be a payload or a file"
-    echo "    -w:           Monitors messages for a selected pull subscription"
-    echo "    -h:           Displays this help message"
+    cat << EOF
+Operations for PubSub topics: create, send messages, monitor messages.
+The following env variables must be set previously manually or by executing 'start-pubsub':
+   - PUBSUB_PROJECT_ID
+   - PUBSUB_PUSH_ENDPOINT
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -c:           Creates topics for selected project
+    -m <message>: Sends a message to a selected topic
+                    'message' argument can be a payload or a file
+    -w:           Monitors messages for a selected pull subscription
+    -h:           Displays this help message
+EOF
     exit 0
 }
 
@@ -161,14 +163,14 @@ _monitor_messages() {
 }
 
 if [ -z "$_option" ]; then
-    echo "Select an operation:"
+    echo "Select an operation:" >&2
     for _idx in "${!_sync_ops[@]}"; do
         _op="${_sync_ops[$_idx]}"
 
         if [ "$_idx" = "$PUBSUB_TOPICS_DEFAULT_OPTION" ]; then
-            echo "$((_idx+1))) (default) $_op"
+            echo "$((_idx+1))) (default) $_op" >&2
         else
-            echo "$((_idx+1))) $_op"
+            echo "$((_idx+1))) $_op" >&2
         fi
     done
     read -p "operation-index> " _op_index
@@ -189,7 +191,7 @@ elif [ "$_sync_op" = "Send" ]; then
 elif [ "$_sync_op" = "Monitor" ]; then
     _monitor_messages
 else
-    echo "Option not implemented yet: $_sync_op"
+    echo "Option not implemented yet: $_sync_op" >&2
 fi
 
 _completed

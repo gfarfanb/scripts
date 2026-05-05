@@ -7,15 +7,17 @@ _require_var CLOUD_HOME
 _require_var CLOUD_REMOTE_SOURCES
 
 __usage_page() {
-    echo "Synchronize local files from cloud providers."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -f: Pull data from cloud"
-    echo "    -p: Push data to cloud"
-    echo "    -s: Apply Rclone sync"
-    echo "    -t: Test run"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Synchronize local files from cloud providers.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -f: Pull data from cloud
+    -p: Push data to cloud
+    -s: Apply Rclone sync
+    -t: Test run
+    -h: Displays this help message
+EOF
     exit 0
 }
 

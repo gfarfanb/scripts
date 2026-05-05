@@ -18,12 +18,14 @@ _require_var GCLOUD_DEFAULT_PROJECT_ID
 _require_var GCLOUD_PROJECT_IDS
 
 __usage_page() {
-    echo "Starts PubSub emulator for a specific project."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -r: Restores the PubSub DB file"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Starts PubSub emulator for a specific project.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -r: Restores the PubSub DB file
+    -h: Displays this help message
+EOF
     exit 0
 }
 

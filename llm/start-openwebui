@@ -27,20 +27,22 @@ _require_var DOCLING_PORT
 _require_var TIKA_SERVER
 
 __usage_page() {
-    echo "Starts Open WebUI and the related services."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -b: Backup Open WebUI"
-    echo "    -a: Restore backup for Open WebUI"
-    echo "    -e: Execute a container"
-    echo "    -k: Kill a container"
-    echo "    -t: Open the terminal for a containers"
-    echo "    -l: Show the logs for a containers"
-    echo "    -s: Stop all containers"
-    echo "    -r: Remove all containers"
-    echo "    -u: Update containers"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Starts Open WebUI and the related services.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -b: Backup Open WebUI
+    -a: Restore backup for Open WebUI
+    -e: Execute a container
+    -k: Kill a container
+    -t: Open the terminal for a containers
+    -l: Show the logs for a containers
+    -s: Stop all containers
+    -r: Remove all containers
+    -u: Update containers
+    -h: Displays this help message
+EOF
     exit 0
 }
 

@@ -6,12 +6,14 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var REDIS_PORT
 
 __usage_page() {
-    echo "Starts Redis server."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -s: Stop Redis server"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Starts Redis server.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -s: Stop Redis server
+    -h: Displays this help message
+EOF
     exit 0
 }
 

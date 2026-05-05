@@ -6,11 +6,13 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var OPENCODE_SERVER_PORT
 
 __usage_page() {
-    echo "Starts OpenCode as server."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Starts OpenCode as server.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -h: Displays this help message
+EOF
     exit 0
 }
 

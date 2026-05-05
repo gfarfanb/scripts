@@ -7,11 +7,13 @@ _require_var POKEMON_SOLUS_HOME
 _require_var GB_GBC_ROMS_HOME
 
 __usage_page() {
-    echo "Builds Pokémon Solus ROMs."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Builds Pokémon Solus ROMs.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -h: Displays this help message
+EOF
     exit 0
 }
 

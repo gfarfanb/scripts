@@ -9,18 +9,20 @@ _require_var SESSION_TEMP_DIR
 _require_var HOSTS_DB_FILE
 
 __usage_page() {
-    echo "Fetch video on MP4 format."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -u <URL>:          Resource URL"
-    echo "    -a:                Get available formats for the video"
-    echo "    -r <resolution>:   Video resolution, numeric"
-    echo "    -c:                Attach cookies to request"
-    echo "    -l <location>:     File for a list of URLs"
-    echo "    -p:                Pack MP4 files into a ZIP file and delete MP4 files"
-    echo "    -m:                Move all ZIP files to 'DOWNLOADS_HOME' location"
-    echo "    -h:                Displays this help message"
+    cat << EOF
+Fetch video on MP4 format.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -u <URL>:          Resource URL
+    -a:                Get available formats for the video
+    -r <resolution>:   Video resolution, numeric
+    -c:                Attach cookies to request
+    -l <location>:     File for a list of URLs
+    -p:                Pack MP4 files into a ZIP file and delete MP4 files
+    -m:                Move all ZIP files to 'DOWNLOADS_HOME' location
+    -h:                Displays this help message
+EOF
     exit 0
 }
 

@@ -4,13 +4,15 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 . ../env-vars
 
 __usage_page() {
-    echo "Pull changes for local repos or clone if they do not exist."
-    echo ;
-    echo "Usage: $(basename $0) [<option>]*"
-    echo "Option:"
-    echo "    -b: Backup repos as ZIP files"
-    echo "    -s: Allow select a repo"
-    echo "    -h: Displays this help message"
+    cat << EOF
+Pull changes for local repos or clone if they do not exist.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -b: Backup repos as ZIP files
+    -s: Allow select a repo
+    -h: Displays this help message
+EOF
     exit 0
 }
 

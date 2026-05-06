@@ -25,7 +25,7 @@ done
 _prop_name=${1:-}
 
 if [ -n "$_prop_name" ]; then
-    _prop_value=$( eval "echo \$$_prop_name >&2" )
+    _prop_value=$( eval "echo -n \$$_prop_name" )
     echo "$_prop_value"
     exit 0
 fi
@@ -35,7 +35,7 @@ _all_props=( $( cat $ENV_VARS_FILE | grep '^.*=.*' | grep -v '^#.*' | cut -d "="
 echo "Select an environment variable:"
 for _idx in "${!_all_props[@]}"; do
     _prop_name="${_all_props[$_idx]}"
-    _prop_value=$( eval "echo \$$_prop_name" )
+    _prop_value=$( eval "echo -n \$$_prop_name" )
 
     if [ -z "$_prop_value" ]; then
         echo "$((_idx+1))) $_prop_name <empty>" >&2

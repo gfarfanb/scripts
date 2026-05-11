@@ -161,12 +161,13 @@ _select_compose_service() {
     fi
 
     _service="${_services[$_service_index]}"
+    _container="$( docker ps -aq --filter "label=com.docker.compose.service=$_service" --all )"
 
     if [ -z "$_service" ]; then
         echo >&2
         echo "Invalid service option" >&2
         exit 1
-    elif [ -z "$(docker ps -q -a -f name=$_service)" ]; then
+    elif [ -z "$( docker ps -q -a -f id=$_container )" ]; then
         echo >&2
         echo "Service is not running: $_service" >&2
         exit 1

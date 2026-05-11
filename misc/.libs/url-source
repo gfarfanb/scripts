@@ -16,12 +16,44 @@ _check_db() {
     fi
 }
 
+_get_host_id() {
+    _check_db
+
+    local _url=${1:-}
+    local _host=$( echo "$_url" | awk -F/ '{print $3}' )
+
+    local _query=$( cat << EOF
+    SELECT id
+        FROM host_mappings
+        WHERE host='$_host'
+            AND deleted = 0
+EOF
+    )
+
+    local _result=$( sqlite3 "$_hosts_db_file" "$_query" )
+
+    if [ -z "$_result" ]; then
+        echo "Id not found for: $_host" >&2
+        exit 1
+    else
+        echo "$_result"
+    fi
+}
+
 _get_source() {
     _check_db
 
     local _url=${1:-}
     local _host=$( echo "$_url" | awk -F/ '{print $3}' )
-    local _query="SELECT source FROM url_mappings WHERE host='$_host';"
+
+    local _query=$( cat << EOF
+    SELECT source
+        FROM host_mappings
+        WHERE host='$_host'
+            AND deleted = 0
+EOF
+    )
+
     local _result=$( sqlite3 "$_hosts_db_file" "$_query" )
 
     if [ -z "$_result" ]; then
@@ -37,7 +69,15 @@ _get_cookies_host() {
 
     local _url=${1:-}
     local _host=$( echo "$_url" | awk -F/ '{print $3}' )
-    local _query="SELECT cookies_host FROM url_mappings WHERE host='$_host';"
+
+    local _query=$( cat << EOF
+    SELECT cookies_host
+        FROM host_mappings
+        WHERE host='$_host'
+            AND deleted = 0
+EOF
+    )
+
     local _result=$( sqlite3 "$_hosts_db_file" "$_query" )
 
     if [ -z "$_result" ]; then
@@ -90,32 +130,44 @@ _log_download() {
     local _status=${3:-}
     local _details=${4:-}
     local _output=${5:-}
-    local _host=$( echo "$_url" | awk -F/ '{print $3}' )
+    local _host_id=$( _get_host_id "$_url" )
 
     [ $_status -eq 0 ] && _status="'SUCCESS'" || _status="'FAILED'"
     [ -z "$_details" ] && _details="null" || _details="'$_details'"
     [ -z "$_output" ] && _output="null" || _output="'$_output'"
 
     local _cmd_msg="format=$_format, status=$_status, details=$_details, output=$_output"
-    local _query="SELECT id FROM downloads WHERE url = '$_url'"
+
+    local _query=$( cat << EOF
+    SELECT id
+        FROM downloads
+        WHERE url = '$_url'
+            AND deleted = 0
+EOF
+    )
+
     local _id=$( sqlite3 "$_hosts_db_file" "$_query" )
 
     if [ -n "$_id" ]; then
-        local _update=" UPDATE downloads "
-        _update+=" SET tries = tries + 1, "
-        _update+=" format = '$_format', "
-        _update+=" details = $_details, "
-        _update+=" output_file = $_output, "
-        _update+=" last_dl_status = $_status, "
-        _update+=" last_dl_ts = CURRENT_TIMESTAMP "
-        _update+=" WHERE id = '$_id'; "
+        local _update=$( cat << EOF
+        UPDATE downloads SET
+                tries = tries + 1,
+                format = '$_format',
+                details = $_details,
+                output_file = $_output,
+                last_dl_status = $_status,
+                last_dl_ts = CURRENT_TIMESTAMP
+            WHERE id = '$_id';
+EOF
+        )
 
         _execute_cmd "$_update" "$_cmd_msg"
     else
-        local _insert=" INSERT INTO downloads(url, host, format, details, output_file, last_dl_status) "
-        _insert+=" VALUES( "
-        _insert+="'$_url', '$_host', '$_format', $_details, $_output, $_status"
-        _insert+=" ); "
+        local _insert=$( cat << EOF
+        INSERT INTO downloads(url, host_id, format, details, output_file, last_dl_status)
+            VALUES('$_url', '$_host_id', '$_format', $_details, $_output, $_status);
+EOF
+        )
 
         _execute_cmd "$_insert" "$_cmd_msg"
     fi

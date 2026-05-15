@@ -8,6 +8,7 @@ import sqlite3
 import argparse
 import json
 import requests
+import re
 import logging
 
 if sys.platform == 'win32':
@@ -25,43 +26,54 @@ pi_config_file = env_vars.env_value('PI_CONFIG_FILE')
 
 logger = logging.getLogger()
 
-models_pull_query = """
+hub_ollama_local = 'Ollama Local'
+
+models_templates_hubs_view ="""
     SELECT om.name,
             ot.template,
             om.model,
             om.parameters,
             om.organization,
             om.quantization,
-            om.basename
-    FROM ollama_models om
-        JOIN ollama_templates ot
-            ON om.template_id = ot.id
-    WHERE om.pull = 1
-        AND om.deleted = 0
-        AND ot.deleted = 0
+            om.basename,
+            h.name AS hub_name,
+            h.base_url,
+            h.api_key
+        FROM ollama_models om
+            JOIN ollama_templates ot
+                ON om.template_id = ot.id
+            JOIN hubs h
+                ON ot.hub_id = h.id
 """
 
-models_agents_query = """
-    SELECT om.name,
-        ot.template,
-        om.model,
-        om.parameters,
-        om.organization,
-        om.quantization,
-        om.basename
-    FROM ollama_models om
-        JOIN ollama_models_agents oma
-            ON om.id = oma.model_id
-        JOIN agents a
-            ON oma.agent_id = a.id
-        JOIN ollama_templates ot
-            ON om.template_id = ot.id
-    WHERE a.name = '{agent}'
-        AND oma.included = 1
-        AND om.deleted = 0
-        AND oma.deleted = 0
-        AND a.deleted = 0
+models_templates_hubs_where_filter = """
+    AND om.deleted = 0
+    AND ot.deleted = 0
+    AND h.deleted = 0
 """
+
+models_pull_query ="""
+    {view}
+        WHERE om.pull = 'LOCAL'
+            {view_filter}
+""".format(view=models_templates_hubs_view,
+           view_filter=models_templates_hubs_where_filter)
+
+models_agents_query = """
+    {view}
+            JOIN ollama_models_agents oma
+                ON om.id = oma.model_id
+            JOIN agents a
+                ON oma.agent_id = a.id
+        WHERE a.name = '{agent}'
+            AND om.pull in ('LOCAL', 'CLOUD')
+            AND oma.included = 1
+            {view_filter}
+            AND oma.deleted = 0
+            AND a.deleted = 0
+""".format(view=models_templates_hubs_view,
+           view_filter=models_templates_hubs_where_filter,
+           agent='{agent}')
 
 
 def pull_models():
@@ -158,7 +170,7 @@ def __get_model_defs(agent_name=None):
 
     model_defs = []
     for row in rows:
-        name, template, model, parameters, organization, quantization, basename = row
+        name, template, model, parameters, organization, quantization, basename, hub_name, base_url, api_key = row
 
         model_def = {
             'name': name,
@@ -167,7 +179,10 @@ def __get_model_defs(agent_name=None):
             'parameters': 'latest' if parameters is None else parameters,
             'organization': organization,
             'quantization': 'latest' if quantization is None else quantization,
-            'basename': basename
+            'basename': basename,
+            'hub_name': hub_name,
+            'base_url': base_url,
+            'api_key': api_key
         }
 
         __expand_model(model_def)
@@ -201,17 +216,33 @@ def sync_opencode():
             data = json.load(f)
 
     model_defs = __get_model_defs(agent_name='OpenCode')
-    models_config = {}
+    models_config_by_hub = {}
+    provider_by_hub = {}
 
     for model_def in model_defs:
+        hub = model_def['hub_name']
         model = model_def['model_tag']
+        provider = provider_by_hub.get(hub)
+
+        if provider is None:
+            provider = {
+                'id': re.sub(r'[^a-z0-9]', '_', hub.lower()).strip('_'),
+                'name': hub,
+                'base_url': model_def['base_url'],
+                'api_key': model_def['api_key']
+            }
+            provider_by_hub[hub] = provider
 
         try:
+            models_config = models_config_by_hub.get(hub, {})
+
             model_base = {
                 '_launch': True,
                 'name': model_def['show_name']
             }
             models_config[model] = { **model_base, **__get_opencode_spec(model_def)}
+
+            models_config_by_hub[hub] = models_config
 
             logger.info("Model [{model}] added to OpenCode configuration".format(model=model))
         except KeyError as err:
@@ -219,16 +250,18 @@ def sync_opencode():
                 model=model,
                 msg=err.args[0]))
 
-    base_url = "{host}/v1".format(host=ollama_host.rstrip('/'))
+    for hub, provider in provider_by_hub.items():
+        models_config = models_config_by_hub.get(hub)
 
-    data['provider']['ollama'] = {
-        'name': 'Ollama (local)',
-        'npm': '@ai-sdk/openai-compatible',
-        'options': {
-            'baseURL': base_url
-        },
-        'models': models_config
-    }
+        data['provider'][provider['id']] = {
+            'name': provider['name'],
+            'npm': '@ai-sdk/openai-compatible',
+            'options': {
+                'baseURL': provider['base_url'],
+                'apiKey': provider['api_key']
+            },
+            'models': models_config
+        }
 
     with open(opencode_config_file, 'w') as f:
         json.dump(data, f, indent=2)
@@ -240,7 +273,27 @@ def sync_opencode():
 
 
 def __get_opencode_spec(model_def):
+    hub = model_def['hub_name']
     model = model_def['model_tag']
+
+    if hub != hub_ollama_local:
+        opencode_spec = {
+            'limit': {
+                'context': 0,
+                'output': 0
+            }
+        }
+
+        model_spec = """
+            Model
+              name             {name}
+              context length   {contextLength}""".format(
+                name=model,
+                contextLength=0)
+        logger.info(model_spec)
+
+        return opencode_spec
+
     payload = { 'model': model }
     json_payload = json.dumps(payload)
     response = requests.post("{host}/api/show".format(host=ollama_host), data=json_payload)
@@ -305,12 +358,26 @@ def sync_pi():
             data = json.load(f)
 
     model_defs = __get_model_defs(agent_name='Pi')
-    models_config = []
+    models_config_by_hub = {}
+    provider_by_hub = {}
 
     for model_def in model_defs:
+        hub = model_def['hub_name']
         model = model_def['model_tag']
+        provider = provider_by_hub.get(hub)
+
+        if provider is None:
+            provider = {
+                'id': re.sub(r'[^a-z0-9]', '_', hub.lower()).strip('_'),
+                'name': hub,
+                'base_url': model_def['base_url'],
+                'api_key': model_def['api_key']
+            }
+            provider_by_hub[hub] = provider
 
         try:
+            models_config = models_config_by_hub.get(hub, [])
+
             model_base = {
                 'id': model,
                 'name': model_def['show_name']
@@ -318,20 +385,23 @@ def sync_pi():
             model_base = { **model_base, **__get_pi_spec(model_def)}
             models_config.append(model_base)
 
+            models_config_by_hub[hub] = models_config
+
             logger.info("Model [{model}] added to Pi configuration".format(model=model))
         except KeyError as err:
             logger.debug("No PI configuration defined for model [{model}] - {msg}".format(
                 model=model,
                 msg=err.args[0]))
 
-    base_url = "{host}/v1".format(host=ollama_host.rstrip('/'))
+    for hub, provider in provider_by_hub.items():
+        models_config = models_config_by_hub.get(hub)
 
-    data['providers']['ollama'] = {
-        'baseUrl': base_url,
-        'api': 'openai-completions',
-        'apiKey': 'ollama',
-        'models': models_config
-    }
+        data['providers'][provider['id']] = {
+            'baseUrl': provider['base_url'],
+            'api': 'openai-completions',
+            'apiKey': provider['api_key'],
+            'models': models_config
+        }
 
     with open(pi_config_file, 'w') as f:
         json.dump(data, f, indent=2)
@@ -343,7 +413,20 @@ def sync_pi():
 
 
 def __get_pi_spec(model_def):
+    hub = model_def['hub_name']
     model = model_def['model_tag']
+
+    if hub != hub_ollama_local:
+        pi_spec = {}
+
+        model_spec = """
+            Model
+              name             {name}""".format(
+                name=model)
+        logger.info(model_spec)
+
+        return pi_spec
+
     payload = { 'model': model }
     json_payload = json.dumps(payload)
     response = requests.post("{host}/api/show".format(host=ollama_host), data=json_payload)

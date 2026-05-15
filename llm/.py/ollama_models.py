@@ -408,11 +408,11 @@ def main():
                             help='Only synchronizes models with specified agent configuration files')
         args = parser.parse_args()
 
-        # if not args.config:
-        #     pull_models()
-        #     cleanup_models()
+        if not args.config:
+            pull_models()
+            cleanup_models()
 
-        agents = args.agent if args.agent else ['opencode']
+        agents = args.agent if args.agent else []
 
         for agent in agents:
             match agent:

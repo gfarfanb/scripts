@@ -42,10 +42,33 @@ _wait_until_healthy() {
     fi
 }
 
+_get_compose_container() {
+    local _service=${1:-}
+    local _container="$( docker ps -aq --filter "label=com.docker.compose.service=$_service" --all )"
+
+    if [ -z "$( docker ps -q -a -f id=$_container )" ]; then
+        echo >&2
+        echo "Service is not running: $_service" >&2
+        exit 1
+    fi
+
+    echo "$_container"
+}
+
+_exist_container() {
+    local _container=${1:-}
+
+    if [ -n "$(docker ps -q -a -f name=$_container)" ] || [ -n "$(docker ps -q -a -f id=$_container)" ]; then
+        echo "$_container"
+    else
+        echo ;
+    fi
+}
+
 _update_container() {
     local _container=${1:-}
 
-    if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
+    if [ -n "$( _exist_container "$_container")" ]; then
         echo "Attempting to update $_container ..." >&2
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once $_container
         echo "$0:container/update:$_container"
@@ -58,7 +81,7 @@ _update_container() {
 _restart_container() {
     local _container=${1:-}
 
-    if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
+    if [ -n "$( _exist_container "$_container")" ]; then
         echo "Attempting to restart  $_container ..." >&2
         docker container restart $_container
         echo "$0:container/restart:$_container"
@@ -71,7 +94,7 @@ _restart_container() {
 _stop_container() {
     local _container=${1:-}
 
-    if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
+    if [ -n "$( _exist_container "$_container")" ]; then
         echo "Stopping $_container ..." >&2
         docker container stop $_container
         echo "$0:container/stop:$_container"
@@ -84,7 +107,7 @@ _stop_container() {
 _remove_container() {
     local _container=${1:-}
 
-    if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
+    if [ -n "$( _exist_container "$_container")" ]; then
         echo "Removing $_container ..." >&2
         docker rm -f $_container
         echo "$0:container/rm:$_container"
@@ -97,7 +120,7 @@ _remove_container() {
 _terminal_container() {
     local _container=${1:-}
 
-    if [ -n "$(docker ps -q -a -f name=$_container)" ]; then
+    if [ -n "$( _exist_container "$_container")" ]; then
         echo "Entering $_container ..." >&2
         docker exec -it $_container /bin/bash
         echo "$0:container/exec:$_container"
@@ -161,26 +184,24 @@ _select_compose_service() {
     fi
 
     _service="${_services[$_service_index]}"
-    _container="$( docker ps -aq --filter "label=com.docker.compose.service=$_service" --all )"
 
     if [ -z "$_service" ]; then
         echo >&2
         echo "Invalid service option" >&2
         exit 1
-    elif [ -z "$( docker ps -q -a -f id=$_container )" ]; then
-        echo >&2
-        echo "Service is not running: $_service" >&2
-        exit 1
     else
-        echo $_service
+        local _container=$( _get_compose_container "$_service" )
+        echo "Selected service: $_service [$_container]" >&2
     fi
+
+    echo $_service
 }
 
 _run_compose_service() {
     local _service=$( _select_compose_service )
 
     if [ -n "$_service" ]; then
-        _docker_compose run --rm $_service
+        _docker_compose run --rm "$_service"
         echo "$0:compose/run:$_service"
     else
         exit 1
@@ -191,7 +212,7 @@ _stop_compose_service() {
     local _service=$( _select_compose_service )
 
     if [ -n "$_service" ]; then
-        _docker_compose stop $_service
+        _docker_compose stop "$_service"
         echo "$0:compose/stop:$_service"
     else
         exit 1
@@ -200,9 +221,10 @@ _stop_compose_service() {
 
 _terminal_compose_service() {
     local _service=$( _select_compose_service )
+    local _container=$( _get_compose_container "$_service" )
 
     if [ -n "$_service" ]; then
-        _terminal_container $_service
+        _terminal_container "$_container"
         echo "$0:compose/terminal:$_service"
     else
         exit 1
@@ -213,7 +235,7 @@ _logs_compose_service() {
     local _service=$( _select_compose_service )
 
     if [ -n "$_service" ]; then
-        _docker_compose logs -f $_service
+        _docker_compose logs -f "$_service"
         echo "$0:compose/logs:$_service"
     else
         exit 1

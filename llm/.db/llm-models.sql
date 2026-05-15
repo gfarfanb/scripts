@@ -104,7 +104,7 @@ WITH _o_hub AS (
         WHERE name IN ('Ollama Local', 'Ollama Cloud')
 )
 INSERT INTO ollama_templates (hub_id, template)
-    SELECT id, '{model}[:{parameters}]' FROM _o_hub;
+    SELECT id, '{model}:{parameters}' FROM _o_hub;
 
 
 -- Ollama Templates for Hugging Face models
@@ -114,7 +114,7 @@ WITH _h_f_hub AS (
         WHERE name IN ('Hugging Face')
 )
 INSERT INTO ollama_templates (hub_id, template)
-    SELECT id, 'hf.co/{organization}/{model}[:{quantization}]' FROM _h_f_hub;
+    SELECT id, 'hf.co/{organization}/{model}:{quantization}' FROM _h_f_hub;
 
 
 -- Ollama Models
@@ -190,3 +190,31 @@ INSERT INTO ollama_models(name, template_id, model, parameters, organization, qu
         'llava-phi3', '3.8b', null, null, null, 0),
     ('Granite-3.1 MoE', (SELECT id FROM _o_template WHERE name = 'Ollama Local'),
         'granite3.1-moe', '3b', null, null, null, 0);
+
+
+-- Ollama Models for Pi
+WITH _agent AS (
+    SELECT a.id
+        FROM agents a
+        WHERE name = 'Pi'
+)
+INSERT INTO ollama_models_agents(model_id, agent_id, included) VALUES
+    ((SELECT id FROM ollama_models WHERE model = 'mistral'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'phi3.5'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'llama3.2'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'qwen3-vl'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'Qwen3-VL-8B-Thinking-GGUF'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'rnj-1'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'granite4'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'gemma4' AND parameters = 'e4b'), (SELECT id FROM _agent), 1),
+    ((SELECT id FROM ollama_models WHERE model = 'gemma4' AND parameters = 'e2b'), (SELECT id FROM _agent), 1);
+
+
+-- Ollama Models for OpenCode
+WITH _agent AS (
+    SELECT a.id
+        FROM agents a
+        WHERE name = 'OpenCode'
+)
+INSERT INTO ollama_models_agents(model_id, agent_id, included) VALUES
+    ((SELECT id FROM ollama_models WHERE model = 'gemma4' AND parameters = 'e4b'), (SELECT id FROM _agent), 1);

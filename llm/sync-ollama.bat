@@ -4,7 +4,7 @@ cd %BASEDIR%
 
 call ..\env-vars
 call ..\.win\require-var OLLAMA_SERVER
-call ..\.win\require-var OLLAMA_MODELS_DEF_DB
+call ..\.win\require-var LLM_MODELS_DB_FILE
 call ..\.win\require-var OPENCODE_CONFIG_FILE
 call ..\.win\require-var PI_CONFIG_FILE
 

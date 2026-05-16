@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 _require_var YT_DLP_VIDEO_OUTPUT_FOLDER
 _require_var YT_DLP_COOKIES_DB_PARENT
 _require_var SESSION_TEMP_DIR
-_require_var HOSTS_DB_FILE
+_require_var URL_SOURCE_DB_FILE
 
 __usage_page() {
     cat << EOF
@@ -28,7 +28,7 @@ EOF
 
 . ./.libs/url-source
 
-_hosts_db_file="$HOSTS_DB_FILE"
+_url_source_db_file="$URL_SOURCE_DB_FILE"
 
 
 _pack_videos() {

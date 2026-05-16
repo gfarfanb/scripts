@@ -133,9 +133,9 @@ _restore_openwebui() {
         _backup="${_backups[$_idx]}"
 
         if [ $_idx -eq $_last ]; then
-            echo "$((_idx+1))) (default) $_backup "
+            echo "$((_idx+1))) (default) $_backup " >&2
         else
-            echo "$((_idx+1))) $_backup"
+            echo "$((_idx+1))) $_backup" >&2
         fi
     done
     read -p "backup-index> " _backup_idx

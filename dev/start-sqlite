@@ -1,0 +1,78 @@
+#! /usr/bin/env bash
+BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../env-vars
+
+_require_var SQLITE_DBS_HOME
+
+__usage_page() {
+    cat << EOF
+Starts SQLite on a selected db.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -n: Creates a new SQLite database file
+    -h: Displays this help message
+EOF
+    exit 0
+}
+
+_create_db() {
+    echo "Enter the database filename:" >&2
+    read -p "db-filename> " _db_filename
+
+    if [ -z "$_db_filename" ]; then
+        echo "Invalid database name" >&2
+        _stopped
+    fi
+
+    local _db="$SQLITE_DBS_HOME/$_db_filename.db"
+
+    echo >&2
+    echo "Creating database..." >&2
+
+    sqlite3 "$_db" ".databases"
+
+    _completed
+}
+
+while getopts "nh" opt; do
+    case "$opt" in
+        n)
+            _create_db
+            ;;
+        h)
+            __usage_page
+            ;;
+    esac
+done
+
+_dbs=()
+_idx=0
+
+echo "Select a database:" >&2
+
+for _db in "$SQLITE_DBS_HOME"/*.db; do
+    _db_name=$( basename "$_db" )
+
+    echo "$((_idx+1))) $_db_name" >&2
+
+    _dbs+=( "$_db" )
+    _idx=$((_idx+1))
+done
+
+read -p "db-index> " _db_index
+
+_db="${_dbs[$((_db_index-1))]}"
+
+if [ -z "$_db" ]; then
+    echo "Invalid database index" >&2
+    _stopped
+fi
+
+echo >&2
+echo "Opening database: $_db" >&2
+
+sqlite3 "$_db"
+
+_completed

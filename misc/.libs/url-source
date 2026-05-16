@@ -5,13 +5,13 @@
 #
 # Usage in script:
 #   . ./.libs/url-source  # Relative source
-#   _hosts_db_file=<hosts_db_file>  # Set hosts database file
+#   _url_source_db_file=<url_source_db_file>  # Set hosts database file
 
-: "${_hosts_db_file:=}"
+: "${_url_source_db_file:=}"
 
 _check_db() {
-    if ! [ -f "$_hosts_db_file" ]; then
-        echo "Database file not found, define it by setting '_hosts_db_file'" >&2
+    if ! [ -f "$_url_source_db_file" ]; then
+        echo "Database file not found, define it by setting '_url_source_db_file'" >&2
         exit 1
     fi
 }
@@ -30,7 +30,7 @@ _get_host_id() {
 EOF
     )
 
-    local _result=$( sqlite3 "$_hosts_db_file" "$_query" )
+    local _result=$( sqlite3 "$_url_source_db_file" "$_query" )
 
     if [ -z "$_result" ]; then
         echo "Id not found for: $_host" >&2
@@ -54,7 +54,7 @@ _get_source() {
 EOF
     )
 
-    local _result=$( sqlite3 "$_hosts_db_file" "$_query" )
+    local _result=$( sqlite3 "$_url_source_db_file" "$_query" )
 
     if [ -z "$_result" ]; then
         echo "Source not found for: $_host" >&2
@@ -78,7 +78,7 @@ _get_cookies_host() {
 EOF
     )
 
-    local _result=$( sqlite3 "$_hosts_db_file" "$_query" )
+    local _result=$( sqlite3 "$_url_source_db_file" "$_query" )
 
     if [ -z "$_result" ]; then
         echo "Cookies host not found for: $_host" >&2
@@ -111,7 +111,7 @@ _execute_cmd() {
             ;;
     esac
 
-    sqlite3 "$_hosts_db_file" "$_sentence"
+    sqlite3 "$_url_source_db_file" "$_sentence"
 
     local _exit=$?
 
@@ -146,7 +146,7 @@ _log_download() {
 EOF
     )
 
-    local _id=$( sqlite3 "$_hosts_db_file" "$_query" )
+    local _id=$( sqlite3 "$_url_source_db_file" "$_query" )
 
     if [ -n "$_id" ]; then
         local _update=$( cat << EOF

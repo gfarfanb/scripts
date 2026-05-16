@@ -20,7 +20,7 @@ sys.path.append(environ['PYLIBSPATH'])
 import env_vars # pyright: ignore[reportMissingImports]
 
 ollama_host = env_vars.env_value('OLLAMA_SERVER')
-ollama_models_db = env_vars.env_value('OLLAMA_MODELS_DEF_DB')
+ollama_models_db = env_vars.env_value('LLM_MODELS_DB_FILE')
 opencode_config_file = env_vars.env_value('OPENCODE_CONFIG_FILE')
 pi_config_file = env_vars.env_value('PI_CONFIG_FILE')
 

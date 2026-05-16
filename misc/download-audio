@@ -5,7 +5,7 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 _require_var YT_DLP_AUDIO_OUTPUT_FOLDER
 _require_var DOWNLOADS_HOME
-_require_var HOSTS_DB_FILE
+_require_var URL_SOURCE_DB_FILE
 
 __usage_page() {
     cat << EOF
@@ -25,7 +25,7 @@ EOF
 
 . ./.libs/url-source
 
-_hosts_db_file="$HOSTS_DB_FILE"
+_hosts_db_file="$URL_SOURCE_DB_FILE"
 _default_quality=4
 
 _pack_audios() {

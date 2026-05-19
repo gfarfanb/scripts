@@ -6,6 +6,7 @@ from sys import exit
 from shutil import copyfile
 
 import sys
+import collections
 import datetime
 import argparse
 import logging
@@ -18,12 +19,14 @@ logger = logging.getLogger()
 
 def get_files_by_name(files_path):
     files = list(
-        { f for f in listdir(join(files_path)) if isfile(join(files_path, f)) }
+        { join(files_path, f) for f in listdir(join(files_path)) if isfile(join(files_path, f)) }
     )
     files_by_name = {}
 
     for file in files:
-        files_by_name[name_without_ext[file]] = file
+        files_by_name[name_without_ext(file)] = file
+
+    files_by_name = collections.OrderedDict(sorted(files_by_name.items()))
 
     return files_by_name
 
@@ -225,6 +228,9 @@ def main():
         parser.add_argument('-k', '--keep', type=int, default=1,
                             help='Number of the snapshots to keep')
         args = parser.parse_args()
+
+        if not args.source:
+            args.source = input('source-directory-or-file> ')
 
         if isfile(args.source):
             if args.recover:

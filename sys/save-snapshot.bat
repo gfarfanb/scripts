@@ -12,14 +12,14 @@ goto :main
 echo Create snapshots of save files.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
-echo Usage: %BASENAME% ^<save_home^> [^<option^>]*
+echo Usage: %BASENAME% ^<directory_or_file^> [^<option^>]*
 echo Option:
 echo     -r: Recovers save from snapshots
 echo     -h: Displays this help message
 goto :eof
 
 :main
-set "_saves_home=%~1"
+set "_source=%~1"
 
 if /i "%~2"=="-r" goto :getsnapshot
 if /i "%~1"=="-h" goto :__usage_page
@@ -27,11 +27,11 @@ goto :snapshot
 
 
 :snapshot
-python ".\.py\file_snapshot.py" -d "%_saves_home%" -k %SNAPSHOTS_TO_KEEP%
+python ".\.py\file_snapshot.py" -s "%_source%" -k %SNAPSHOTS_TO_KEEP%
 goto :completed
 
 :getsnapshot
-python ".\.py\file_snapshot.py" -d "%_saves_home%" --recover
+python ".\.py\file_snapshot.py" -s "%_source%" --recover
 goto :completed
 
 :completed

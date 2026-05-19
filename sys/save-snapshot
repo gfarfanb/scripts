@@ -12,16 +12,26 @@ Create snapshots of save files.
 
 Usage: $(basename $0) [<option>]*
 Option:
+    -s: Source directory or file
+    -k: Number of the snapshots to keep
     -r: Recovers save from snapshots
     -h: Displays this help message
 EOF
     exit 0
 }
 
+_source=""
+_keep=$SNAPSHOTS_TO_KEEP
 _recover_flag=0
 
-while getopts "rh" opt; do
+while getopts "s:k:rh" opt; do
     case "$opt" in
+        s)
+            _source="$OPTARG"
+            ;;
+        k)
+            _keep=$OPTARG
+            ;;
         r)
             _recover_flag=1
             ;;
@@ -31,12 +41,10 @@ while getopts "rh" opt; do
     esac
 done
 
-_saves_home="$1"
-
 if ! [ $_recover_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -d "$_saves_home" -k $SNAPSHOTS_TO_KEEP
+    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -s "$_source" -k $_keep
 else
-    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -d "$_saves_home" --recover
+    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -s "$_source" --recover
 fi
 
 _completed

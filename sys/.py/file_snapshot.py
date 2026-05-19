@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from os import environ, listdir, makedirs, remove
-from os.path import isfile, join, basename, exists, splitext
+from os.path import isfile, join, basename, exists, splitext, dirname
 from sys import exit
 from shutil import copyfile
 
@@ -16,11 +16,16 @@ import env_vars # pyright: ignore[reportMissingImports]
 logger = logging.getLogger()
 
 
-def names_without_ext(files_path):
+def get_files_by_name(files_path):
     files = list(
-        { name_without_ext(f) for f in listdir(join(files_path)) if isfile(join(files_path, f)) }
+        { f for f in listdir(join(files_path)) if isfile(join(files_path, f)) }
     )
-    return sorted(files)
+    files_by_name = {}
+
+    for file in files:
+        files_by_name[name_without_ext[file]] = file
+
+    return files_by_name
 
 
 def name_without_ext(file_path):
@@ -29,12 +34,14 @@ def name_without_ext(file_path):
     return file_name[:index_of_dot]
 
 
-def select_file_name(names, select_message):
+def select_file(files_by_name, select_message):
     logger.info(select_message)
 
     i = 1
-    for name in names:
+    names = []
+    for name in files_by_name:
         logger.info("{i}) {name}".format(i=i, name=name))
+        names.append(name)
         i+=1
 
     logger.info("{i}) (default) <skip file>".format(i=i))
@@ -48,11 +55,11 @@ def select_file_name(names, select_message):
     if file_idx < 0 or file_idx >= i:
         return None
 
-    return names[file_idx - 1]
+    return files_by_name[names[file_idx - 1]]
 
 
-def get_snapshot_dir(files_home):
-    snapshots_home = join(files_home, 'snapshots')
+def get_snapshot_dir(source_home):
+    snapshots_home = join(source_home, 'snapshots')
 
     if not exists(snapshots_home):
         makedirs(snapshots_home)
@@ -60,28 +67,29 @@ def get_snapshot_dir(files_home):
     return snapshots_home
 
 
-def create_snapshot(files_home, file_name, snapshots_home):
+def create_snapshot(source_home, file_path, snapshots_home):
     tmp_tag = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    file_name = name_without_ext(file_path)
     snapshot_file_names = set()
 
-    for f in listdir(join(files_home)):
+    for f in listdir(join(source_home)):
         if basename(f).startswith(file_name):
             snapshot_file = join(snapshots_home, "{}.{}".format(f, tmp_tag))
             snapshot_file_names.add(basename(f))
 
             logger.info("Creating snapshot: \"{file}\"".format(file=snapshot_file))
-            copyfile(join(files_home, f), snapshot_file)
+            copyfile(join(source_home, f), snapshot_file)
 
     return snapshot_file_names
 
 
-def recover_snapshot(files_home, snapshots_home, snapshot_file_names):
+def recover_snapshot(source_home, snapshots_home, snapshot_file_names):
     for f in snapshot_file_names:
         snapshot = join(snapshots_home, f)
         file = splitext(basename(f))[0]
 
         logger.info("Recovering file: \"{snapshot}\" -> \"{file}\"".format(snapshot=snapshot, file=file))
-        copyfile(snapshot, join(files_home, file))
+        copyfile(snapshot, join(source_home, file))
 
 
 def cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep):
@@ -100,10 +108,12 @@ def cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep):
                 remove(join(snapshots_home, snapshot))
 
 
-def cleanup_current(file_name, files_home):
-    for f in listdir(join(files_home)):
+def cleanup_current(file_path, source_home):
+    file_name = name_without_ext(file_path)
+
+    for f in listdir(join(source_home)):
         if basename(f).startswith(file_name):
-            file = join(files_home, f)
+            file = join(source_home, f)
 
             logger.info("Removing file: \"{file}\"".format(file=file))
             remove(file)
@@ -147,46 +157,58 @@ def select_snapshot(file_name, snapshots_home):
         return None
 
 
-def execute_snapshot(files_home, number_to_keep):
-    names = names_without_ext(files_home)
+def select_and_execute_snapshot(files_home, number_to_keep):
+    files_by_name = get_files_by_name(files_home)
 
-    if len(names) < 1:
-        raise ValueError('Snapshot not created')
+    if len(files_by_name) < 1:
+        raise ValueError('Empty source directory')
 
-    file_name = select_file_name(names, 'Choose a file to create a snapshot:')
+    file_path = select_file(files_by_name, 'Choose a file to create a snapshot:')
 
-    if file_name is None:
-        raise ValueError('Snapshot not created')
+    execute_snapshot(file_path=file_path,
+                     number_to_keep=number_to_keep)
+
+
+def execute_snapshot(file_path, number_to_keep):
+    if not exists(file_path):
+        raise ValueError('Invalid source file')
 
     logger.info('')
 
-    snapshots_home = get_snapshot_dir(files_home)
-    snapshot_file_names = create_snapshot(files_home, file_name, snapshots_home)
+    source_home = dirname(file_path)
+    snapshots_home = get_snapshot_dir(source_home)
+    snapshot_file_names = create_snapshot(source_home, file_path, snapshots_home)
 
     cleanup_snapshots(snapshots_home, snapshot_file_names, number_to_keep)
 
 
-def execute_recover(files_home):
+def select_and_execute_recover(files_home):
     snapshots_home = get_snapshot_dir(files_home)
-    names = names_without_ext(snapshots_home)
+    files_by_name = get_files_by_name(snapshots_home)
 
-    if len(names) < 1:
+    if len(files_by_name) < 1:
         raise ValueError('Snapshot not recovered')
 
-    file_name = select_file_name(names, 'Choose a file to recover its snapshot:')
+    file_path = select_file(files_by_name, 'Choose a file to recover its snapshot:')
 
-    if file_name is None:
-        raise ValueError('Snapshot not recovered')
+    execute_recover(file_path)
 
-    snapshot_file_names = select_snapshot(file_name, snapshots_home)
+
+def execute_recover(file_path):
+    if not exists(file_path):
+        raise ValueError('Invalid source file')
+
+    source_home = dirname(file_path)
+    snapshots_home = get_snapshot_dir(source_home)
+    snapshot_file_names = select_snapshot(file_path, snapshots_home)
 
     if snapshot_file_names is None:
         raise ValueError('Snapshot not recovered')
 
     logger.info('')
 
-    cleanup_current(file_name, files_home)
-    recover_snapshot(files_home, snapshots_home, snapshot_file_names)
+    cleanup_current(file_path, source_home)
+    recover_snapshot(source_home, snapshots_home, snapshot_file_names)
 
 
 def main():
@@ -196,22 +218,26 @@ def main():
             level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-d', '--directory',
-                            help='Source files directory')
+        parser.add_argument('-s', '--source',
+                            help='Source directory or file')
         parser.add_argument('-r', '--recover', action='store_true',
                             help='Enables recover snapshot files')
         parser.add_argument('-k', '--keep', type=int, default=1,
                             help='Number of the snapshots to keep')
         args = parser.parse_args()
 
-        if not args.directory:
-            args.directory = input('source-files-directory> ')
-
-        if args.recover:
-            execute_recover(files_home=args.directory)
+        if isfile(args.source):
+            if args.recover:
+                execute_recover(file_path=args.source)
+            else:
+                execute_snapshot(file_path=args.source,
+                                 number_to_keep=args.keep)
         else:
-            execute_snapshot(files_home=args.directory,
-                             number_to_keep=args.keep)
+            if args.recover:
+                select_and_execute_recover(files_home=args.source)
+            else:
+                select_and_execute_snapshot(files_home=args.source,
+                                            number_to_keep=args.keep)
     except BaseException as err:
         logger.error(err.args[0])
 

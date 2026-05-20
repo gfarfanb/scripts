@@ -27,13 +27,3 @@ CREATE TABLE downloads (
     );
 
 CREATE INDEX idx_downloads_url ON downloads(url);
-
-
--- Initial data
-
--- Hosts Mappings
-INSERT INTO host_mappings(host, source, cookies_host) VALUES
-    ('youtu.be', 'YouTube', '.youtube.com'),
-    ('youtube.com', 'YouTube', '.youtube.com'),
-    ('www.youtube.com', 'YouTube', '.youtube.com'),
-    ('music.youtube.com', 'YouTube', '.youtube.com');

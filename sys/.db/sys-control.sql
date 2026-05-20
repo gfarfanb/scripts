@@ -1,0 +1,37 @@
+-- SQLite Database Schema
+
+CREATE TABLE operating_systems (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+
+
+CREATE TABLE machines (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    dir_base TEXT NOT NULL,
+    os_id INTEGER NOT NULL,
+    parent_id INTEGER,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (os_id) REFERENCES operating_systems(id),
+    FOREIGN KEY (parent_id) REFERENCES machines(id)
+);
+
+
+CREATE TABLE commands (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    machine_id INTEGER NOT NULL,
+    command TEXT NOT NULL,
+    ordinal INTEGER NOT NULL DEFAULT 0,
+    mode TEXT CHECK( mode IN ('EXECUTION', 'READONLY') ) NOT NULL DEFAULT 'READONLY',
+    approval INTEGER NOT NULL DEFAULT 0,
+    approval_msg TEXT,
+    reject_cmd TEXT,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (machine_id) REFERENCES machines(id)
+);
+
+CREATE INDEX idx_commands_command ON commands(command);
+CREATE INDEX idx_commands_approval_msg ON commands(approval_msg);
+CREATE INDEX idx_commands_reject_cmd ON commands(reject_cmd);

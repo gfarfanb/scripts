@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./env-vars
+. ../env-vars
 
 _require_var CLOUD_HOME
 _require_var CLOUD_REMOTE_SOURCES

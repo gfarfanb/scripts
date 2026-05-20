@@ -2,9 +2,9 @@
 set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call .\env-vars
-call .\.win\require-var WORKSPACE_HOME
-call .\.win\require-var UPDATE_PLAN_FILE
+call ..\env-vars
+call ..\.win\require-var WORKSPACE_HOME
+call ..\.win\require-var UPDATE_PLAN_FILE
 
 goto :main
 

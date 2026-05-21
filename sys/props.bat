@@ -25,7 +25,7 @@ goto :props
 
 
 :getvalue
-call .\.win\eval set "_prop_value=%%%~1%%"
+call ..\.win\eval set "_prop_value=%%%~1%%"
 echo | set /p=!_prop_value!
 goto :eof
 
@@ -73,7 +73,7 @@ if "%_prop_name%"=="" (
 )
 
 echo:
-call .\win\eval set "_prop_value=%%%_prop_name%%%"
+call ..\win\eval set "_prop_value=%%%_prop_name%%%"
 
 if "!_prop_value!"=="" (
     echo !_prop_name!=^<empty^>

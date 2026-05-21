@@ -27,7 +27,7 @@ systeminfo
 set /a _cmd_idx=1
 
 for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
-    call .\.win\eval set "_cmd=%%l"
+    call ..\.win\eval set "_cmd=%%l"
 
     echo !_cmd! | findstr /r /i "^p:.*" >nul
 
@@ -40,7 +40,7 @@ for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
         echo:
         echo Executing: [!_cmd!]
 
-        call .\.win\eval !_cmd!
+        call ..\.win\eval !_cmd!
     )
 )
 

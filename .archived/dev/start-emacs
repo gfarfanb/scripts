@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./env-vars
+. ./.libs/env-vars
 
 # Last assigned: 5
 _require_var EMACS_WAIT_SECS

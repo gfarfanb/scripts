@@ -2,7 +2,7 @@
 set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\env-vars
+call ..\.libs\env-vars
 call ..\.win\require-var EIGHTBITDO_FIRMWARE_UPDATER_HOME
 
 goto :main

@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../env-vars
+. ../.libs/env-vars
 
 __usage_page() {
     cat << EOF

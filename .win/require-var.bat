@@ -6,7 +6,7 @@ rem
 rem Arguments:
 rem   %1 - Environment variable name
 rem Dependencies:
-rem   call .\env-vars rem Relative call
+rem   call .\.libs\env-vars rem Relative call
 rem Usage in script:
 rem   call .\.win\require-var <var> # Relative call
 

@@ -2,7 +2,7 @@
 set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\env-vars
+call ..\.libs\env-vars
 call ..\.win\require-var SYNC_FOLDER_PRIVATE_DIR
 call ..\.win\require-var ORG_ROAM_PRIVATE_DIR
 

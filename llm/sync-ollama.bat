@@ -2,7 +2,7 @@
 set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\env-vars
+call ..\.libs\env-vars
 call ..\.win\require-var OLLAMA_SERVER
 call ..\.win\require-var LLM_MODELS_DB_FILE
 call ..\.win\require-var OPENCODE_CONFIG_FILE

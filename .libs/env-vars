@@ -9,7 +9,7 @@
 #   #! /usr/bin/env bash
 #   BASEDIR=$(dirname $0); cd $BASEDIR
 #
-#   . ./env-vars  # Relative source
+#   . ./.libs/env-vars  # Relative source
 #
 #   _require_var <ENVIRONMENT_VARIABLE>
 

@@ -9,7 +9,7 @@ rem   @echo OFF
 rem   set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 rem   cd %BASEDIR%
 rem
-rem   call .\env-vars rem Relative call
+rem   call .\.libs\env-vars rem Relative call
 rem
 rem   call .\.win\require-var <ENVIRONMENT_VARIABLE>
 

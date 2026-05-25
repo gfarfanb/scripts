@@ -2,7 +2,7 @@
 set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\env-vars
+call ..\.libs\env-vars
 call ..\.win\require-var PKHEX_HOME
 call ..\.win\require-var PKHEX_RELEASE_HOME
 

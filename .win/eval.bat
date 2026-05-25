@@ -4,7 +4,7 @@ rem __usage_lib_page:
 rem Executes arguments as a batch scripts
 rem
 rem Dependencies:
-rem   call .\env-vars rem Relative call
+rem   call .\.libs\env-vars rem Relative call
 rem Usage in script:
 rem   call .\.win\eval <arg1> <arg2> <argn> # Relative call
 

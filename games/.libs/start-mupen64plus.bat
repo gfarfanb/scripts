@@ -4,7 +4,7 @@ rem __usage_lib_page:
 rem Starts Mupen64Plus emulator
 rem
 rem Dependencies:
-rem   call .\env-vars rem Relative call
+rem   call .\.libs\env-vars rem Relative call
 rem Usage in script:
 rem   call ".\.libs\start-mupen64plus" %*  rem Relative call
 

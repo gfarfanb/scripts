@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../env-vars
+. ../.libs/env-vars
 
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 : "${SNAPSHOTS_TO_KEEP:=1}"

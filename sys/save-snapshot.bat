@@ -2,7 +2,7 @@
 set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\env-vars
+call ..\.libs\env-vars
 
 if not defined SNAPSHOTS_TO_KEEP set "SNAPSHOTS_TO_KEEP=1"
 

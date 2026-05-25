@@ -47,10 +47,6 @@ if not "%STORAGE_HOME%" == "" (
         mkdir "%STORAGE_HOME%\iso"
         echo Created directory '%STORAGE_HOME%\iso'
     )
-    if not exist "%STORAGE_HOME%\llm" (
-        mkdir "%STORAGE_HOME%\llm"
-        echo Created directory '%STORAGE_HOME%\models'
-    )
     if not exist "%STORAGE_HOME%\devices" (
         mkdir "%STORAGE_HOME%\devices"
         echo Created directory '%STORAGE_HOME%\devices'

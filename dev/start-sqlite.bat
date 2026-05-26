@@ -46,7 +46,6 @@ goto :completed
 :selectdb
 set /a _idx=1
 for /f "delims=" %%G in ('dir %SQLITE_DBS_HOME%\*.db /b') do (
-    echo !_idx!
     set _db_filename[!_idx!]=%%~G
     set /a _idx+=1
 )

@@ -18,11 +18,11 @@ echo     -h: Displays this help message
 goto :back
 
 :main
+setlocal enableDelayedExpansion
 if /i "%~1"=="-h" goto :__usage_page
 
-call ..\.win\source-file "%OPEN_SSH_HOSTS_FILE%"
 
-setlocal enableDelayedExpansion
+call ..\.win\source-file "%OPEN_SSH_HOSTS_FILE%"
 
 echo Select a knwon host:
 for /l %%i in (1,1,%KNOWN_HOST_LENGTH%) do (

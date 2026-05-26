@@ -20,11 +20,11 @@ echo     -h: Displays this help message
 goto :back
 
 :main
+setlocal enableDelayedExpansion
 if /i "%~1"=="-h" goto :__usage_page
 
 call ..\.win\source-file "%JDK_HOMES_FILE%"
 
-setlocal enableDelayedExpansion
 
 set "_JDK_INDEX="
 

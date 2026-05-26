@@ -16,9 +16,9 @@ echo     -h: Displays this help message
 goto :back
 
 :main
+setlocal enableDelayedExpansion
 if /i "%~1"=="-h" goto :__usage_page
 
-setlocal enableDelayedExpansion
 
 if not "%~1"=="" goto :getvalue
 goto :props
@@ -73,7 +73,7 @@ if "%_prop_name%"=="" (
 )
 
 echo:
-call ..\win\eval set "_prop_value=%%%_prop_name%%%"
+call ..\.win\eval set "_prop_value=%%%_prop_name%%%"
 
 if "!_prop_value!"=="" (
     echo !_prop_name!=^<empty^>

@@ -19,10 +19,10 @@ echo     -h: Displays this help message
 goto :back
 
 :main
+setlocal enableDelayedExpansion
 if /i "%~1"=="-i" goto :import
 if /i "%~1"=="-h" goto :__usage_page
 
-setlocal enableDelayedExpansion
 
 call .\setup-jdk %*
 

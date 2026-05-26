@@ -17,9 +17,9 @@ echo     -h: Displays this help message
 goto :back
 
 :main
+setlocal enableDelayedExpansion
 if /i "%~1"=="-h" goto :__usage_page
 
-setlocal enableDelayedExpansion
 
 set /a _repo_idx=1
 

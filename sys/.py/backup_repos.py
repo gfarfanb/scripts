@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from os import environ, makedirs, rmdir, rename, remove
 from os.path import islink, join, exists

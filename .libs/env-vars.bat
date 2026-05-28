@@ -15,7 +15,9 @@ rem   call .\.win\require-var <ENVIRONMENT_VARIABLE>
 
 set "TEMP_DIR=%TEMP%"
 set "SESSION_TEMP_DIR=%TEMP%"
+rem Temporary files for scripts
 set "SCRIPTS_TEMP_DIR=%SCRIPTS_HOME%\.tmp"
+rem User profile
 set "USER_HOME=%USERPROFILE%"
 
 if not exist "%SCRIPTS_TEMP_DIR%" (

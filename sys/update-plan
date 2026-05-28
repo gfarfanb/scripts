@@ -3,15 +3,14 @@ BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../.libs/env-vars
 
-_require_var WORKSPACE_HOME
 _require_var SYS_CONTROL_DB_FILE
 _require_var MACHINE_CONTROL_NAME
 _require_var OS_CONTROL_NAME
-_require_var SESSION_TEMP_DIR
+_require_var SCRIPTS_TEMP_DIR
 
 __usage_page() {
     cat << EOF
-Execute the update plan.
+Execute the update plan using bash.
 
 Usage: $(basename $0) [<option>]*
 Option:
@@ -46,91 +45,9 @@ if [ -n "$( type -t sudo )" ]; then
     fi
 fi
 
-_get_command_ids() {
-    local _mode=${1:-}
-    local _query=$( cat << EOF
-    SELECT c.id
-        FROM commands c
-            JOIN machines m ON c.machine_id = m.id
-            JOIN operating_systems o ON m.os_id = o.id
-        WHERE m.name = '$MACHINE_CONTROL_NAME'
-            AND o.name = '$OS_CONTROL_NAME'
-            AND c.mode = '$_mode'
-            AND c.deleted = 0
-        ORDER BY ordinal
-EOF
-    )
+_update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
 
-    echo $( sqlite3 "$SYS_CONTROL_DB_FILE" "$_query" )
-}
-
-_get_command_column() {
-    local _cmd_id=${1:-}
-    local _column=${2:-}
-    local _query=$( cat << EOF
-    SELECT c.$_column
-        FROM commands c
-        WHERE c.id = $_cmd_id
-EOF
-    )
-
-    echo "$( sqlite3 "$SYS_CONTROL_DB_FILE" "$_query" )"
-}
-
-_ids_result=( $( _get_command_ids EXECUTION ) )
-
-if [ ${#_ids_result[@]} -eq 0 ]; then
-    echo "Plan not found" >&2
-    _completed
-fi
-
-_update_plan_tmp=$( mktemp "$SESSION_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
-
-echo "#! /usr/bin/env bash" >> "$_update_plan_tmp"
-
-for _cmd_id in "${_ids_result[@]}"; do
-    if [ "$( _get_command_column $_cmd_id approval )" = "1" ]; then
-        _cmd="$( _get_command_column $_cmd_id command )"
-        _cmd_entry=$( cat << EOF
-            echo >&2
-            _update_flag=""
-            read -p "$( _get_command_column $_cmd_id approval_msg ) [y/n] > " _update_flag
-            case \$_update_flag in
-                [Yy])
-                    echo "Executing: [$_cmd]" >&2
-                    $_cmd
-                    ;;
-                *)
-                    $( _get_command_column $_cmd_id reject_cmd )
-                    ;;
-            esac
-EOF
-        )
-        echo "$_cmd_entry" >> "$_update_plan_tmp"
-    else
-        _cmd="$( _get_command_column $_cmd_id command )"
-        _cmd_entry=$( cat << EOF
-            echo >&2
-            echo "Executing: [$_cmd]" >&2
-            $_cmd
-EOF
-        )
-        echo "$_cmd_entry" >> "$_update_plan_tmp"
-    fi
-done
-
-_ids_result=( $( _get_command_ids READONLY ) )
-
-if [ ${#_ids_result[@]} -gt 0 ]; then
-    echo "echo >&2" >> "$_update_plan_tmp"
-    echo "echo \"Execute these commands if needed:\" >&2" >> "$_update_plan_tmp"
-
-    for _cmd_id in "${_ids_result[@]}"; do
-        _cmd="$( _get_command_column $_cmd_id command )"
-        echo "echo >&2" >> "$_update_plan_tmp"
-        echo "echo \"> $_cmd\" >&2" >> "$_update_plan_tmp"
-    done
-fi
+$(command -v python3 || command -v python) "./.py/update_plan.py" -s bash -m "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" -f "$_update_plan_tmp"
 
 . "$_update_plan_tmp"
 

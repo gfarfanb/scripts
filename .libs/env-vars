@@ -18,8 +18,12 @@ PWD=$(pwd)
 TEMP_DIR=$(systemd-path temporary-large)
 # Files are flushed out on each reboot
 SESSION_TEMP_DIR=$(systemd-path temporary)
+# Temporary files for scripts
+SCRIPTS_TEMP_DIR=$SCRIPTS_HOME/.tmp
 # User profile
 USER_HOME=$HOME
+
+if [ ! -d "$SCRIPTS_TEMP_DIR" ]; then mkdir -vp "$SCRIPTS_TEMP_DIR"; fi
 
 if [ ! "$(grep -in "ENV_VARS_FILE=*" ~/.bashrc)" ]; then
     echo "Specify environment variables file by defining the environment variable 'export ENV_VARS_FILE=...' in ~/.bashrc"

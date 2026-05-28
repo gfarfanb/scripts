@@ -3,7 +3,6 @@ set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
 call ..\.libs\env-vars
-call ..\.win\require-var WORKSPACE_HOME
 call ..\.win\require-var SYS_CONTROL_DB_FILE
 call ..\.win\require-var MACHINE_CONTROL_NAME
 call ..\.win\require-var OS_CONTROL_NAME
@@ -12,7 +11,7 @@ call ..\.win\require-var SCRIPTS_TEMP_DIR
 goto :main
 
 :__usage_page
-echo Update packages and execute a plan.
+echo Execute the update plan using batch.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*

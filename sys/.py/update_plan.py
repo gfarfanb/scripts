@@ -113,7 +113,6 @@ def generate_batch(machine_name, os_name, tmp_file):
                                   os_name=os_name)
 
         for command in commands:
-            print(command.command)
             if command.approval:
                 command_entry = """
                     echo:
@@ -123,9 +122,9 @@ def generate_batch(machine_name, os_name, tmp_file):
                     if "%_update_flag%"=="y" set _approval=1
                     if "%_approval%"=="1" (
                         echo Executing: [{cmd}]
-                        call %SCRIPTS_HOME%\.win\eval {cmd}
+                        call %SCRIPTS_HOME%\\.win\\eval {cmd}
                     ) else (
-                        call %SCRIPTS_HOME%\.win\eval {reject}
+                        call %SCRIPTS_HOME%\\.win\\eval {reject}
                     )
                 """.format(confirm=command.approval_msg,
                            cmd=command.command,
@@ -134,7 +133,7 @@ def generate_batch(machine_name, os_name, tmp_file):
                 command_entry = """
                     echo:
                     echo Executing: [{cmd}]
-                    call %SCRIPTS_HOME%\.win\eval {cmd}
+                    call %SCRIPTS_HOME%\\.win\\eval {cmd}
                 """.format(cmd=command.command)
 
             file.write(command_entry)

@@ -60,16 +60,14 @@ set /P _prop_index="env-index> "
 
 if "%_prop_index%"=="" (
     echo Invalid environment variable index
-    echo [Process stopped]: %0
-    goto :back
+    goto :stopped
 )
 
 set "_prop_name=!_vars[%_prop_index%]!"
 
 if "%_prop_name%"=="" (
     echo Invalid environment variable index
-    echo [Process stopped]: %0
-    goto :back
+    goto :stopped
 )
 
 echo:
@@ -99,5 +97,12 @@ echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

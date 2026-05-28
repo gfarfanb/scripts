@@ -26,11 +26,19 @@ cd "%CERTIFICA_HOME%"
 "%JAVA_HOME%\bin\java.exe" -jar Certifica.jar
 goto :completed
 
+
 :completed
 echo:
 echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

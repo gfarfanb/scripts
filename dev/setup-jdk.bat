@@ -80,8 +80,7 @@ set "_JDK_NAME=!JDK_NAMES[%_JDK_INDEX%]!"
 
 if "%_JDK_NAME%"=="" (
     echo Invalid JDK index
-    echo [Process stopped]: %0
-    goto :back
+    goto :stopped
 )
 
 set "JAVA_HOME=!JDK_HOMES[%_JDK_INDEX%]!"
@@ -94,11 +93,19 @@ echo     JAVA_HOME=%JAVA_HOME%
 echo     JAVA_JRE_HOME=%JAVA_JRE_HOME%
 goto :completed
 
+
 :completed
 echo:
 echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

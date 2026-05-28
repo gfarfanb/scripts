@@ -38,7 +38,7 @@ if /i "%_opt_index%"=="2" goto :run
 if /i "%_opt_index%"=="3" goto :stop
 if /i "%_opt_index%"=="4" goto :import
 echo Invalid option index
-goto :invalid
+goto :stopped
 
 :initialization
 cd %POSTGRESQL_HOME%
@@ -66,16 +66,11 @@ echo Importing database:
 set /P _db_file="db-file-path> "
 if "%_db_file%"=="" (
     echo Invalid DB file
-    goto :invalid
+    goto :stopped
 )
 
 bin\psql -U postgres -f "%_db_file%"
 goto :completed
-
-
-:invalid
-echo [Process invalid]: %0
-goto :back
 
 
 :completed
@@ -84,5 +79,12 @@ echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

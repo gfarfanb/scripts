@@ -34,4 +34,4 @@ set __env_vars_bat="%TEMP%\env-vars-%__env_vars_tag%.bat"
 
 more "%ENV_VARS_FILE%" > "%__env_vars_bat%"
 
-endlocal & call "%__env_vars_bat%" & del "%__env_vars_bat%"
+endlocal & call "%__env_vars_bat%" & if exist "%__env_vars_bat%" del "%__env_vars_bat%"

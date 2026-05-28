@@ -4,7 +4,10 @@ cd %BASEDIR%
 
 call ..\.libs\env-vars
 call ..\.win\require-var WORKSPACE_HOME
-call ..\.win\require-var UPDATE_PLAN_FILE
+call ..\.win\require-var SYS_CONTROL_DB_FILE
+call ..\.win\require-var MACHINE_CONTROL_NAME
+call ..\.win\require-var OS_CONTROL_NAME
+call ..\.win\require-var SESSION_TEMP_DIR
 
 goto :main
 
@@ -24,36 +27,16 @@ if /i "%~1"=="-h" goto :__usage_page
 
 systeminfo
 
-set /a _cmd_idx=1
+set __update_plan_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
+set __update_plan_bat="%SESSION_TEMP_DIR%\update_plan-%__update_plan_tag%.bat"
 
-for /f "tokens=*" %%l in (%UPDATE_PLAN_FILE%) do (
-    call ..\.win\eval set "_cmd=%%l"
+python ".\.py\update_plan.py" -s batch -f "%__update_plan_bat%"
 
-    echo !_cmd! | findstr /r /i "^p:.*" >nul
+call "%__update_plan_bat%"
 
-    if !errorlevel! equ 0 (
-        set "_cmd=!_cmd:~2!"
+if exist "%__update_plan_bat%" del "%__update_plan_bat%"
 
-        set "_print_cmds[!_cmd_idx!]=!_cmd!"
-        set /a _cmd_idx+=1
-    ) else (
-        echo:
-        echo Executing: [!_cmd!]
-
-        call ..\.win\eval !_cmd!
-    )
-)
-
-set /a _cmd_count=%_cmd_idx%-1
-
-if %_cmd_count% gtr 0 (
-    echo:
-    echo Execute these update commands if needed:
-
-    for /L %%i in (1,1,%_cmd_count%) do (
-        echo ^> !_print_cmds[%%i]!
-    )
-)
+goto :completed
 
 endlocal
 
@@ -64,5 +47,12 @@ echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

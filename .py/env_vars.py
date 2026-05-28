@@ -8,8 +8,8 @@ import sys
 
 def prop_value(name):
     if sys.platform == 'win32':
-        command = "{dir}/sys/props".format(dir=environ['SCRIPTS_HOME'])
-        value = subprocess.run([command, name], capture_output=True, text=True)
+        command = "{dir}\\sys\\props".format(dir=environ['SCRIPTS_HOME'])
+        value = subprocess.run([command, name], capture_output=True, text=True, shell=True)
     else:
         command = "{dir}/sys/props".format(dir=environ['SCRIPTS_HOME'])
         value = subprocess.run(['bash', command, name], capture_output=True, text=True)

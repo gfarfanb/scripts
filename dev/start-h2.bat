@@ -33,11 +33,19 @@ for /F "delims=" %%G in ('dir /b /s "h2*.jar"') do (
 
 goto :completed
 
+
 :completed
 echo:
 echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

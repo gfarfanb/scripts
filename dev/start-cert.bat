@@ -126,8 +126,7 @@ endlocal
 
 :certnotfound
 echo PEM files not found
-echo [Process invalid]: %0
-goto :back
+goto :stopped
 
 
 :completed
@@ -136,5 +135,12 @@ echo [Completed]: %0
 goto :back
 
 
+:stopped
+echo:
+echo [Process stopped]: %0
+goto :back
+
+
 :back
 cd /d %PWD%
+goto :eof

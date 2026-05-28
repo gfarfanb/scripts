@@ -80,9 +80,11 @@ goto :back
 
 
 :stopped
+echo:
 echo [Process stopped]: %0
 goto :back
 
 
 :back
 cd /d %PWD%
+goto :eof

@@ -11,7 +11,7 @@ rem   call .\.win\eval <arg1> <arg2> <argn> # Relative call
 setlocal
 
 set __eval_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
-set __eval_bat="%TEMP%\eval-%__eval_tag%.bat"
+set __eval_bat="%SCRIPTS_TEMP_DIR%\eval-%__eval_tag%.bat"
 
 echo %* > "%__eval_bat%"
 

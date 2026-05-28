@@ -11,8 +11,6 @@ sys.path.append(environ['PYLIBSPATH'])
 import env_vars # pyright: ignore[reportMissingImports]
 
 sys_control_db = env_vars.env_value('SYS_CONTROL_DB_FILE')
-machine_name = env_vars.env_value('MACHINE_CONTROL_NAME')
-os_name = env_vars.env_value('OS_CONTROL_NAME')
 
 logger = logging.getLogger()
 
@@ -29,10 +27,7 @@ commands_query = """
             AND c.mode = '{mode}'
             AND c.deleted = 0
         ORDER BY ordinal
-""".format(machine=machine_name,
-           os=os_name,
-           mode='{mode}')
-
+"""
 
 class Command:
     def __init__(self, command, approval, approval_msg, reject_cmd):
@@ -42,8 +37,10 @@ class Command:
         self.reject_cmd = reject_cmd
 
 
-def __get_commands(mode):
-    query = commands_query.format(mode=mode) 
+def __get_commands(mode, machine_name, os_name):
+    query = commands_query.format(machine=machine_name,
+                                  os=os_name,
+                                  mode=mode) 
     conn = sqlite3.connect(sys_control_db)
     cursor = conn.cursor()
     cursor.execute(query)
@@ -54,18 +51,18 @@ def __get_commands(mode):
     for row in rows:
         command, approval, approval_msg, reject_cmd = row
 
-        print(approval_msg)
-
         commands.append(Command(command, bool(approval), approval_msg, reject_cmd))
 
     return commands
 
 
-def generate_bash(tmp_file):
+def generate_bash(machine_name, os_name, tmp_file):
     with open(tmp_file, "a") as file:
         file.write('#! /usr/bin/env bash\n')
 
-        commands = __get_commands('EXECUTION')
+        commands = __get_commands(mode='EXECUTION',
+                                  machine_name=machine_name,
+                                  os_name=os_name)
 
         for command in commands:
             if command.approval:
@@ -94,7 +91,9 @@ def generate_bash(tmp_file):
 
             file.write(command_entry)
 
-        commands = __get_commands('READONLY')
+        commands = __get_commands(mode='READONLY',
+                                  machine_name=machine_name,
+                                  os_name=os_name)
 
         if commands:
             file.write('echo >&2\n')
@@ -105,14 +104,16 @@ def generate_bash(tmp_file):
                 file.write("echo \"> {cmd}\" >&2\n".format(cmd=command.command))
 
 
-def generate_batch(tmp_file):
+def generate_batch(machine_name, os_name, tmp_file):
     with open(tmp_file, "a") as file:
         file.write('@echo OFF\n')
 
-        commands = __get_commands('EXECUTION')
+        commands = __get_commands(mode='EXECUTION',
+                                  machine_name=machine_name,
+                                  os_name=os_name)
 
         for command in commands:
-            print(command.reject_cmd)
+            print(command.command)
             if command.approval:
                 command_entry = """
                     echo:
@@ -122,9 +123,9 @@ def generate_batch(tmp_file):
                     if "%_update_flag%"=="y" set _approval=1
                     if "%_approval%"=="1" (
                         echo Executing: [{cmd}]
-                        {cmd}
+                        call %SCRIPTS_HOME%\.win\eval {cmd}
                     ) else (
-                        {reject}
+                        call %SCRIPTS_HOME%\.win\eval {reject}
                     )
                 """.format(confirm=command.approval_msg,
                            cmd=command.command,
@@ -133,12 +134,14 @@ def generate_batch(tmp_file):
                 command_entry = """
                     echo:
                     echo Executing: [{cmd}]
-                    {cmd}
+                    call %SCRIPTS_HOME%\.win\eval {cmd}
                 """.format(cmd=command.command)
 
             file.write(command_entry)
 
-        commands = __get_commands('READONLY')
+        commands = __get_commands(mode='READONLY',
+                                  machine_name=machine_name,
+                                  os_name=os_name)
 
         if commands:
             file.write('echo:\n')
@@ -159,15 +162,23 @@ def main():
         parser.add_argument('-s', '--script',
                             choices=[ 'bash', 'batch' ],
                             help='Script type for the output file')
+        parser.add_argument('-m', '--machine',
+                            help='Machine name to get commands related')
+        parser.add_argument('-o', '--os',
+                            help='OS name to get commands related')
         parser.add_argument('-f', '--file',
                            help='Path for the outputfile')
         args = parser.parse_args()
 
         match args.script:
             case 'bash':
-                generate_bash(args.file)
+                generate_bash(machine_name=args.machine,
+                              os_name=args.os,
+                              tmp_file=args.file)
             case 'batch':
-                generate_batch(args.file)
+                generate_batch(machine_name=args.machine,
+                               os_name=args.os,
+                               tmp_file=args.file)
             case _:
                 raise ValueError("Invalid script type: {type}".format(type=args.script))
     except BaseException as err:

@@ -15,7 +15,12 @@ rem   call .\.win\require-var <ENVIRONMENT_VARIABLE>
 
 set "TEMP_DIR=%TEMP%"
 set "SESSION_TEMP_DIR=%TEMP%"
+set "SCRIPTS_TEMP_DIR=%SCRIPTS_HOME%\.tmp"
 set "USER_HOME=%USERPROFILE%"
+
+if not exist "%SCRIPTS_TEMP_DIR%" (
+    mkdir "%SCRIPTS_TEMP_DIR%"
+)
 
 if "%ENV_VARS_FILE%"=="" (
     echo Specify environment variables file by defining the environment variable 'ENV_VARS_FILE=...'
@@ -30,7 +35,7 @@ if not exist "%ENV_VARS_FILE%" (
 setlocal
 
 set __env_vars_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
-set __env_vars_bat="%TEMP%\env-vars-%__env_vars_tag%.bat"
+set __env_vars_bat="%SCRIPTS_TEMP_DIR%\env-vars-%__env_vars_tag%.bat"
 
 more "%ENV_VARS_FILE%" > "%__env_vars_bat%"
 

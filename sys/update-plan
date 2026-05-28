@@ -14,13 +14,22 @@ Execute the update plan using bash.
 
 Usage: $(basename $0) [<option>]*
 Option:
+    -s: Start plan from specific command
+    -o: Select and execute a command
     -h: Displays this help message
 EOF
     exit 0
 }
 
-while getopts "h" opt; do
+_mode="all"
+while getopts "soh" opt; do
     case "$opt" in
+        s)
+            _mode='start-from'
+            ;;
+        o)
+            _mode='only-one'
+            ;;
         h)
             __usage_page
             ;;
@@ -47,7 +56,8 @@ fi
 
 _update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
 
-$(command -v python3 || command -v python) "./.py/update_plan.py" -s bash -m "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" -f "$_update_plan_tmp"
+$(command -v python3 || command -v python) "./.py/update_plan.py" -t bash \
+    -n "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" -f "$_update_plan_tmp" -m "$_mode"
 
 . "$_update_plan_tmp"
 

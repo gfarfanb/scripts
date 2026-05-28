@@ -203,7 +203,7 @@ def main():
     try:
         logging.basicConfig(
             format='%(message)s',
-            level=env_vars.logging_level('DEBUG'))
+            level=env_vars.logging_level())
 
         environ['GIT_PYTHON_TRACE'] = 'True'
 

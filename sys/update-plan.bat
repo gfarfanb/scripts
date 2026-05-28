@@ -16,11 +16,16 @@ echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
+echo     -s: Start plan from specific command
+echo     -o: Select and execute a command
 echo     -h: Displays this help message
 goto :back
 
 :main
 setlocal enableDelayedExpansion
+set "_mode=all"
+if /i "%~1"=="-s" set "_mode=start-from"
+if /i "%~1"=="-o" set "_mode=only-one"
 if /i "%~1"=="-h" goto :__usage_page
 
 
@@ -29,7 +34,7 @@ systeminfo
 set __update_plan_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
 set __update_plan_bat="%SCRIPTS_TEMP_DIR%\update_plan-%__update_plan_tag%.bat"
 
-python ".\.py\update_plan.py" -s batch -m "%MACHINE_CONTROL_NAME%" -o "%OS_CONTROL_NAME%" -f "%__update_plan_bat%"
+python ".\.py\update_plan.py" -t batch -n "%MACHINE_CONTROL_NAME%" -o "%OS_CONTROL_NAME%" -f "%__update_plan_bat%" -m "%_mode%"
 
 endlocal & call "%__update_plan_bat%" & if exist "%__update_plan_bat%" del "%__update_plan_bat%"
 

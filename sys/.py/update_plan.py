@@ -122,7 +122,7 @@ def generate_bash(commands, tmp_file):
                 else:
                     declined = """
                         echo >&2
-                        echo "Executing [<decline_command>]" >&2
+                        echo "Executing: [<decline_command>]" >&2
                         {cmd}
                     """.format(cmd=command.reject_cmd)
 
@@ -183,7 +183,7 @@ def generate_batch(commands, tmp_file):
                 else:
                     declined = """
                         echo:
-                        echo Executing [^<decline_command^>]
+                        echo Executing: [^<decline_command^>]
                         call %SCRIPTS_HOME%\\.win\\eval {cmd}
                     """.format(cmd=command.reject_cmd)
 

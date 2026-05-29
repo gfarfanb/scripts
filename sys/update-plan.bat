@@ -27,6 +27,7 @@ setlocal enableDelayedExpansion
 set "_accept="
 set "_mode=all"
 if /i "%~1"=="-a" set "_accept=--accept"
+if /i "%~2"=="-a" set "_accept=--accept"
 if /i "%~1"=="-s" set "_mode=start-from"
 if /i "%~1"=="-o" set "_mode=only-one"
 if /i "%~1"=="-h" goto :__usage_page

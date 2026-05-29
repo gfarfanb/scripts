@@ -56,6 +56,8 @@ fi
 
 _update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
 
+echo >&2
+
 $(command -v python3 || command -v python) "./.py/update_plan.py" -t bash \
     -n "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" -f "$_update_plan_tmp" -m "$_mode"
 

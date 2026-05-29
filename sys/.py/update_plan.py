@@ -60,9 +60,13 @@ def __get_commands(machine_name, os_name, select_mode):
         mode, cmd_line, approval, approval_msg, reject_cmd = row
         command = Command(mode, cmd_line, bool(approval), approval_msg, reject_cmd)
 
-        commands.append(command)
+        if not command.cmd_line or not command.cmd_line.strip():
+            logger.warning("Empty command line in: {cmd}".format(cmd=command))
+            continue
 
-        logger.debug("Command obtained: {cmd}".format(cmd=command))
+        logger.debug("Command added to plan: {cmd}".format(cmd=command))
+
+        commands.append(command)
 
     match select_mode:
         case 'start-from':
@@ -111,23 +115,37 @@ def generate_bash(machine_name, os_name, tmp_file, select_mode):
 
         for command in execution_cmds:
             if command.approval:
+                if not command.approval_msg or not command.approval_msg.strip():
+                    confirm = "Confirm? [{cmd}]".format(cmd=command.cmd_line)
+                else:
+                    confirm = command.approval_msg
+                
+                if not command.reject_cmd or not command.reject_cmd.strip():
+                    declined = 'echo Declined'
+                else:
+                    declined = """
+                        echo >&2
+                        echo "Executing decline command" >&2
+                        {cmd}
+                    """.format(cmd=command.reject_cmd)
+
                 command_entry = """
                     echo >&2
                     _update_flag=""
                     read -p "{confirm} [y/n] > " _update_flag
                     case $_update_flag in
                         [Yy])
+                            echo >&2
                             echo "Executing: [{cmd}]" >&2
                             {cmd}
                             ;;
                         *)
-                            echo "Executing decline command" >&2
-                            {reject}
+                            {declined}
                             ;;
                     esac
-                """.format(confirm=command.approval_msg,
+                """.format(confirm=confirm,
                            cmd=command.cmd_line,
-                           reject=command.reject_cmd)
+                           declined=declined)
             else:
                 command_entry = """
                     echo >&2
@@ -161,22 +179,37 @@ def generate_batch(machine_name, os_name, tmp_file, select_mode):
 
         for command in execution_cmds:
             if command.approval:
+                if not command.approval_msg or not command.approval_msg.strip():
+                    confirm = "Confirm? [{cmd}]".format(cmd=command.cmd_line)
+                else:
+                    confirm = command.approval_msg
+
+                if not command.reject_cmd or not command.reject_cmd.strip():
+                    declined = 'echo Declined'
+                else:
+                    declined = """
+                        echo:
+                        echo Executing decline command
+                        call %SCRIPTS_HOME%\\.win\\eval {cmd}
+                    """.format(cmd=command.reject_cmd)
+
                 command_entry = """
                     echo:
                     set "_update_flag="
+                    set "_approval="
                     set /P _update_flag="{confirm} [y/n] > "
                     if "%_update_flag%"=="Y" set _approval=1
                     if "%_update_flag%"=="y" set _approval=1
                     if "%_approval%"=="1" (
+                        echo:
                         echo Executing: [{cmd}]
                         call %SCRIPTS_HOME%\\.win\\eval {cmd}
                     ) else (
-                        echo Executing decline command
-                        call %SCRIPTS_HOME%\\.win\\eval {reject}
+                        {declined}
                     )
-                """.format(confirm=command.approval_msg,
+                """.format(confirm=confirm,
                            cmd=command.cmd_line,
-                           reject=command.reject_cmd)
+                           declined=declined)
             else:
                 command_entry = """
                     echo:
@@ -194,7 +227,7 @@ def generate_batch(machine_name, os_name, tmp_file, select_mode):
 
             for command in readonly_cmds:
                 file.write('echo:\n')
-                file.write("echo > {cmd}\n".format(cmd=command.cmd_line))
+                file.write("echo ^> {cmd}\n".format(cmd=command.cmd_line))
 
 
 def main():

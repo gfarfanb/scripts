@@ -102,15 +102,12 @@ def __select_command_index(commands, select_message):
     return cmd_idx - 1
 
 
-def generate_bash(machine_name, os_name, tmp_file, select_mode):
+def generate_bash(commands, tmp_file):
     logger.debug("Generating 'bash' file: {file}".format(file=tmp_file))
 
     with open(tmp_file, "a") as file:
         file.write('#! /usr/bin/env bash\n')
 
-        commands = __get_commands(machine_name=machine_name,
-                                  os_name=os_name,
-                                  select_mode=select_mode)
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
 
         for command in execution_cmds:
@@ -125,7 +122,7 @@ def generate_bash(machine_name, os_name, tmp_file, select_mode):
                 else:
                     declined = """
                         echo >&2
-                        echo "Executing decline command" >&2
+                        echo "Executing [<decline_command>]" >&2
                         {cmd}
                     """.format(cmd=command.reject_cmd)
 
@@ -155,7 +152,7 @@ def generate_bash(machine_name, os_name, tmp_file, select_mode):
 
             file.write(command_entry)
 
-        readonly_cmds = filter(lambda cmd: cmd.mode == 'READONLY', commands)
+        readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
         if readonly_cmds:
             file.write('echo >&2\n')
@@ -166,15 +163,12 @@ def generate_bash(machine_name, os_name, tmp_file, select_mode):
                 file.write("echo \"> {cmd}\" >&2\n".format(cmd=command.cmd_line))
 
 
-def generate_batch(machine_name, os_name, tmp_file, select_mode):
+def generate_batch(commands, tmp_file):
     logger.debug("Generating 'batch' file: {file}".format(file=tmp_file))
 
     with open(tmp_file, "a") as file:
         file.write('@echo OFF\n')
 
-        commands = __get_commands(machine_name=machine_name,
-                                  os_name=os_name,
-                                  select_mode=select_mode)
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
 
         for command in execution_cmds:
@@ -189,7 +183,7 @@ def generate_batch(machine_name, os_name, tmp_file, select_mode):
                 else:
                     declined = """
                         echo:
-                        echo Executing decline command
+                        echo Executing [^<decline_command^>]
                         call %SCRIPTS_HOME%\\.win\\eval {cmd}
                     """.format(cmd=command.reject_cmd)
 
@@ -219,7 +213,7 @@ def generate_batch(machine_name, os_name, tmp_file, select_mode):
 
             file.write(command_entry)
 
-        readonly_cmds = filter(lambda cmd: cmd.mode == 'READONLY', commands)
+        readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
         if readonly_cmds:
             file.write('echo:\n')
@@ -251,17 +245,17 @@ def main():
                             help='Execute plan in a specific mode')
         args = parser.parse_args()
 
+        commands = __get_commands(machine_name=args.name,
+                                  os_name=args.os,
+                                  select_mode=args.mode)
+
         match args.type:
             case 'bash':
-                generate_bash(machine_name=args.name,
-                              os_name=args.os,
-                              tmp_file=args.file,
-                              select_mode=args.mode)
+                generate_bash(commands=commands,
+                              tmp_file=args.file)
             case 'batch':
-                generate_batch(machine_name=args.name,
-                               os_name=args.os,
-                               tmp_file=args.file,
-                               select_mode=args.mode)
+                generate_batch(commands=commands,
+                               tmp_file=args.file)
             case _:
                 raise ValueError("Invalid script type: {type}".format(type=args.type))
     except BaseException as err:

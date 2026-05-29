@@ -1,5 +1,5 @@
 @echo OFF
-set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
 call ..\.libs\env-vars
@@ -33,6 +33,7 @@ goto :completed
 :getsnapshot
 python ".\.py\file_snapshot.py" -s "%_source%" --recover
 goto :completed
+
 
 :completed
 echo:

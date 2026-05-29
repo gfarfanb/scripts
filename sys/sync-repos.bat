@@ -1,5 +1,5 @@
 @echo OFF
-set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
 call ..\.libs\env-vars
@@ -37,5 +37,5 @@ goto :back
 
 
 :back
-cd /d %PWD%
+cd /d %SOURCEDIR%
 goto :eof

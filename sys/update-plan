@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-BASEDIR=$(dirname $0); cd $BASEDIR
+SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
 . ../.libs/env-vars
 
@@ -14,6 +14,7 @@ Execute the update plan using bash.
 
 Usage: $(basename $0) [<option>]*
 Option:
+    -a: Accept all commands
     -s: Start plan from specific command
     -o: Select and execute a command
     -h: Displays this help message
@@ -21,9 +22,13 @@ EOF
     exit 0
 }
 
+_accept=""
 _mode="all"
-while getopts "soh" opt; do
+while getopts "asoh" opt; do
     case "$opt" in
+        a)
+            _accept="--accept"
+            ;;
         s)
             _mode='start-from'
             ;;
@@ -59,7 +64,8 @@ _update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
 echo >&2
 
 $(command -v python3 || command -v python) "./.py/update_plan.py" -t bash \
-    -n "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" -f "$_update_plan_tmp" -m "$_mode"
+    -n "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" \
+    -f "$_update_plan_tmp" -m "$_mode" $_accept
 
 . "$_update_plan_tmp"
 

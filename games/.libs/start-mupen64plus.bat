@@ -349,4 +349,5 @@ goto :eof
 endlocal
 
 :back
-cd /d %PWD%
+cd /d %SOURCEDIR%
+goto :eof

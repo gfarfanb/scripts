@@ -7,13 +7,12 @@
 #
 # Usage in script:
 #   #! /usr/bin/env bash
-#   BASEDIR=$(dirname $0); cd $BASEDIR
+#   SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 #
 #   . ./.libs/env-vars  # Relative source
 #
 #   _require_var <ENVIRONMENT_VARIABLE>
 
-PWD=$(pwd)
 # Files are backed by physical storage
 TEMP_DIR=$(systemd-path temporary-large)
 # Files are flushed out on each reboot
@@ -52,8 +51,8 @@ _require_var() {
 }
 
 _back() {
-    if [ -n "$PWD" ]; then
-        cd $PWD
+    if [ -n "$SOURCEDIR" ]; then
+        cd "$SOURCEDIR"
     fi
 }
 

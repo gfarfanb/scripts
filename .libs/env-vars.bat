@@ -6,7 +6,7 @@ rem imports environment variables from from $ENV_VARS_FILE file
 rem
 rem Usage in script:
 rem   @echo OFF
-rem   set "PWD=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
+rem   set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 rem   cd %BASEDIR%
 rem
 rem   call .\.libs\env-vars rem Relative call

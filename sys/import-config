@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
-BASEDIR=$(dirname $0); cd $BASEDIR
-
-PWD=$(pwd)
+SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
 __usage_page() {
     cat << EOF
@@ -113,5 +111,5 @@ fi
 echo >&2
 echo "[Completed]: $0" >&2
 
-cd $PWD
+cd $SOURCEDIR
 exit 0

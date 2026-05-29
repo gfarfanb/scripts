@@ -30,9 +30,10 @@ commands_query = """
 """
 
 class Command:
-    def __init__(self, mode, cmd_line, approval, approval_msg, reject_cmd):
+    def __init__(self, mode, cmd_line, require_approval, approval, approval_msg, reject_cmd):
         self.mode = mode
         self.cmd_line = cmd_line
+        self.require_approval = require_approval
         self.approval = approval
         self.approval_msg = approval_msg
         self.reject_cmd = reject_cmd
@@ -41,12 +42,13 @@ class Command:
         return (f"{self.__class__.__name__}("
             f"mode={self.mode!r}, "
             f"cmd_line={self.cmd_line!r}, "
+            f"require_approval={self.require_approval!r}, "
             f"approval={self.approval!r}, "
             f"approval_msg={self.approval_msg!r}, "
             f"reject_cmd={self.reject_cmd!r})")
 
 
-def __get_commands(machine_name, os_name, select_mode):
+def __get_commands(machine_name, os_name, select_mode, accept_cmds):
     query = commands_query.format(machine=machine_name,
                                   os=os_name) 
     conn = sqlite3.connect(sys_control_db)
@@ -58,7 +60,8 @@ def __get_commands(machine_name, os_name, select_mode):
     commands = []
     for row in rows:
         mode, cmd_line, approval, approval_msg, reject_cmd = row
-        command = Command(mode, cmd_line, bool(approval), approval_msg, reject_cmd)
+        require_approval = False if accept_cmds else bool(approval)
+        command = Command(mode, cmd_line, require_approval, approval, approval_msg, reject_cmd)
 
         if not command.cmd_line or not command.cmd_line.strip():
             logger.warning("Empty command line in: {cmd}".format(cmd=command))
@@ -111,7 +114,7 @@ def generate_bash(commands, tmp_file):
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
 
         for command in execution_cmds:
-            if command.approval:
+            if command.require_approval:
                 if not command.approval_msg or not command.approval_msg.strip():
                     confirm = "Confirm? [{cmd}]".format(cmd=command.cmd_line)
                 else:
@@ -172,7 +175,7 @@ def generate_batch(commands, tmp_file):
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
 
         for command in execution_cmds:
-            if command.approval:
+            if command.require_approval:
                 if not command.approval_msg or not command.approval_msg.strip():
                     confirm = "Confirm? [{cmd}]".format(cmd=command.cmd_line)
                 else:
@@ -231,6 +234,8 @@ def main():
             level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
+        parser.add_argument('-a', '--accept', action='store_true',
+                            help='Accept all commands that require approval')
         parser.add_argument('-t', '--type',
                             choices=[ 'bash', 'batch' ],
                             help='Script type for the output file')
@@ -247,7 +252,8 @@ def main():
 
         commands = __get_commands(machine_name=args.name,
                                   os_name=args.os,
-                                  select_mode=args.mode)
+                                  select_mode=args.mode,
+                                  accept_cmds=args.accept)
 
         match args.type:
             case 'bash':

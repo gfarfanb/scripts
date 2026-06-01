@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 from os import environ
+from os.path import join
 
 import sys
 import sqlite3
+import uuid
 import argparse
 import logging
 
@@ -11,6 +13,8 @@ sys.path.append(environ['PYLIBSPATH'])
 import env_vars # pyright: ignore[reportMissingImports]
 
 sys_control_db = env_vars.env_value('SYS_CONTROL_DB_FILE')
+scripts_temp_dir = env_vars.env_value('SCRIPTS_TEMP_DIR')
+max_cmd_print_length = 60
 
 logger = logging.getLogger()
 
@@ -30,9 +34,10 @@ commands_query = """
 """
 
 class Command:
-    def __init__(self, mode, cmd_line, require_approval, approval, approval_msg, reject_cmd):
+    def __init__(self, mode, cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd):
         self.mode = mode
-        self.cmd_line = cmd_line
+        self.cmd = cmd
+        self.cmd_print = cmd_print
         self.require_approval = require_approval
         self.approval = approval
         self.approval_msg = approval_msg
@@ -41,7 +46,8 @@ class Command:
     def __str__(self):
         return (f"{self.__class__.__name__}("
             f"mode={self.mode!r}, "
-            f"cmd_line={self.cmd_line!r}, "
+            f"cmd={self.cmd!r}, "
+            f"cmd_print={self.cmd_print!r}, "
             f"require_approval={self.require_approval!r}, "
             f"approval={self.approval!r}, "
             f"approval_msg={self.approval_msg!r}, "
@@ -59,11 +65,14 @@ def __get_commands(machine_name, os_name, select_mode, accept_cmds):
 
     commands = []
     for row in rows:
-        mode, cmd_line, approval, approval_msg, reject_cmd = row
-        require_approval = False if accept_cmds else bool(approval)
-        command = Command(mode, cmd_line, require_approval, approval, approval_msg, reject_cmd)
+        mode, cmd, approval, approval_msg, reject_cmd = row
 
-        if not command.cmd_line or not command.cmd_line.strip():
+        require_approval = False if accept_cmds else bool(approval)
+        cmd_print = cmd[:max_cmd_print_length] + '...' if len(cmd) > max_cmd_print_length else cmd
+
+        command = Command(mode, cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd)
+
+        if not command.cmd or not command.cmd.strip():
             logger.warning("Empty command line in: {cmd}".format(cmd=command))
             continue
 
@@ -87,10 +96,9 @@ def __select_command_index(commands, select_message):
 
     i = 1
     for command in commands:
-        cmd_line = command.cmd_line[:80] + '...' if len(command.cmd_line) > 80 else command.cmd_line
-        logger.info("{i}) [{mode}] {cmd}".format(i=i,
+        logger.info("{i}) [{mode}] {print}".format(i=i,
                                                  mode=command.mode,
-                                                 cmd=cmd_line))
+                                                 print=command.cmd_print))
         i+=1
 
     logger.info('command-index> ')
@@ -112,23 +120,28 @@ def generate_bash(commands, tmp_file):
         file.write('#! /usr/bin/env bash\n')
 
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
+        cmd_files = []
 
         for command in execution_cmds:
             if command.require_approval:
                 if not command.approval_msg or not command.approval_msg.strip():
-                    confirm = "Confirm? [{cmd}]".format(cmd=command.cmd_line)
+                    confirm = "Confirm? [{print}]".format(print=command.cmd_print)
                 else:
                     confirm = command.approval_msg
                 
                 if not command.reject_cmd or not command.reject_cmd.strip():
                     declined = 'echo Declined'
                 else:
+                    reject_bash = create_bash_command(command.reject_cmd)
+                    cmd_files.append(reject_bash)
                     declined = """
                         echo >&2
                         echo "Executing: [<decline_command>]" >&2
-                        {cmd}
-                    """.format(cmd=command.reject_cmd)
+                        . {bash}
+                    """.format(bash=reject_bash)
 
+                command_bash = create_bash_command(command.cmd)
+                cmd_files.append(command_bash)
                 command_entry = """
                     echo >&2
                     _update_flag=""
@@ -136,24 +149,33 @@ def generate_bash(commands, tmp_file):
                     case $_update_flag in
                         [Yy])
                             echo >&2
-                            echo "Executing: [{cmd}]" >&2
-                            {cmd}
+                            echo "Executing: [{print}]" >&2
+                            . {bash}
                             ;;
                         *)
                             {declined}
                             ;;
                     esac
                 """.format(confirm=confirm,
-                           cmd=command.cmd_line,
+                           print=command.cmd_print,
+                           bash=command_bash,
                            declined=declined)
             else:
+                command_bash = create_bash_command(command.cmd)
+                cmd_files.append(command_bash)
                 command_entry = """
                     echo >&2
-                    echo "Executing: [{cmd}]" >&2
-                    {cmd}
-                """.format(cmd=command.cmd_line)
+                    echo "Executing: [{print}]" >&2
+                    . {bash}
+                """.format(print=command.cmd_print,
+                           bash=command_bash)
 
             file.write(command_entry)
+
+        for cmd_file in cmd_files:
+            file.write('''
+                rm "{bash}"\n
+            '''.format(bash=cmd_file))
 
         readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
@@ -163,7 +185,17 @@ def generate_bash(commands, tmp_file):
 
             for command in readonly_cmds:
                 file.write('echo >&2\n')
-                file.write("echo \"> {cmd}\" >&2\n".format(cmd=command.cmd_line))
+                file.write("echo \"> {cmd}\" >&2\n".format(cmd=command.cmd))
+
+
+def create_bash_command(content):
+    bash_path = join(scripts_temp_dir, "cmd-{bash}".format(bash=uuid.uuid4()))
+
+    with open(bash_path, 'w') as file:
+        file.write('#! /usr/bin/env bash\n')
+        file.write(content)
+
+    return bash_path
 
 
 def generate_batch(commands, tmp_file):
@@ -173,23 +205,29 @@ def generate_batch(commands, tmp_file):
         file.write('@echo OFF\n')
 
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
+        cmd_files = []
 
         for command in execution_cmds:
             if command.require_approval:
                 if not command.approval_msg or not command.approval_msg.strip():
-                    confirm = "Confirm? [{cmd}]".format(cmd=command.cmd_line)
+                    confirm = "Confirm? [{print}]".format(print=command.cmd_print)
                 else:
                     confirm = command.approval_msg
 
                 if not command.reject_cmd or not command.reject_cmd.strip():
                     declined = 'echo Declined'
                 else:
+                    reject_bat = create_batch_command(command.reject_cmd)
+                    cmd_files.append(reject_bat)
                     declined = """
                         echo:
                         echo Executing: [^<decline_command^>]
-                        call %SCRIPTS_HOME%\\.win\\eval {cmd}
-                    """.format(cmd=command.reject_cmd)
+                        call {bat}
+                    """.format(cmd=command.reject_cmd,
+                               bat=reject_bat)
 
+                command_bat = create_batch_command(command.cmd)
+                cmd_files.append(command_bat)
                 command_entry = """
                     echo:
                     set "_update_flag="
@@ -199,22 +237,32 @@ def generate_batch(commands, tmp_file):
                     if "%_update_flag%"=="y" set _approval=1
                     if "%_approval%"=="1" (
                         echo:
-                        echo Executing: [{cmd}]
-                        call %SCRIPTS_HOME%\\.win\\eval {cmd}
+                        echo Executing: [{print}]
+                        call {bat}
+
                     ) else (
                         {declined}
                     )
                 """.format(confirm=confirm,
-                           cmd=command.cmd_line,
+                           print=command.cmd_print,
+                           bat=command_bat,
                            declined=declined)
             else:
+                command_bat = create_batch_command(command.cmd)
+                cmd_files.append(command_bat)
                 command_entry = """
                     echo:
-                    echo Executing: [{cmd}]
-                    call %SCRIPTS_HOME%\\.win\\eval {cmd}
-                """.format(cmd=command.cmd_line)
+                    echo Executing: [{print}]
+                    call {bat}
+                """.format(print=command.cmd_print,
+                           bat=command_bat)
 
             file.write(command_entry)
+
+        for cmd_file in cmd_files:
+            file.write('''
+                if exist "{bat}" del "{bat}"\n
+            '''.format(bat=cmd_file))
 
         readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
@@ -224,7 +272,17 @@ def generate_batch(commands, tmp_file):
 
             for command in readonly_cmds:
                 file.write('echo:\n')
-                file.write("echo ^> {cmd}\n".format(cmd=command.cmd_line))
+                file.write("echo ^> {cmd}\n".format(cmd=command.cmd))
+
+
+def create_batch_command(content):
+    batch_path = join(scripts_temp_dir, "cmd-{batch}.bat".format(batch=uuid.uuid4()))
+
+    with open(batch_path, 'w') as file:
+        file.write('@echo OFF\n')
+        file.write(content)
+
+    return batch_path
 
 
 def main():

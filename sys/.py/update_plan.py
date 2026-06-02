@@ -68,7 +68,7 @@ def __get_commands(machine_name, os_name, select_mode, accept_cmds):
         mode, cmd, approval, approval_msg, reject_cmd = row
 
         require_approval = False if accept_cmds else bool(approval)
-        cmd_print = cmd[:max_cmd_print_length] + '...' if len(cmd) > max_cmd_print_length else cmd
+        cmd_print = __printable_cmd(cmd)
 
         command = Command(mode, cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd)
 
@@ -89,6 +89,14 @@ def __get_commands(machine_name, os_name, select_mode, accept_cmds):
             return [ commands[cmd_idx] ]
         case _:
             return commands
+
+
+def __printable_cmd(cmd):
+    if not cmd:
+        return None
+
+    cmd = cmd.splitlines()[0]
+    return cmd[:max_cmd_print_length] + '...' if len(cmd) > max_cmd_print_length else cmd
 
 
 def __select_command_index(commands, select_message):

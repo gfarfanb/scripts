@@ -41,24 +41,6 @@ while getopts "asoh" opt; do
     esac
 done
 
-if [ -n "$( type -t uname )" ]; then
-    uname -m && cat /etc/*release
-fi
-
-if [ -n "$( type -t hostnamectl )" ]; then
-    echo >&2
-    hostnamectl
-fi
-
-if [ -n "$( type -t sudo )" ]; then
-    sudo -l 1>/dev/null
-    if [ $? -ne 0 ] || ! [ "$( sudo whoami )" = "root" ]; then
-        echo "Execute:" >&2
-        echo "> su \$USER" >&2
-        _stopped
-    fi
-fi
-
 _update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
 
 echo >&2

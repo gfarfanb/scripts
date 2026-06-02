@@ -95,7 +95,7 @@ def __printable_cmd(cmd):
     if not cmd:
         return None
 
-    cmd = cmd.splitlines()[0]
+    cmd = cmd.splitlines()[0].replace('"', '').replace('\'', '')
     return cmd[:max_cmd_print_length] + '...' if len(cmd) > max_cmd_print_length else cmd
 
 
@@ -196,16 +196,6 @@ def generate_bash(commands, tmp_file):
                 file.write("echo \"> {cmd}\" >&2\n".format(cmd=command.cmd))
 
 
-def create_bash_command(content):
-    bash_path = join(scripts_temp_dir, "cmd-{bash}".format(bash=uuid.uuid4()))
-
-    with open(bash_path, 'w') as file:
-        file.write('#! /usr/bin/env bash\n')
-        file.write(content)
-
-    return bash_path
-
-
 def generate_batch(commands, tmp_file):
     logger.debug("Generating 'batch' file: {file}".format(file=tmp_file))
 
@@ -283,8 +273,18 @@ def generate_batch(commands, tmp_file):
                 file.write("echo ^> {cmd}\n".format(cmd=command.cmd))
 
 
+def create_bash_command(content):
+    bash_path = join(scripts_temp_dir, "cmd-bash.{uuid}".format(uuid=uuid.uuid4()))
+
+    with open(bash_path, 'w') as file:
+        file.write('#! /usr/bin/env bash\n')
+        file.write(content)
+
+    return bash_path
+
+
 def create_batch_command(content):
-    batch_path = join(scripts_temp_dir, "cmd-{batch}.bat".format(batch=uuid.uuid4()))
+    batch_path = join(scripts_temp_dir, "cmd-batch.{uuid}.bat".format(uuid=uuid.uuid4()))
 
     with open(batch_path, 'w') as file:
         file.write('@echo OFF\n')

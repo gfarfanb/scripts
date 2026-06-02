@@ -41,7 +41,10 @@ while getopts "asoh" opt; do
     esac
 done
 
-_update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update-plan.bash.XXXXXXXXXX" )
+rm -f "$SCRIPTS_TEMP_DIR/update_plan*"
+rm -f "$SCRIPTS_TEMP_DIR/cmd-bash.*"
+
+_update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update_plan.bash.XXXXXXXXXX" )
 
 echo >&2
 

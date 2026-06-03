@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from os import environ
+from os import environ, linesep
 from os.path import join
 
 import sys
@@ -33,7 +33,9 @@ commands_query = """
         ORDER BY ordinal
 """
 
+
 class Command:
+
     def __init__(self, mode, cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd):
         self.mode = mode
         self.cmd = cmd
@@ -125,7 +127,8 @@ def generate_bash(commands, tmp_file):
     logger.debug("Generating 'bash' file: {file}".format(file=tmp_file))
 
     with open(tmp_file, "a") as file:
-        file.write('#! /usr/bin/env bash\n')
+        file.write(__get_bash_shebang())
+        file.write(linesep)
 
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
         cmd_files = []
@@ -140,7 +143,7 @@ def generate_bash(commands, tmp_file):
                 if not command.reject_cmd or not command.reject_cmd.strip():
                     declined = 'echo Declined'
                 else:
-                    reject_bash = create_bash_command(command.reject_cmd)
+                    reject_bash = __create_bash_command(command.reject_cmd)
                     cmd_files.append(reject_bash)
                     declined = """
                         echo >&2
@@ -148,7 +151,7 @@ def generate_bash(commands, tmp_file):
                         . {bash}
                     """.format(bash=reject_bash)
 
-                command_bash = create_bash_command(command.cmd)
+                command_bash = __create_bash_command(command.cmd)
                 cmd_files.append(command_bash)
                 command_entry = """
                     echo >&2
@@ -169,7 +172,7 @@ def generate_bash(commands, tmp_file):
                            bash=command_bash,
                            declined=declined)
             else:
-                command_bash = create_bash_command(command.cmd)
+                command_bash = __create_bash_command(command.cmd)
                 cmd_files.append(command_bash)
                 command_entry = """
                     echo >&2
@@ -182,25 +185,31 @@ def generate_bash(commands, tmp_file):
 
         for cmd_file in cmd_files:
             file.write('''
-                rm "{bash}"\n
+                rm "{bash}"
             '''.format(bash=cmd_file))
+            file.write(linesep)
 
         readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
         if readonly_cmds:
-            file.write('echo >&2\n')
-            file.write('echo "Execute these commands if needed:" >&2\n')
+            file.write('echo >&2')
+            file.write(linesep)
+            file.write('echo "Execute these commands if needed:" >&2')
+            file.write(linesep)
 
             for command in readonly_cmds:
-                file.write('echo >&2\n')
-                file.write("echo \"> {cmd}\" >&2\n".format(cmd=command.cmd))
+                file.write('echo >&2')
+                file.write(linesep)
+                file.write("echo \"> {cmd}\" >&2".format(cmd=command.cmd))
+                file.write(linesep)
 
 
 def generate_batch(commands, tmp_file):
     logger.debug("Generating 'batch' file: {file}".format(file=tmp_file))
 
     with open(tmp_file, "a") as file:
-        file.write('@echo OFF\n')
+        file.write(__get_batch_shebang())
+        file.write(linesep)
 
         execution_cmds = filter(lambda cmd: cmd.mode == 'EXECUTION', commands)
         cmd_files = []
@@ -215,7 +224,7 @@ def generate_batch(commands, tmp_file):
                 if not command.reject_cmd or not command.reject_cmd.strip():
                     declined = 'echo Declined'
                 else:
-                    reject_bat = create_batch_command(command.reject_cmd)
+                    reject_bat = __create_batch_command(command.reject_cmd)
                     cmd_files.append(reject_bat)
                     declined = """
                         echo:
@@ -224,7 +233,7 @@ def generate_batch(commands, tmp_file):
                     """.format(cmd=command.reject_cmd,
                                bat=reject_bat)
 
-                command_bat = create_batch_command(command.cmd)
+                command_bat = __create_batch_command(command.cmd)
                 cmd_files.append(command_bat)
                 command_entry = """
                     echo:
@@ -246,7 +255,7 @@ def generate_batch(commands, tmp_file):
                            bat=command_bat,
                            declined=declined)
             else:
-                command_bat = create_batch_command(command.cmd)
+                command_bat = __create_batch_command(command.cmd)
                 cmd_files.append(command_bat)
                 command_entry = """
                     echo:
@@ -259,35 +268,50 @@ def generate_batch(commands, tmp_file):
 
         for cmd_file in cmd_files:
             file.write('''
-                if exist "{bat}" del "{bat}"\n
+                if exist "{bat}" del "{bat}"
             '''.format(bat=cmd_file))
+            file.write(linesep)
 
         readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
         if readonly_cmds:
-            file.write('echo:\n')
-            file.write('echo Execute these commands if needed:\n')
+            file.write('echo:')
+            file.write(linesep)
+            file.write('echo Execute these commands if needed:')
+            file.write(linesep)
 
             for command in readonly_cmds:
-                file.write('echo:\n')
-                file.write("echo ^> {cmd}\n".format(cmd=command.cmd))
+                file.write('echo:')
+                file.write(linesep)
+                file.write("echo ^> {cmd}".format(cmd=command.cmd))
+                file.write(linesep)
 
 
-def create_bash_command(content):
+def __get_bash_shebang():
+    return '#! /usr/bin/env bash'
+
+
+def __create_bash_command(content):
     bash_path = join(scripts_temp_dir, "cmd-bash.{uuid}".format(uuid=uuid.uuid4()))
 
     with open(bash_path, 'w') as file:
-        file.write('#! /usr/bin/env bash\n')
+        file.write(__get_bash_shebang())
+        file.write(linesep)
         file.write(content)
 
     return bash_path
 
 
-def create_batch_command(content):
+def __get_batch_shebang():
+    return '@echo OFF'
+
+
+def __create_batch_command(content):
     batch_path = join(scripts_temp_dir, "cmd-batch.{uuid}.bat".format(uuid=uuid.uuid4()))
 
     with open(batch_path, 'w') as file:
-        file.write('@echo OFF\n')
+        file.write(__get_batch_shebang())
+        file.write(linesep)
         file.write(content)
 
     return batch_path

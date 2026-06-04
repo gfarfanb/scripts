@@ -20,7 +20,8 @@ logger = logging.getLogger()
 
 commands_query = """
     SELECT c.mode,
-            c.command,
+            c.cli_name,
+            c.action_cmd,
             c.approval,
             c.approval_msg,
             c.reject_cmd
@@ -36,9 +37,10 @@ commands_query = """
 
 class Command:
 
-    def __init__(self, mode, cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd):
+    def __init__(self, mode, cli_name, action_cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd):
         self.mode = mode
-        self.cmd = cmd
+        self.cli_name = cli_name
+        self.action_cmd = action_cmd
         self.cmd_print = cmd_print
         self.require_approval = require_approval
         self.approval = approval
@@ -48,7 +50,8 @@ class Command:
     def __str__(self):
         return (f"{self.__class__.__name__}("
             f"mode={self.mode!r}, "
-            f"cmd={self.cmd!r}, "
+            f"cli_name={self.cli_name!r}, "
+            f"action_cmd={self.action_cmd!r}, "
             f"cmd_print={self.cmd_print!r}, "
             f"require_approval={self.require_approval!r}, "
             f"approval={self.approval!r}, "
@@ -67,14 +70,14 @@ def __get_commands(machine_name, os_name, select_mode, accept_cmds):
 
     commands = []
     for row in rows:
-        mode, cmd, approval, approval_msg, reject_cmd = row
+        mode, cli_name, action_cmd, approval, approval_msg, reject_cmd = row
 
         require_approval = False if accept_cmds else bool(approval)
-        cmd_print = __printable_cmd(cmd)
+        cmd_print = __printable_cmd(action_cmd)
 
-        command = Command(mode, cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd)
+        command = Command(mode, cli_name, action_cmd, cmd_print, require_approval, approval, approval_msg, reject_cmd)
 
-        if not command.cmd or not command.cmd.strip():
+        if not command.action_cmd or not command.action_cmd.strip():
             logger.warning("Empty command line in: {cmd}".format(cmd=command))
             continue
 
@@ -106,9 +109,9 @@ def __select_command_index(commands, select_message):
 
     i = 1
     for command in commands:
-        logger.info("{i}) [{mode}] {print}".format(i=i,
+        logger.info("{i}) [{mode}] {name}".format(i=i,
                                                  mode=command.mode,
-                                                 print=command.cmd_print))
+                                                 name=command.cli_name))
         i+=1
 
     logger.info('command-index> ')
@@ -151,7 +154,7 @@ def generate_bash(commands, tmp_file):
                         . {bash}
                     """.format(bash=reject_bash)
 
-                command_bash = __create_bash_command(command.cmd)
+                command_bash = __create_bash_command(command.action_cmd)
                 cmd_files.append(command_bash)
                 command_entry = """
                     echo >&2
@@ -160,7 +163,7 @@ def generate_bash(commands, tmp_file):
                     case $_update_flag in
                         [Yy])
                             echo >&2
-                            echo "Executing: [{print}]" >&2
+                            echo "Executing: [{name}]" >&2
                             . {bash}
                             ;;
                         *)
@@ -168,17 +171,17 @@ def generate_bash(commands, tmp_file):
                             ;;
                     esac
                 """.format(confirm=confirm,
-                           print=command.cmd_print,
+                           name=command.cli_name,
                            bash=command_bash,
                            declined=declined)
             else:
-                command_bash = __create_bash_command(command.cmd)
+                command_bash = __create_bash_command(command.action_cmd)
                 cmd_files.append(command_bash)
                 command_entry = """
                     echo >&2
-                    echo "Executing: [{print}]" >&2
+                    echo "Executing: [{name}]" >&2
                     . {bash}
-                """.format(print=command.cmd_print,
+                """.format(name=command.cli_name,
                            bash=command_bash)
 
             file.write(command_entry)
@@ -200,7 +203,7 @@ def generate_bash(commands, tmp_file):
             for command in readonly_cmds:
                 file.write('echo >&2')
                 file.write(linesep)
-                file.write("echo \"> {cmd}\" >&2".format(cmd=command.cmd))
+                file.write("echo \"> {cmd}\" >&2".format(cmd=command.action_cmd))
                 file.write(linesep)
 
 
@@ -233,7 +236,7 @@ def generate_batch(commands, tmp_file):
                     """.format(cmd=command.reject_cmd,
                                bat=reject_bat)
 
-                command_bat = __create_batch_command(command.cmd)
+                command_bat = __create_batch_command(command.action_cmd)
                 cmd_files.append(command_bat)
                 command_entry = """
                     echo:
@@ -244,24 +247,24 @@ def generate_batch(commands, tmp_file):
                     if "%_update_flag%"=="y" set _approval=1
                     if "%_approval%"=="1" (
                         echo:
-                        echo Executing: [{print}]
+                        echo Executing: [{name}]
                         call {bat}
 
                     ) else (
                         {declined}
                     )
                 """.format(confirm=confirm,
-                           print=command.cmd_print,
+                           name=command.cli_name,
                            bat=command_bat,
                            declined=declined)
             else:
-                command_bat = __create_batch_command(command.cmd)
+                command_bat = __create_batch_command(command.action_cmd)
                 cmd_files.append(command_bat)
                 command_entry = """
                     echo:
-                    echo Executing: [{print}]
+                    echo Executing: [{name}]
                     call {bat}
-                """.format(print=command.cmd_print,
+                """.format(name=command.cli_name,
                            bat=command_bat)
 
             file.write(command_entry)
@@ -283,7 +286,7 @@ def generate_batch(commands, tmp_file):
             for command in readonly_cmds:
                 file.write('echo:')
                 file.write(linesep)
-                file.write("echo ^> {cmd}".format(cmd=command.cmd))
+                file.write("echo ^> {cmd}".format(cmd=command.action_cmd))
                 file.write(linesep)
 
 

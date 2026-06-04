@@ -41,8 +41,8 @@ while getopts "asoh" opt; do
     esac
 done
 
-rm -f "$SCRIPTS_TEMP_DIR/update_plan*"
-rm -f "$SCRIPTS_TEMP_DIR/cmd-bash.*"
+rm -f $SCRIPTS_TEMP_DIR/update_plan*
+rm -f $SCRIPTS_TEMP_DIR/cmd_bash*
 
 _update_plan_tmp=$( mktemp "$SCRIPTS_TEMP_DIR/update_plan.bash.XXXXXXXXXX" )
 
@@ -52,7 +52,7 @@ $(command -v python3 || command -v python) "./.py/update_plan.py" -t bash \
     -n "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" \
     -f "$_update_plan_tmp" -m "$_mode" $_accept
 
-. "$_update_plan_tmp"
+# . "$_update_plan_tmp"
 
 rm -f "$_update_plan_tmp"
 

@@ -33,7 +33,7 @@ if /i "%~1"=="-o" set "_mode=only-one"
 if /i "%~1"=="-h" goto :__usage_page
 
 del /q "%SCRIPTS_TEMP_DIR%\update_plan*" 2>nul
-del /q "%SCRIPTS_TEMP_DIR%\cmd-batch.*" 2>nul
+del /q "%SCRIPTS_TEMP_DIR%\cmd_batch*" 2>nul
 
 set __update_plan_tag=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%-%RANDOM%_%RANDOM%
 set __update_plan_bat="%SCRIPTS_TEMP_DIR%\update_plan-%__update_plan_tag%.bat"

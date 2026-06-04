@@ -305,7 +305,7 @@ def __get_bash_shebang():
 
 
 def __create_bash_command(content, shebang=True):
-    bash_path = join(scripts_temp_dir, "cmd-bash.{uuid}".format(uuid=uuid.uuid4()))
+    bash_path = join(scripts_temp_dir, "cmd_bash.{uuid}".format(uuid=uuid.uuid4()))
 
     with open(bash_path, 'w') as file:
         if shebang:
@@ -322,7 +322,7 @@ def __get_batch_shebang():
 
 
 def __create_batch_command(content, shebang=True):
-    batch_path = join(scripts_temp_dir, "cmd-batch.{uuid}.bat".format(uuid=uuid.uuid4()))
+    batch_path = join(scripts_temp_dir, "cmd_batch.{uuid}.bat".format(uuid=uuid.uuid4()))
 
     with open(batch_path, 'w') as file:
         if shebang:

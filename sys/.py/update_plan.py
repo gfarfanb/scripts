@@ -186,12 +186,6 @@ def generate_bash(commands, tmp_file):
 
             file.write(command_entry)
 
-        for cmd_file in cmd_files:
-            file.write('''
-                rm "{bash}"
-            '''.format(bash=cmd_file))
-            file.write(linesep)
-
         readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
         if readonly_cmds:
@@ -201,10 +195,21 @@ def generate_bash(commands, tmp_file):
             file.write(linesep)
 
             for command in readonly_cmds:
+                command_bash = __create_bash_command(command.action_cmd, False)
+                cmd_files.append(command_bash)
+
                 file.write('echo >&2')
                 file.write(linesep)
-                file.write("echo \"> {cmd}\" >&2".format(cmd=command.action_cmd))
+                file.write("echo \"> [{name}]\" >&2".format(name=command.cli_name))
                 file.write(linesep)
+                file.write("cat {bash} >&2".format(bash=command_bash))
+                file.write(linesep)
+
+        for cmd_file in cmd_files:
+            file.write('''
+                rm "{bash}"
+            '''.format(bash=cmd_file))
+            file.write(linesep)
 
 
 def generate_batch(commands, tmp_file):
@@ -269,12 +274,6 @@ def generate_batch(commands, tmp_file):
 
             file.write(command_entry)
 
-        for cmd_file in cmd_files:
-            file.write('''
-                if exist "{bat}" del "{bat}"
-            '''.format(bat=cmd_file))
-            file.write(linesep)
-
         readonly_cmds = list(filter(lambda cmd: cmd.mode == 'READONLY', commands))
 
         if readonly_cmds:
@@ -284,22 +283,35 @@ def generate_batch(commands, tmp_file):
             file.write(linesep)
 
             for command in readonly_cmds:
+                command_bat = __create_batch_command(command.action_cmd, False)
+                cmd_files.append(command_bat)
+
                 file.write('echo:')
                 file.write(linesep)
-                file.write("echo ^> {cmd}".format(cmd=command.action_cmd))
+                file.write("echo ^> [{name}]".format(name=command.cli_name))
                 file.write(linesep)
+                file.write("type {bat}".format(bat=command_bat))
+                file.write(linesep)
+
+        for cmd_file in cmd_files:
+            file.write('''
+                if exist "{bat}" del "{bat}"
+            '''.format(bat=cmd_file))
+            file.write(linesep)
 
 
 def __get_bash_shebang():
     return '#! /usr/bin/env bash'
 
 
-def __create_bash_command(content):
+def __create_bash_command(content, shebang=True):
     bash_path = join(scripts_temp_dir, "cmd-bash.{uuid}".format(uuid=uuid.uuid4()))
 
     with open(bash_path, 'w') as file:
-        file.write(__get_bash_shebang())
-        file.write(linesep)
+        if shebang:
+            file.write(__get_bash_shebang())
+            file.write(linesep)
+
         file.write(content)
 
     return bash_path
@@ -309,12 +321,14 @@ def __get_batch_shebang():
     return '@echo OFF'
 
 
-def __create_batch_command(content):
+def __create_batch_command(content, shebang=True):
     batch_path = join(scripts_temp_dir, "cmd-batch.{uuid}.bat".format(uuid=uuid.uuid4()))
 
     with open(batch_path, 'w') as file:
-        file.write(__get_batch_shebang())
-        file.write(linesep)
+        if shebang:
+            file.write(__get_batch_shebang())
+            file.write(linesep)
+
         file.write(content)
 
     return batch_path

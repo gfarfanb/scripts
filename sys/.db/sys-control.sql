@@ -19,6 +19,32 @@ CREATE TABLE machines (
 );
 
 
+CREATE TABLE repo_hubs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    clone_template TEXT NOT NULL,
+    backup_template TEXT NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+
+
+CREATE TABLE repos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    machine_id INTEGER NOT NULL,
+    repo_name TEXT NOT NULL,
+    branch TEXT NOT NULL,
+    hub_id TEXT NOT NULL,
+    username TEXT NOT NULL,
+    pull_required INTEGER NOT NULL DEFAULT 0,
+    pull_dir TEXT NOT NULL,
+    backup_required INTEGER NOT NULL DEFAULT 0,
+    backup_dir TEXT NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (machine_id) REFERENCES machines(id),
+    FOREIGN KEY (hub_id) REFERENCES repo_hubs(id)
+);
+
+
 CREATE TABLE commands (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     machine_id INTEGER NOT NULL,

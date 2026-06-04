@@ -69,6 +69,7 @@ def __get_commands(machine_name, os_name, select_mode, accept_cmds):
     conn.close()
 
     commands = []
+
     for row in rows:
         mode, cli_name, action_cmd, approval, approval_msg, reject_cmd = row
 

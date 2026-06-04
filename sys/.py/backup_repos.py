@@ -4,8 +4,8 @@ from os import environ, makedirs, rmdir, rename, remove
 from os.path import islink, join, exists
 
 import sys
+import sqlite3
 import argparse
-import json
 import git
 import wget
 import logging
@@ -13,33 +13,94 @@ import logging
 sys.path.append(environ['PYLIBSPATH'])
 import env_vars # pyright: ignore[reportMissingImports]
 
+sys_control_db = env_vars.env_value('SYS_CONTROL_DB_FILE')
 workspace_home = env_vars.env_value('WORKSPACE_HOME')
 repos_home = env_vars.env_value('REPOS_HOME')
-repos_def = env_vars.env_value('REPOS_DEF_FILE')
-
-github_clone = "https://github.com/{username}/{repo}.git"
-github_backup = "https://github.com/{username}/{repo}/archive/refs/heads/{branch}.zip"
-
-gitlab_clone = "https://gitlab.com/{username}/{repo}.git"
-gitlab_backup = "https://gitlab.com/{username}/{repo}/-/archive/master/{repo}-{branch}.zip"
 
 logger = logging.getLogger()
 
-def pull_repos(select=False):
-    repo_defs = __get_repo_defs()
+repo_hubs = {}
+
+repos_query = """
+    SELECT r.hub_id,
+        r.repo_name,
+        r.branch,
+        r.username,
+        r.pull_required,
+        r.pull_dir,
+        r.backup_required,
+        r.backup_dir
+    FROM repos r
+        JOIN machines m ON r.machine_id = m.id
+        JOIN operating_systems o ON m.os_id = o.id
+    WHERE m.name = '{machine}'
+        AND o.name = '{os}'
+        AND r.deleted = 0
+"""
+
+hubs_query = """
+    SELECT h.id,
+        h.clone_template,
+        h.backup_template
+    FROM repo_hubs h
+    WHERE id IN ({hub_ids})
+"""
+
+
+class Repo:
+
+    def __init__(self, hub_id, repo_name, branch, username, pull_required, pull_dir, backup_required, backup_dir):
+        self.hub_id = hub_id
+        self.repo_name = repo_name
+        self.branch = branch
+        self.username = username
+        self.pull_required = pull_required
+        self.pull_dir = pull_dir
+        self.backup_required = backup_required
+        self.backup_dir = backup_dir
+
+    def __str__(self):
+        return (f"{self.__class__.__name__}("
+            f"hub_id={self.hub_id!r}, "
+            f"repo_name={self.repo_name!r}, "
+            f"branch={self.branch!r}, "
+            f"username={self.username!r}, "
+            f"pull_required={self.pull_required!r}, "
+            f"pull_dir={self.pull_dir!r}, "
+            f"backup_required={self.backup_required!r}, "
+            f"backup_dir={self.backup_dir!r})")
+
+
+class Hub:
+
+    def __init__(self, hub_id, clone_template, backup_template):
+        self.hub_id = hub_id
+        self.clone_template = clone_template
+        self.backup_template = backup_template
+
+    def __str__(self):
+        return (f"{self.__class__.__name__}("
+            f"hub_id={self.hub_id!r}, "
+            f"clone_template={self.clone_template!r}, "
+            f"backup_template={self.backup_template!r})")
+
+
+def pull_repos(machine_name, os_name, select=False):
+    repo_defs = __get_repo_defs(machine_name=machine_name,
+                                os_name=os_name)
 
     discarded_repos = []
 
     if select:
         selected_repo = __select_repo(repo_defs, 'Choose a repo to pull:')
 
-        if selected_repo and not selected_repo['pullRequired']:
+        if selected_repo and not selected_repo.pull_required:
             discarded_repos.append(selected_repo)
         else:
             __pull_repo(selected_repo)
     else:
         for repo_def in repo_defs:
-            if repo_def and not repo_def['pullRequired']:
+            if repo_def and not repo_def.pull_required:
                 discarded_repos.append(repo_def)
             else:
                 __pull_repo(repo_def)
@@ -49,60 +110,58 @@ def pull_repos(select=False):
         logger.info('Update these repos if needed:')
 
         for repo_def in discarded_repos:
-            repo_home = join(repo_def['location'], repo_def['name'])
+            repo_home = join(repo_def.pull_dir, repo_def.repo_name)
 
-            logger.info("> [{branch}] {location}".format(branch=repo_def['branch'],
+            logger.info("> [{branch}] {location}".format(branch=repo_def.branch,
                                                          location=repo_home))
 
 
 def __pull_repo(repo_def):
-    repo_home = join(repo_def['location'], repo_def['name'])
+    repo_home = join(repo_def.pull_dir, repo_def.repo_name)
 
     if not exists(repo_home):
         makedirs(repo_home)
         rmdir(repo_home)
 
-        logger.info("\nCloning {repo} ...".format(repo=repo_def['name']))
+        clone_link = __get_clone_link(repo_def)
 
-        git.Repo.clone_from(__get_clone_link(repo_def), repo_home)
+        logger.info('')
+        logger.info("Cloning {link} ...".format(repo=clone_link))
+
+        git.Repo.clone_from(clone_link, repo_home)
         return
 
     if islink(repo_home):
-        logger.info("\n{location} ...".format(location=repo_home))
+        logger.info('')
+        logger.info("<link> {location} ...".format(location=repo_home))
         return
 
-    logger.info("\nUpdating {repo} ...".format(repo=repo_def['name']))
+    logger.info('')
+    logger.info("Pulling [{branch}] {dir}/{repo} ...".format(branch=repo_def.branch,
+                                                             dir=repo_home,
+                                                             repo=repo_def.repo_name))
 
     repo = git.Repo(repo_home)
-    repo.git.checkout(repo_def['branch'])
-    repo.remotes.origin.pull(repo_def['branch'])
+    repo.git.checkout(repo_def.branch)
+    repo.remotes.origin.pull(repo_def.branch)
 
 
-def __get_clone_link(repo_def):
-    match repo_def['hub']:
-        case 'github':
-            return github_clone.format(username=repo_def['username'],
-                                       repo=repo_def['name'])
-        case 'gitlab':
-            return gitlab_clone.format(username=repo_def['username'],
-                                       repo=repo_def['name'])
-
-
-def backup_repos(select=False):
-    repo_defs = __get_repo_defs()
+def backup_repos(machine_name, os_name, select=False):
+    repo_defs = __get_repo_defs(machine_name=machine_name,
+                                os_name=os_name)
 
     discarded_repos = []
 
     if select:
         selected_repo = __select_repo(repo_defs, 'Choose a repo to backup:')
 
-        if selected_repo and not selected_repo['backupRequired']:
+        if selected_repo and not selected_repo.backup_required:
             discarded_repos.append(selected_repo)
         else:
             __backup_repo(selected_repo)
     else:
         for repo_def in repo_defs:
-            if repo_def and not repo_def['backupRequired']:
+            if repo_def and not repo_def.backup_required:
                 discarded_repos.append(repo_def)
             else:
                 __backup_repo(repo_def)
@@ -116,9 +175,9 @@ def backup_repos(select=False):
 
 
 def __backup_repo(repo_def):
-    zip_name = "{repo}-{branch}.zip".format(repo=repo_def['name'],
-                                            branch=repo_def['branch'])
-    zip_location = join(repo_def['backupLocation'], zip_name)
+    zip_name = "{repo}-{branch}.zip".format(repo=repo_def.repo_name,
+                                            branch=repo_def.branch)
+    zip_location = join(repo_def.backup_dir, zip_name)
     zip_url = __get_backup_link(repo_def)
 
     if exists(zip_location):
@@ -136,26 +195,14 @@ def __backup_repo(repo_def):
         remove(backup_location)
 
 
-def __get_backup_link(repo_def):
-    match repo_def['hub']:
-        case 'github':
-            return github_backup.format(username=repo_def['username'],
-                                        repo=repo_def['name'],
-                                        branch=repo_def['branch'])
-        case 'gitlab':
-            return gitlab_backup.format(username=repo_def['username'],
-                                        repo=repo_def['name'],
-                                        branch=repo_def['branch'])
-
-
 def __select_repo(repo_defs, select_message):
     logger.info(select_message)
 
     i = 1
     for repo_def in repo_defs:
         logger.info("{i}) {name} [{branch}]".format(i=i,
-                                                    name=repo_def['name'],
-                                                    branch=repo_def['branch']))
+                                                    name=repo_def.repo_name,
+                                                    branch=repo_def.branch))
         i+=1
 
     logger.info("{i}) (default) <skip repo>".format(i=i))
@@ -172,31 +219,71 @@ def __select_repo(repo_defs, select_message):
     return repo_defs[file_idx - 1]
 
 
-def __get_repo_defs():
-    with open(repos_def, 'r') as f:
-        repo_defs = json.load(f)
+def __get_repo_defs(machine_name, os_name):
+    query = repos_query.format(machine=machine_name,
+                                  os=os_name) 
+    conn = sqlite3.connect(sys_control_db)
+    cursor = conn.cursor()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    conn.close()
 
-    hubs = [ 'github', 'gitlab' ]
     vars = {
         "WORKSPACE_HOME": workspace_home,
         "REPOS_HOME": repos_home
     }
 
-    for repo_def in repo_defs:
-        try:
-            if repo_def['hub'] not in hubs:
-                raise ValueError("Invalid hub for repo: {hub} - {model}".format(
-                    model=repo_def,
-                    hub=repo_def['hub']))
-            
-            repo_def['location'] = repo_def['location'].format(**vars)
-            repo_def['backupLocation'] = repo_def['backupLocation'].format(**vars)
-        except KeyError as err:
-            raise ValueError("Undefined field for repo: {n} - {model}".format(
-                model=repo_def,
-                n=err.args[0]))
+    repo_defs = []
+
+    for row in rows:
+        hub_id, repo_name, branch, username, pull_flag, pull_dir, backup_flag, backup_dir = row
+
+        pull_required = bool(pull_flag)
+        backup_required = bool(backup_flag)
+        pull_dir = pull_dir.format(**vars)
+        backup_dir = backup_dir.format(**vars)
+
+        repo = Repo(hub_id, repo_name, branch, username, pull_required, pull_dir, backup_required, backup_dir)
+
+        logger.debug("Repo obtained: {repo}".format(repo=repo))
+
+        repo_defs.append(repo)
+
+    __load_hubs(list({repo.hub_id for repo in repo_defs}))
 
     return repo_defs
+
+
+def __load_hubs(hub_ids):
+    query = hubs_query.format(hub_ids=",".join(map(str, hub_ids))) 
+    conn = sqlite3.connect(sys_control_db)
+    cursor = conn.cursor()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    conn.close()
+
+    for row in rows:
+        hub_id, clone_template, backup_remplate = row
+        hub = Hub(hub_id, clone_template, backup_remplate)
+
+        logger.debug("Hub loaded: {hub}".format(hub=hub))
+
+        repo_hubs[hub.hub_id] = hub
+
+
+def __get_clone_link(repo_def):
+    hub = repo_hubs[repo_def.hub_id]
+
+    return hub.clone_template.format(username=repo_def.username,
+                                     repo=repo_def.repo_name)
+
+
+def __get_backup_link(repo_def):
+    hub = repo_hubs[repo_def.hub_id]
+
+    return hub.backup_template.format(username=repo_def.username,
+                                     repo=repo_def.repo_name,
+                                     branch=repo_def.branch)
 
 
 def main():
@@ -214,12 +301,20 @@ def main():
         parser.add_argument('-s', '--select', action='store_true',
                             required=False, default=False,
                             help='Allow select a repo')
+        parser.add_argument('-n', '--name',
+                            help='Machine name to get repos related')
+        parser.add_argument('-o', '--os',
+                            help='OS name to get repos related')
         args = parser.parse_args()
 
         if args.backup:
-            backup_repos(args.select)
+            backup_repos(machine_name=args.name,
+                         os_name=args.os,
+                         select=args.select)
         else:
-            pull_repos(args.select)
+            pull_repos(machine_name=args.name,
+                         os_name=args.os,
+                         select=args.select)
     except BaseException as err:
         logger.error(err.args[0])
 

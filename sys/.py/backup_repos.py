@@ -3,6 +3,9 @@
 from os import environ, makedirs, rmdir, rename, remove
 from os.path import islink, join, exists
 
+from urllib.error import HTTPError
+from git.exc import GitCommandError
+
 import sys
 import sqlite3
 import argparse
@@ -119,31 +122,35 @@ def pull_repos(machine_name, os_name, select=False):
 def __pull_repo(repo_def):
     repo_home = join(repo_def.pull_dir, repo_def.repo_name)
 
-    if not exists(repo_home):
-        makedirs(repo_home)
-        rmdir(repo_home)
+    try:
+        if not exists(repo_home):
+            makedirs(repo_home)
+            rmdir(repo_home)
 
-        clone_link = __get_clone_link(repo_def)
+            clone_link = __get_clone_link(repo_def)
+
+            logger.info('')
+            logger.info("Cloning {link} ...".format(link=clone_link))
+
+            git.Repo.clone_from(clone_link, repo_home)
+            return
+
+        if islink(repo_home):
+            logger.info('')
+            logger.info("<Symlink> {location} ...".format(location=repo_home))
+            return
 
         logger.info('')
-        logger.info("Cloning {link} ...".format(repo=clone_link))
+        logger.info("Pulling [{branch}] {dir}/{repo} ...".format(branch=repo_def.branch,
+                                                                dir=repo_home,
+                                                                repo=repo_def.repo_name))
 
-        git.Repo.clone_from(clone_link, repo_home)
-        return
-
-    if islink(repo_home):
-        logger.info('')
-        logger.info("<link> {location} ...".format(location=repo_home))
-        return
-
-    logger.info('')
-    logger.info("Pulling [{branch}] {dir}/{repo} ...".format(branch=repo_def.branch,
-                                                             dir=repo_home,
-                                                             repo=repo_def.repo_name))
-
-    repo = git.Repo(repo_home)
-    repo.git.checkout(repo_def.branch)
-    repo.remotes.origin.pull(repo_def.branch)
+        repo = git.Repo(repo_home)
+        repo.git.checkout(repo_def.branch)
+        repo.remotes.origin.pull(repo_def.branch)
+    except GitCommandError as err:
+        logger.error("[GIT/Error] Unable to process repo - command={cmd} status={status}".format(cmd=err.command,
+                                                                                           status=err.status))
 
 
 def backup_repos(machine_name, os_name, select=False):
@@ -179,6 +186,7 @@ def __backup_repo(repo_def):
                                             branch=repo_def.branch)
     zip_location = join(repo_def.backup_dir, zip_name)
     zip_url = __get_backup_link(repo_def)
+    backup_location = ''
 
     if exists(zip_location):
         backup_location = "{zip}.bak".format(zip=zip_location)
@@ -187,9 +195,13 @@ def __backup_repo(repo_def):
     logger.info('')
     logger.info("Getting URL: {url}".format(url=zip_url))
 
-    output = wget.download(zip_url, out=zip_location, bar=wget.bar_thermometer)
+    try:
+        output = wget.download(zip_url, out=zip_location, bar=wget.bar_thermometer)
 
-    logger.info("Downloaded backup: {output}".format(output=output))
+        logger.info("Downloaded backup: {output}".format(output=output))
+    except HTTPError as err:
+        logger.error("[HTTP/Error] Unable to get backup - code={code} msg={msg}".format(code=err.code,
+                                                                                        msg=err.msg))
 
     if exists(backup_location):
         remove(backup_location)
@@ -268,22 +280,22 @@ def __load_hubs(hub_ids):
 
         logger.debug("Hub loaded: {hub}".format(hub=hub))
 
-        repo_hubs[hub.hub_id] = hub
+        repo_hubs[str(hub.hub_id)] = hub
 
 
 def __get_clone_link(repo_def):
-    hub = repo_hubs[repo_def.hub_id]
+    hub = repo_hubs[str(repo_def.hub_id)]
 
     return hub.clone_template.format(username=repo_def.username,
                                      repo=repo_def.repo_name)
 
 
 def __get_backup_link(repo_def):
-    hub = repo_hubs[repo_def.hub_id]
+    hub = repo_hubs[str(repo_def.hub_id)]
 
     return hub.backup_template.format(username=repo_def.username,
-                                     repo=repo_def.repo_name,
-                                     branch=repo_def.branch)
+                                      repo=repo_def.repo_name,
+                                      branch=repo_def.branch)
 
 
 def main():

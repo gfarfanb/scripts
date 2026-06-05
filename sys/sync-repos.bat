@@ -6,8 +6,6 @@ call ..\.libs\env-vars
 call ..\.win\require-var SYS_CONTROL_DB_FILE
 call ..\.win\require-var MACHINE_CONTROL_NAME
 call ..\.win\require-var OS_CONTROL_NAME
-call ..\.win\require-var WORKSPACE_HOME
-call ..\.win\require-var REPOS_HOME
 
 goto :main
 

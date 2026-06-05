@@ -1,4 +1,3 @@
--- SQLite Database Schema
 
 CREATE TABLE operating_systems (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,3 +62,14 @@ CREATE TABLE commands (
 CREATE INDEX idx_commands_command ON commands(action_cmd);
 CREATE INDEX idx_commands_approval_msg ON commands(approval_msg);
 CREATE INDEX idx_commands_reject_cmd ON commands(reject_cmd);
+
+
+CREATE TABLE jdks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    machine_id INTEGER NOT NULL,
+    release INTEGER NOT NULL,
+    jdk_home TEXT NOT NULL,
+    jre_home TEXT NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (machine_id) REFERENCES machines(id)
+);

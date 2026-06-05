@@ -4,6 +4,7 @@ import subprocess
 
 import logging
 import sys
+import re
 
 
 def prop_value(name):
@@ -42,3 +43,11 @@ def logging_level(default_level='INFO') -> int:
             default_value=default_level,
             only_envs=True)
     ]
+
+
+def replace_all_envs(value):
+    env_vars = re.findall(r'\{env:([^}]+)\}', value)
+    values = {}
+    for env_var in env_vars:
+        values[env_var] = env_value(env_var)
+    return value.replace('env:', '').format(**values)

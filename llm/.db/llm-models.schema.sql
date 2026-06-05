@@ -1,5 +1,4 @@
 
--- SQLite Database Schema
 
 CREATE TABLE hubs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

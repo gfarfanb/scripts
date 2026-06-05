@@ -17,8 +17,6 @@ sys.path.append(environ['PYLIBSPATH'])
 import env_vars # pyright: ignore[reportMissingImports]
 
 sys_control_db = env_vars.env_value('SYS_CONTROL_DB_FILE')
-workspace_home = env_vars.env_value('WORKSPACE_HOME')
-repos_home = env_vars.env_value('REPOS_HOME')
 
 logger = logging.getLogger()
 
@@ -240,11 +238,6 @@ def __get_repo_defs(machine_name, os_name):
     rows = cursor.fetchall()
     conn.close()
 
-    vars = {
-        "WORKSPACE_HOME": workspace_home,
-        "REPOS_HOME": repos_home
-    }
-
     repo_defs = []
 
     for row in rows:
@@ -252,8 +245,8 @@ def __get_repo_defs(machine_name, os_name):
 
         pull_required = bool(pull_flag)
         backup_required = bool(backup_flag)
-        pull_dir = pull_dir.format(**vars)
-        backup_dir = backup_dir.format(**vars)
+        pull_dir = env_vars.replace_all_envs(pull_dir)
+        backup_dir = env_vars.replace_all_envs(backup_dir)
 
         repo = Repo(hub_id, repo_name, branch, username, pull_required, pull_dir, backup_required, backup_dir)
 

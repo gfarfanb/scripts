@@ -1,5 +1,4 @@
 
--- SQLite Database Schema
 
 CREATE TABLE host_mappings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

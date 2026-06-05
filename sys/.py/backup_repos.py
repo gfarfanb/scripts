@@ -139,9 +139,8 @@ def __pull_repo(repo_def):
             return
 
         logger.info('')
-        logger.info("Pulling [{branch}] {dir}/{repo} ...".format(branch=repo_def.branch,
-                                                                dir=repo_home,
-                                                                repo=repo_def.repo_name))
+        logger.info("Pulling [{branch}] {dir} ...".format(branch=repo_def.branch,
+                                                                dir=repo_home))
 
         repo = git.Repo(repo_home)
         repo.git.checkout(repo_def.branch)

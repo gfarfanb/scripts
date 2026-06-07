@@ -45,9 +45,11 @@ def logging_level(default_level='INFO') -> int:
     ]
 
 
-def replace_all_envs(value):
+def replace_all_envs(value, values: dict = {}):
     env_vars = re.findall(r'\{env:([^}]+)\}', value)
-    values = {}
+    env_values = {}
     for env_var in env_vars:
-        values[env_var] = env_value(env_var)
-    return value.replace('env:', '').format(**values)
+        env_values[env_var] = env_value(env_var)
+    if values:
+        env_values.update(values)
+    return value.replace('env:', '').format(**env_values)

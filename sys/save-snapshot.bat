@@ -14,20 +14,23 @@ echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% ^<directory_or_file^> [^<option^>]*
 echo Option:
+echo     -s: Source directory or file
+echo     -k: Number of the snapshots to keep
 echo     -r: Recovers save from snapshots
 echo     -h: Displays this help message
 goto :eof
 
 :main
-set "_source=%~1"
-
-if /i "%~2"=="-r" goto :getsnapshot
+set _keep=%SNAPSHOTS_TO_KEEP%
+if /i "%~1"=="-s" set "_source=%~2"
+if /i "%~3"=="-k" set "_keep=%~4" & goto :snapshot
+if /i "%~3"=="-r" goto :getsnapshot
 if /i "%~1"=="-h" goto :__usage_page
 goto :snapshot
 
 
 :snapshot
-python ".\.py\file_snapshot.py" -s "%_source%" -k %SNAPSHOTS_TO_KEEP%
+python ".\.py\file_snapshot.py" -s "%_source%" -k %_keep%
 goto :completed
 
 :getsnapshot

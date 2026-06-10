@@ -4,6 +4,7 @@ cd %BASEDIR%
 
 call ..\.libs\env-vars
 call ..\.win\require-var POSTGRESQL_HOME
+call ..\.win\require-var POSTGRESQL_BACKUP_HOME
 
 rem https://blog.marcnuri.com/windows-postgresql-without-installation-portable
 
@@ -15,30 +16,22 @@ echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
+echo     -c: Starts PostgreSQL initialization
+echo     -s: Stops PostgreSQL server
+echo     -i: Import a database file
+echo     -b: Backup a database
 echo     -h: Displays this help message
 goto :back
 
 :main
+setlocal enableDelayedExpansion
+if /i "%~1"=="-c" goto :initialization
+if /i "%~1"=="-s" goto :stop
+if /i "%~1"=="-i" goto :import
+if /i "%~1"=="-b" goto :backup
 if /i "%~1"=="-h" goto :__usage_page
+goto :run
 
-set _default_opt_index=2
-
-echo Select an option:
-echo 1^) PostgreSQL initialization
-echo 2^) ^(default^) Run PostgreSQL
-echo 3^) Stop PostgreSQL
-echo 4^) Import database
-
-set "_opt_index="
-set /P _opt_index="option-index> "
-if "%_opt_index%"=="" set _opt_index=%_default_opt_index%
-
-if /i "%_opt_index%"=="1" goto :initialization
-if /i "%_opt_index%"=="2" goto :run
-if /i "%_opt_index%"=="3" goto :stop
-if /i "%_opt_index%"=="4" goto :import
-echo Invalid option index
-goto :stopped
 
 :initialization
 cd %POSTGRESQL_HOME%
@@ -64,13 +57,45 @@ cd %POSTGRESQL_HOME%
 echo Importing database:
 
 set /P _db_file="db-file-path> "
-if "%_db_file%"=="" (
-    echo Invalid DB file
+if not exist "%_db_file%" (
+    echo Invalid DB file: "%_db_file%"
     goto :stopped
 )
 
 bin\psql -U postgres -f "%_db_file%"
 goto :completed
+
+
+:backup
+cd %POSTGRESQL_HOME%
+
+echo Select a database:
+for /L %%l in (1,1,%POSTGRESQL_DATABASE_NAMES_LENGTH%) do (
+    echo %%l^) !POSTGRESQL_DATABASE_NAMES[%%l]!
+)
+
+set "_database_idx="
+set /P _database_idx="database-index> "
+set _database_name=!POSTGRESQL_DATABASE_NAMES[%_database_idx%]!
+set _database_username=!POSTGRESQL_DATABASE_USERNAMES[%_database_idx%]!
+
+if "%_database_name%"=="" (
+    echo Invalid database index
+    goto :stopped
+)
+
+set "_backup_file=%POSTGRESQL_BACKUP_HOME%\%_database_name%.sql"
+
+bin\pg_dump.exe -U "%_database_username%" -d "%_database_name%" > "%_backup_file%"
+
+echo Backup generated: "%_backup_file%"
+
+call %SCRIPTS_HOME%\sys\save-snapshot -s "%_backup_file%" -k 3
+
+goto :completed
+
+
+endlocal
 
 
 :completed

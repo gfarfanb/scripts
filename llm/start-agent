@@ -1,0 +1,129 @@
+#! /usr/bin/env bash
+SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
+
+. ../.libs/env-vars
+
+_require_var GRAPHIFY_BACKEND
+_require_var GRAPHIFY_MODEL
+
+__usage_page() {
+    cat << EOF
+Initialize project and start a selected agent.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -h: Displays this help message
+EOF
+    exit 0
+}
+
+_registered_agents=(
+    'opencode'
+    'pi'
+)
+
+_registered_plugins=(
+    'Graphify'
+    'CodeGraph'
+)
+
+_select_agent() {
+    echo >&2
+    echo "Select an agent:" >&2
+    for _idx in "${!_registered_agents[@]}"; do
+        _agent="${_registered_agents[$_idx]}"
+
+        echo "$((_idx+1))) $_agent" >&2
+    done
+    read -p "agent-index> " _agent_idx
+
+    if [ -z "$_agent_idx" ]; then
+        echo "Invalid agent index"
+        _stopped
+    fi
+
+    _agent="${_registered_agents[$((_agent_idx-1))]}"
+
+    if [ -z "$_agent" ]; then
+        echo "Invalid agent index"
+        _stopped
+    fi
+
+    echo $_agent
+}
+
+_select_plugin() {
+    echo >&2
+    echo "Select a plugin:" >&2
+    for _idx in "${!_registered_plugins[@]}"; do
+        _plugin="${_registered_plugins[$_idx]}"
+
+        echo "$((_idx+1))) $_plugin" >&2
+    done
+    read -p "plugin-index> " _plugin_idx
+
+    if [ -z "$_plugin_idx" ]; then
+        echo "Invalid plugin index"
+        _stopped
+    fi
+
+    _plugin="${_registered_plugins[$((_plugin_idx-1))]}"
+
+    if [ -z "$_plugin" ]; then
+        echo "Invalid plugin index"
+        _stopped
+    fi
+
+    echo $_plugin
+}
+
+_setup_graphify() {
+    local _agent=${1:-}
+
+    echo >&2
+    echo "Installing skill for agent '$_agent'" >&2
+    graphify install --project --platform $_agent
+
+    echo "Initializing graph backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL" >&2
+    graphify . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
+
+    echo "Adding Git hook" >&2
+    graphify hook install
+}
+
+_setup_codegraph() {
+    local _agent=${1:-}
+
+    echo >&2
+    echo "Connecting to agent '$_agent'" >&2
+    codegraph install --target $_agent --location local
+
+    echo "Initializing index" >&2
+    codegraph init -i
+}
+
+while getopts "h" opt; do
+    case "$opt" in
+        h)
+            __usage_page
+            ;;
+    esac
+done
+
+echo >&2
+echo "Project: $SOURCEDIR" >&2
+
+_agent=$( _select_agent )
+_plugin=$( _select_plugin )
+
+case $_plugin in
+    Graphify)
+        _setup_graphify $_agent
+        ;;
+    CodeGraph)
+        _setup_codegraph $_agent
+        ;;
+esac
+
+# TODO: Check if plugin exists, if yes, update/sync
+# TODO: Start agent

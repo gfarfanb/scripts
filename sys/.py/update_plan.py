@@ -145,7 +145,7 @@ def generate_bash(commands, tmp_file):
                     confirm = command.approval_msg
                 
                 if not command.reject_cmd or not command.reject_cmd.strip():
-                    declined = 'echo Declined'
+                    declined = 'echo Declined >&2'
                 else:
                     reject_bash = __create_bash_command(command.reject_cmd)
                     cmd_files.append(reject_bash)

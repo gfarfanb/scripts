@@ -27,6 +27,7 @@ pi_config_file = env_vars.env_value('PI_CONFIG_FILE')
 logger = logging.getLogger()
 
 hub_ollama_local = 'Ollama Local'
+registered_agents = [ 'opencode', 'pi' ]
 
 models_templates_hubs_view ="""
     SELECT om.name,
@@ -484,8 +485,9 @@ def main():
             level=env_vars.logging_level())
 
         parser = argparse.ArgumentParser()
+
         parser.add_argument('-a', '--agent', action='append', required=False,
-                            choices=[ 'opencode', 'pi' ],
+                            choices=registered_agents,
                             help='Coding agent to synchronize models; repeat the option to target multiple agents')
         parser.add_argument('-c', '--config', action='store_true',
                             help='Only synchronizes models with specified agent configuration files')
@@ -494,17 +496,16 @@ def main():
         if not args.config:
             pull_models()
             cleanup_models()
-
-        agents = args.agent if args.agent else []
-
-        for agent in agents:
-            match agent:
-                case 'opencode':
-                    sync_opencode()
-                case 'pi':
-                    sync_pi()
-                case _:
-                    raise ValueError("Invalid agent: {agent}".format(agent=agent))
+        else:
+            for agent in args.agent:
+                match agent:
+                    case 'opencode':
+                        sync_opencode()
+                    case 'pi':
+                        sync_pi()
+                    case _:
+                        raise ValueError("Invalid agent: {agent} - registered: {registered}".format(agent=agent,
+                                                                                                    registered=registered_agents))
     except BaseException as err:
         logger.error(err.args[0])
 

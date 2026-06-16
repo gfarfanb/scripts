@@ -18,13 +18,13 @@ EOF
 }
 
 _registered_agents=(
-    'opencode'
-    'pi'
+    "opencode"
+    "pi"
 )
 
 _registered_plugins=(
-    'Graphify'
-    'CodeGraph'
+    "Graphify"
+    "CodeGraph"
 )
 
 _select_agent() {
@@ -38,18 +38,69 @@ _select_agent() {
     read -p "agent-index> " _agent_idx
 
     if [ -z "$_agent_idx" ]; then
-        echo "Invalid agent index"
+        echo "Invalid agent index" >&2
         _stopped
     fi
 
     _agent="${_registered_agents[$((_agent_idx-1))]}"
 
     if [ -z "$_agent" ]; then
-        echo "Invalid agent index"
+        echo "Invalid agent index" >&2
         _stopped
     fi
 
     echo $_agent
+}
+
+_verify_graphify() {
+    if [ -f "./.opencode/plugins/graphify.js" ]; then
+        echo "Graphify"
+    fi
+}
+
+_setup_graphify() {
+    local _agent=${1:-}
+
+    if [ -z "$( _verify_graphify )" ]; then
+        echo >&2
+        echo "Installing skill for agent '$_agent'" >&2
+        graphify install --project --platform $_agent
+
+        echo "Initializing graph backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL" >&2
+        graphify . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
+
+        echo "Adding Git hook" >&2
+        graphify hook install
+    else
+        echo >&2
+        echo "Updating skill for agent '$_agent'" >&2
+        graphify install
+
+        echo "Updating Git hook" >&2
+        graphify hook install
+    fi
+}
+
+_verify_codegraph() {
+    if [ -d "./.codegraph" ]; then
+        echo "CodeGraph"
+    fi
+}
+
+_setup_codegraph() {
+    local _agent=${1:-}
+
+    if [ -z "$( _verify_codegraph )" ]; then
+        echo >&2
+        echo "Connecting to agent '$_agent'" >&2
+        codegraph install --target $_agent --location local
+
+        echo "Initializing index" >&2
+        codegraph init -i
+    else
+        echo >&2
+        codegraph status
+    fi
 }
 
 _select_plugin() {
@@ -63,43 +114,31 @@ _select_plugin() {
     read -p "plugin-index> " _plugin_idx
 
     if [ -z "$_plugin_idx" ]; then
-        echo "Invalid plugin index"
+        echo "Invalid plugin index" >&2
         _stopped
     fi
 
     _plugin="${_registered_plugins[$((_plugin_idx-1))]}"
 
     if [ -z "$_plugin" ]; then
-        echo "Invalid plugin index"
+        echo "Invalid plugin index" >&2
         _stopped
     fi
 
     echo $_plugin
 }
 
-_setup_graphify() {
-    local _agent=${1:-}
+_verify_plugin() {
+    local _installed_plugins=()
 
-    echo >&2
-    echo "Installing skill for agent '$_agent'" >&2
-    graphify install --project --platform $_agent
+    [ -n "$( _verify_graphify )" ] && _installed_plugins+=( "Graphify" )
+    [ -n "$( _verify_codegraph )" ] && _installed_plugins+=( "CodeGraph" )
 
-    echo "Initializing graph backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL" >&2
-    graphify . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
-
-    echo "Adding Git hook" >&2
-    graphify hook install
-}
-
-_setup_codegraph() {
-    local _agent=${1:-}
-
-    echo >&2
-    echo "Connecting to agent '$_agent'" >&2
-    codegraph install --target $_agent --location local
-
-    echo "Initializing index" >&2
-    codegraph init -i
+    if [[ ${#_installed_plugins[@]} -eq 1 ]]; then
+        echo ${_installed_plugins[0]}
+    else
+        echo $( _select_plugin )
+    fi
 }
 
 while getopts "h" opt; do
@@ -113,8 +152,10 @@ done
 echo >&2
 echo "Project: $SOURCEDIR" >&2
 
+cd $SOURCEDIR
+
 _agent=$( _select_agent )
-_plugin=$( _select_plugin )
+_plugin=$( _verify_plugin )
 
 case $_plugin in
     Graphify)
@@ -123,7 +164,23 @@ case $_plugin in
     CodeGraph)
         _setup_codegraph $_agent
         ;;
+    *)
+        echo "Plugin not selected" >&2
+        _stopped
+        ;;
 esac
 
-# TODO: Check if plugin exists, if yes, update/sync
-# TODO: Start agent
+case $_agent in
+    opencode)
+        opencode
+        ;;
+    pi)
+        pi
+        ;;
+    *)
+        echo "Agent not selected" >&2
+        _stopped
+        ;;
+esac
+
+_completed

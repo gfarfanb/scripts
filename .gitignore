@@ -168,13 +168,28 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-### VS Code ###
+# VS Code
 .vscode/
-
 
 # Redis
 dump.rdb
 
-
-## Temporary
+# Temporary
 .tmp/
+
+# Graphify
+node_modules/
+dist/
+*.generated.py
+graphify-out/cost.json
+graphify-out/cache/
+
+# CodeGraph
+node_modules/
+vendor/
+dist/
+build/
+target/
+.venv/
+Pods/
+.next/

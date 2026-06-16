@@ -74,7 +74,7 @@ _setup_graphify() {
     else
         echo >&2
         echo "Updating skill for agent '$_agent'" >&2
-        graphify install
+        graphify $_agent install
 
         echo "Updating Git hook" >&2
         graphify hook install

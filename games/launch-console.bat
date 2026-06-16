@@ -2,7 +2,7 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
+call %SCRIPTS_HOME%\.libs\env-vars
 
 goto :main
 
@@ -71,9 +71,9 @@ goto :invalid
 :launchzelda64
 echo:
 
-call ..\.win\require-var ZELDA64RECOMPILED_HOME
-call ..\.win\require-var ZELDA64RECOMPILED_SAVES_HOME
-call ..\.win\require-var ZELDA64RECOMPILED_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var ZELDA64RECOMPILED_HOME
+call %SCRIPTS_HOME%\.win\require-var ZELDA64RECOMPILED_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var ZELDA64RECOMPILED_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Getting 'Zelda 64: Recompiled' backup from "%ZELDA64RECOMPILED_BACKUP_HOME%"
@@ -93,8 +93,7 @@ if %_execute_console% equ 1 (
     robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -102,9 +101,9 @@ goto :completed
 :launch1964gepd
 echo:
 
-call ..\.win\require-var GEPD_1964_HOME
-call ..\.win\require-var GEPD_1964_SAVES_HOME
-call ..\.win\require-var GEPD_1964_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEPD_1964_HOME
+call %SCRIPTS_HOME%\.win\require-var GEPD_1964_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEPD_1964_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Getting '1964 GEPD Edition' backup from "%GEPD_1964_BACKUP_HOME%"
@@ -129,8 +128,7 @@ if %_execute_console% equ 1 (
     robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -138,9 +136,9 @@ goto :completed
 :launchdolphin
 echo:
 
-call ..\.win\require-var DOLPHIN_HOME
-call ..\.win\require-var DOLPHIN_SAVES_HOME
-call ..\.win\require-var DOLPHIN_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var DOLPHIN_HOME
+call %SCRIPTS_HOME%\.win\require-var DOLPHIN_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var DOLPHIN_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Getting 'Dolphin' backup from "%DOLPHIN_BACKUP_HOME%"
@@ -160,8 +158,7 @@ if %_execute_console% equ 1 (
     robocopy *.gci "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -178,11 +175,10 @@ if %_recover_backup% equ 1 (
 if %_execute_console% equ 1 (
     echo Launching 'Mupen64Plus' at "%MUPEN64PLUS_HOME%"
 
-    call ".\.libs\start-mupen64plus" %*
+    call "%SCRIPTS_HOME%\games\.libs\start-mupen64plus" %*
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%N64_SAVES_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%N64_SAVES_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -190,8 +186,8 @@ goto :completed
 :launchmgba
 echo:
 
-call ..\.win\require-var MGBA_HOME
-call ..\.win\require-var MGBA_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var MGBA_HOME
+call %SCRIPTS_HOME%\.win\require-var MGBA_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Save files already synchronized for 'mGBA'
@@ -206,8 +202,7 @@ if %_execute_console% equ 1 (
     mGBA.exe
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%MGBA_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%MGBA_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -215,8 +210,8 @@ goto :completed
 :launchazahar
 echo:
 
-call ..\.win\require-var AZAHAR_HOME
-call ..\.win\require-var AZAHAR_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var AZAHAR_HOME
+call %SCRIPTS_HOME%\.win\require-var AZAHAR_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Save files already synchronized for 'Azahar'
@@ -231,8 +226,7 @@ if %_execute_console% equ 1 (
     azahar.exe
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%AZAHAR_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%AZAHAR_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -240,8 +234,8 @@ goto :completed
 :launchsnes9x
 echo:
 
-call ..\.win\require-var SNES9X_HOME
-call ..\.win\require-var SNES9X_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var SNES9X_HOME
+call %SCRIPTS_HOME%\.win\require-var SNES9X_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Save files already synchronized for 'Snes9x'
@@ -256,8 +250,7 @@ if %_execute_console% equ 1 (
     snes9x-x64.exe
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%SNES9X_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%SNES9X_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -265,9 +258,9 @@ goto :completed
 :launchceleste64
 echo:
 
-call ..\.win\require-var CELESTE_64_HOME
-call ..\.win\require-var CELESTE_64_SAVES_HOME
-call ..\.win\require-var CELESTE_64_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var CELESTE_64_HOME
+call %SCRIPTS_HOME%\.win\require-var CELESTE_64_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var CELESTE_64_BACKUP_HOME
 
 if %_recover_backup% equ 1 (
     echo Getting 'Celeste 64' backup from "%CELESTE_64_BACKUP_HOME%"
@@ -287,8 +280,7 @@ if %_execute_console% equ 1 (
     robocopy "%CELESTE_64_SAVES_HOME%" "%CELESTE_64_BACKUP_HOME%" /z
 )
 
-cd "%SCRIPTS_HOME%"
-call ".\sys\save-snapshot" "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 

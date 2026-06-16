@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ./.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 # Last assigned: $WORKSPACE_HOME/github/private-gpt
 _require_var PRIVATE_GPT_HOME

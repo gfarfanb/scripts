@@ -4,28 +4,28 @@ rem __usage_lib_page:
 rem Starts Mupen64Plus emulator
 rem
 rem Dependencies:
-rem   call .\.libs\env-vars rem Relative call
+rem   call %SCRIPTS_HOME%\.libs\env-vars rem Relative call
 rem Usage in script:
-rem   call ".\.libs\start-mupen64plus" %*  rem Relative call
+rem   call "%SCRIPTS_HOME%\.libs\start-mupen64plus" %*  rem Relative call
 
-call ..\.win\require-var MUPEN64PLUS_HOME
-call ..\.win\require-var N64_PROFILES_FILE
-call ..\.win\require-var N64_ROMS_HOME
-call ..\.win\require-var N64_SAVES_HOME
-call ..\.win\require-var N64_SCREENSHOTS_HOME
-call ..\.win\require-var GB_GBC_ROMS_HOME
-call ..\.win\require-var GB_GBC_SAVES_HOME
-call ..\.win\require-var N64_CONFIGURED_JOYSTICK_LENGTH
-call ..\.win\require-var N64_CONFIGURED_JOYSTICK_DEFAULT
+call %SCRIPTS_HOME%\.win\require-var MUPEN64PLUS_HOME
+call %SCRIPTS_HOME%\.win\require-var N64_PROFILES_FILE
+call %SCRIPTS_HOME%\.win\require-var N64_ROMS_HOME
+call %SCRIPTS_HOME%\.win\require-var N64_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var N64_SCREENSHOTS_HOME
+call %SCRIPTS_HOME%\.win\require-var GB_GBC_ROMS_HOME
+call %SCRIPTS_HOME%\.win\require-var GB_GBC_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var N64_CONFIGURED_JOYSTICK_LENGTH
+call %SCRIPTS_HOME%\.win\require-var N64_CONFIGURED_JOYSTICK_DEFAULT
 
 rem set "N64_JOYSTICK_NAMES[<joystick_index>]=<joystick_name>"
 rem set "N64_JOYSTICK_CONFIGS[<joystick_index>]=<joystick_connection>"
 for /l %%i in (1,1,%N64_CONFIGURED_JOYSTICK_LENGTH%) do (
-    call ..\.win\require-var N64_JOYSTICK_NAMES[%%i]
-    call ..\.win\require-var N64_JOYSTICK_CONFIGS[%%i]
+    call %SCRIPTS_HOME%\.win\require-var N64_JOYSTICK_NAMES[%%i]
+    call %SCRIPTS_HOME%\.win\require-var N64_JOYSTICK_CONFIGS[%%i]
 )
 
-call ..\.win\source-file "%N64_PROFILES_FILE%"
+call %SCRIPTS_HOME%\.win\source-file "%N64_PROFILES_FILE%"
 
 
 rem ######################### Profile definition
@@ -94,7 +94,7 @@ goto :romselected
 rem /********** N64 ROM selected **********/
 :romselected
 
-for /f "delims=" %%a in ('call ..\.win\sha256sum "%_n64_rom%"') do set _n64_rom_hash=%%a
+for /f "delims=" %%a in ('call %SCRIPTS_HOME%\.win\sha256sum "%_n64_rom%"') do set _n64_rom_hash=%%a
 
 
 rem /********** Number of controls menu **********/

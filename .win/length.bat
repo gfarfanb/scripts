@@ -7,7 +7,7 @@ rem Arguments:
 rem   %1 - String value
 rem   %2 - Output variable
 rem Usage in script:
-rem   call .\.win\length <value> <var> # Relative call
+rem   call %SCRIPTS_HOME%\.win\length <value> <var> # Relative call
 
 setlocal
 

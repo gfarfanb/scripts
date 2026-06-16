@@ -2,9 +2,9 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var JDK_CERT_BACKUP_HOME
-call ..\.win\require-var JDK_PEM_HOME
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var JDK_CERT_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var JDK_PEM_HOME
 
 goto :main
 
@@ -24,7 +24,7 @@ if /i "%~1"=="-i" goto :import
 if /i "%~1"=="-h" goto :__usage_page
 
 
-call .\setup-jdk %*
+call %SCRIPTS_HOME%\dev\setup-jdk %*
 
 if exist "%PEM_FILE_HOME%\*.pem" goto :loadcerts
 goto :certnotfound
@@ -83,7 +83,7 @@ goto :completed
 
 
 :import
-call .\setup-jdk
+call %SCRIPTS_HOME%\dev\setup-jdk
 
 set /a CERT_ID=1
 

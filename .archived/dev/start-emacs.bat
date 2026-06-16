@@ -2,10 +2,10 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var EMACS_HOME
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var EMACS_HOME
 rem Last assigned: 5
-call ..\.win\require-var EMACS_WAIT_SECS
+call %SCRIPTS_HOME%\.win\require-var EMACS_WAIT_SECS
 
 goto :main
 

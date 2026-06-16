@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 _require_var OLLAMA_SERVER
 _require_var LLM_MODELS_DB_FILE
@@ -38,9 +38,9 @@ if ! [ "$( systemctl is-active ollama )" = "active" ]; then
 fi
 
 if ! [ $_sync_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "./.py/ollama_models.py" -a opencode -a pi
+    $(command -v python3 || command -v python) "$SCRIPTS_HOME/llm/.py/ollama_models.py" -a opencode -a pi
 else
-    $(command -v python3 || command -v python) "./.py/ollama_models.py" -a opencode -a pi --config
+    $(command -v python3 || command -v python) "$SCRIPTS_HOME/llm/.py/ollama_models.py" -a opencode -a pi --config
 fi
 
 _completed

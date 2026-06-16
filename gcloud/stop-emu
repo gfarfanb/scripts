@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 GCLOUD_EMULATORS=(
     pubsub:Pub/Sub

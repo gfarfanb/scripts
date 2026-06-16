@@ -2,9 +2,9 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var OPEN_SSH_HOSTS_FILE
-call ..\.win\require-var OPEN_SSH_CLIENT
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var OPEN_SSH_HOSTS_FILE
+call %SCRIPTS_HOME%\.win\require-var OPEN_SSH_CLIENT
 
 goto :main
 
@@ -22,7 +22,7 @@ setlocal enableDelayedExpansion
 if /i "%~1"=="-h" goto :__usage_page
 
 
-call ..\.win\source-file "%OPEN_SSH_HOSTS_FILE%"
+call %SCRIPTS_HOME%\.win\source-file "%OPEN_SSH_HOSTS_FILE%"
 
 echo Select a knwon host:
 for /l %%i in (1,1,%KNOWN_HOST_LENGTH%) do (
@@ -51,7 +51,7 @@ goto :invalidssh
 
 :clientputty
 if "%_REQUIRED_PRIVATE_KEY%"=="1" (
-    call ..\.win\require-var OPEN_SSH_PRIVATE_KEY_LOCATION
+    call %SCRIPTS_HOME%\.win\require-var OPEN_SSH_PRIVATE_KEY_LOCATION
 
     set "_PRIVATE_KEY_OPT= -i ^"%OPEN_SSH_PRIVATE_KEY_LOCATION%^""
 )
@@ -66,7 +66,7 @@ goto :executessh
 
 :clientssh
 if "%_REQUIRED_PRIVATE_KEY%"=="1" (
-    call ..\.win\require-var OPEN_SSH_PRIVATE_KEY_LOCATION
+    call %SCRIPTS_HOME%\.win\require-var OPEN_SSH_PRIVATE_KEY_LOCATION
 
     set "_PRIVATE_KEY_OPT= -i ^"%OPEN_SSH_PRIVATE_KEY_LOCATION%^""
 )

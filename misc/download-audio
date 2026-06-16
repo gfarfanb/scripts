@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 _require_var YT_DLP_AUDIO_OUTPUT_FOLDER
 _require_var DOWNLOADS_HOME
@@ -23,7 +23,7 @@ EOF
     exit 0
 }
 
-. ./.libs/url-source
+. $SCRIPTS_HOME/misc/.libs/url-source
 
 _hosts_db_file="$URL_SOURCE_DB_FILE"
 _default_quality=4

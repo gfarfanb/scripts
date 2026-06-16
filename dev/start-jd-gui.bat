@@ -2,8 +2,8 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var JD_GUI_JAR
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var JD_GUI_JAR
 
 goto :main
 
@@ -19,7 +19,7 @@ goto :back
 :main
 if /i "%~1"=="-h" goto :__usage_page
 
-call .\setup-jdk %*
+call %SCRIPTS_HOME%\dev\setup-jdk %*
 
 "%JAVA_HOME%\bin\java" -jar "%JD_GUI_JAR%"
 goto :completed

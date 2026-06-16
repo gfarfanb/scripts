@@ -2,7 +2,7 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
+call %SCRIPTS_HOME%\.libs\env-vars
 
 goto :main
 

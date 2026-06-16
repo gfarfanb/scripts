@@ -2,7 +2,7 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
+call %SCRIPTS_HOME%\.libs\env-vars
 
 if not defined SNAPSHOTS_TO_KEEP set "SNAPSHOTS_TO_KEEP=1"
 
@@ -30,11 +30,11 @@ goto :snapshot
 
 
 :snapshot
-python ".\.py\file_snapshot.py" -s "%_source%" -k %_keep%
+python "%SCRIPTS_HOME%\sys\.py\file_snapshot.py" -s "%_source%" -k %_keep%
 goto :completed
 
 :getsnapshot
-python ".\.py\file_snapshot.py" -s "%_source%" --recover
+python "%SCRIPTS_HOME%\sys\.py\file_snapshot.py" -s "%_source%" --recover
 goto :completed
 
 

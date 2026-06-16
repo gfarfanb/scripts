@@ -2,11 +2,11 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var CERTIFICA_HOME
-call ..\.win\require-var CERTIFICA_REQUIRED_JDK
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var CERTIFICA_HOME
+call %SCRIPTS_HOME%\.win\require-var CERTIFICA_REQUIRED_JDK
 
-call ..\dev\setup-jdk "%CERTIFICA_REQUIRED_JDK%"
+call %SCRIPTS_HOME%\dev\setup-jdk "%CERTIFICA_REQUIRED_JDK%"
 
 goto :main
 

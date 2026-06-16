@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 : "${SNAPSHOTS_TO_KEEP:=1}"
@@ -42,9 +42,9 @@ while getopts "s:k:rh" opt; do
 done
 
 if ! [ $_recover_flag -eq 1 ]; then
-    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -s "$_source" -k $_keep
+    $(command -v python3 || command -v python) "$SCRIPTS_HOME/sys/.py/file_snapshot.py" -s "$_source" -k $_keep
 else
-    $(command -v python3 || command -v python) "./.py/file_snapshot.py" -s "$_source" --recover
+    $(command -v python3 || command -v python) "$SCRIPTS_HOME/sys/.py/file_snapshot.py" -s "$_source" --recover
 fi
 
 _completed

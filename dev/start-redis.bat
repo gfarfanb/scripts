@@ -2,10 +2,10 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var REDIS_HOME
-call ..\.win\require-var REDIS_DATA
-call ..\.win\require-var REDIS_PORT
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var REDIS_HOME
+call %SCRIPTS_HOME%\.win\require-var REDIS_DATA
+call %SCRIPTS_HOME%\.win\require-var REDIS_PORT
 
 goto :main
 

@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 _require_var TEMP_DIR
 # Last assigned: ./.config/pubsub-db.json.original
@@ -42,7 +42,7 @@ while getopts "rh" opt; do
     esac
 done
 
-. ./.libs/select-project
+. $SCRIPTS_HOME/gcloud/.libs/select-project
 
 _require_var PUSH_PORT_SELECTED
 

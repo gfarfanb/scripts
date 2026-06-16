@@ -6,7 +6,7 @@ rem
 rem Arguments:
 rem   %* - Input
 rem Usage in script:
-rem   call .\.win\sha256sum <arg1> <arg2> <argn> # Relative call
+rem   call %SCRIPTS_HOME%\.win\sha256sum <arg1> <arg2> <argn> # Relative call
 
 setlocal
 

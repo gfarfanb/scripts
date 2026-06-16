@@ -2,8 +2,8 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var REPOS_DEF_FILE
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var REPOS_DEF_FILE
 
 goto :main
 
@@ -24,7 +24,7 @@ if /i "%~1"=="-h" goto :__usage_page
 set /a _repo_idx=1
 
 for /f "tokens=*" %%l in (%REPOS_DEF_FILE%) do (
-    call ..\.win\eval set "_repo=%%l"
+    call %SCRIPTS_HOME%\.win\eval set "_repo=%%l"
 
     set _execute_flag=true
 
@@ -42,8 +42,8 @@ for /f "tokens=*" %%l in (%REPOS_DEF_FILE%) do (
 
     set "_prefix=!_branch!:!_username!:"
 
-    call ..\.win\length "!_prefix!" _prefix_length
-    call ..\.win\eval set "_location=%%_repo:~!_prefix_length!%%"
+    call %SCRIPTS_HOME%\.win\length "!_prefix!" _prefix_length
+    call %SCRIPTS_HOME%\.win\eval set "_location=%%_repo:~!_prefix_length!%%"
 
     for /f %%i in ("!_location!") do set "_repo_name=%%~ni"
 

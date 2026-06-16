@@ -2,9 +2,9 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var POSTGRESQL_HOME
-call ..\.win\require-var POSTGRESQL_BACKUP_HOME
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var POSTGRESQL_HOME
+call %SCRIPTS_HOME%\.win\require-var POSTGRESQL_BACKUP_HOME
 
 rem https://blog.marcnuri.com/windows-postgresql-without-installation-portable
 

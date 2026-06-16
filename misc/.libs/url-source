@@ -4,7 +4,7 @@
 # Gets source and cookies host from a URL
 #
 # Usage in script:
-#   . ./.libs/url-source  # Relative source
+#   . $SCRIPTS_HOME/misc/.libs/url-source  # Relative source
 #   _url_source_db_file=<url_source_db_file>  # Set hosts database file
 
 : "${_url_source_db_file:=}"

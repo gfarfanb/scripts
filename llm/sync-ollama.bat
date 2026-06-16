@@ -2,11 +2,11 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var OLLAMA_SERVER
-call ..\.win\require-var LLM_MODELS_DB_FILE
-call ..\.win\require-var OPENCODE_CONFIG_FILE
-call ..\.win\require-var PI_CONFIG_FILE
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var OLLAMA_SERVER
+call %SCRIPTS_HOME%\.win\require-var LLM_MODELS_DB_FILE
+call %SCRIPTS_HOME%\.win\require-var OPENCODE_CONFIG_FILE
+call %SCRIPTS_HOME%\.win\require-var PI_CONFIG_FILE
 
 goto :main
 
@@ -27,11 +27,11 @@ if /i "%~1"=="-h" goto :__usage_page
 goto :pull
 
 :pull
-python ".\.py\ollama_models.py" -a opencode -a pi
+python "%SCRIPTS_HOME%\llm\.py\ollama_models.py" -a opencode -a pi
 goto :completed
 
 :sync
-python ".\.py\ollama_models.py" -a opencode -a pi --config
+python "%SCRIPTS_HOME%\llm\.py\ollama_models.py" -a opencode -a pi --config
 goto :completed
 
 

@@ -2,10 +2,10 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var SYS_CONTROL_DB_FILE
-call ..\.win\require-var MACHINE_CONTROL_NAME
-call ..\.win\require-var OS_CONTROL_NAME
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var SYS_CONTROL_DB_FILE
+call %SCRIPTS_HOME%\.win\require-var MACHINE_CONTROL_NAME
+call %SCRIPTS_HOME%\.win\require-var OS_CONTROL_NAME
 
 goto :main
 
@@ -23,7 +23,7 @@ goto :back
 :main
 if /i "%~1"=="-h" goto :__usage_page
 
-python ".\.py\backup_repos.py" ^
+python "%SCRIPTS_HOME%\sys\.py\backup_repos.py" ^
     -n "%MACHINE_CONTROL_NAME%" -o "%OS_CONTROL_NAME%" %*
 goto :completed
 

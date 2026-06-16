@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 _require_var SYNC_FOLDER_PRIVATE_DIR
 # Last assigned: $WORKSPACE_HOME/pkb/org-roam/private

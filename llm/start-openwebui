@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 _require_var OPEN_WEBUI_ENV
 _require_var OPEN_WEBUI_PORT
@@ -46,7 +46,7 @@ EOF
     exit 0
 }
 
-. ../dev/.libs/docker-fn
+. $SCRIPTS_HOME/dev/.libs/docker-fn
 
 _default_compose_service_name=open-webui-$OPEN_WEBUI_ENV
 

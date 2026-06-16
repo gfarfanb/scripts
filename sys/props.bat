@@ -2,7 +2,7 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
+call %SCRIPTS_HOME%\.libs\env-vars
 
 goto :main
 
@@ -25,7 +25,7 @@ goto :props
 
 
 :getvalue
-call ..\.win\eval set "_prop_value=%%%~1%%"
+call %SCRIPTS_HOME%\.win\eval set "_prop_value=%%%~1%%"
 echo | set /p=!_prop_value!
 goto :eof
 
@@ -71,7 +71,7 @@ if "%_prop_name%"=="" (
 )
 
 echo:
-call ..\.win\eval set "_prop_value=%%%_prop_name%%%"
+call %SCRIPTS_HOME%\.win\eval set "_prop_value=%%%_prop_name%%%"
 
 if "!_prop_value!"=="" (
     echo !_prop_name!=^<empty^>

@@ -2,7 +2,7 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
+call %SCRIPTS_HOME%\.libs\env-vars
 
 goto :main
 
@@ -18,7 +18,7 @@ goto :back
 :main
 if /i "%~1"=="-h" goto :__usage_page
 
-call .\setup-jdk %*
+call %SCRIPTS_HOME%\dev\setup-jdk %*
 
 "%JAVA_HOME%\bin\jshell"
 goto :completed

@@ -6,7 +6,7 @@ rem
 rem Arguments:
 rem   %1 - File to source
 rem Usage in script:
-rem   call .\.win\source-file <file> # Relative call
+rem   call %SCRIPTS_HOME%\.win\source-file <file> # Relative call
 
 set "__file=%~1"
 

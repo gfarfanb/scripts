@@ -2,9 +2,9 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var SYNC_FOLDER_PRIVATE_DIR
-call ..\.win\require-var ORG_ROAM_PRIVATE_DIR
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var SYNC_FOLDER_PRIVATE_DIR
+call %SCRIPTS_HOME%\.win\require-var ORG_ROAM_PRIVATE_DIR
 
 goto :main
 

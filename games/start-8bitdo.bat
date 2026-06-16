@@ -2,8 +2,8 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var EIGHTBITDO_FIRMWARE_UPDATER_HOME
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var EIGHTBITDO_FIRMWARE_UPDATER_HOME
 
 goto :main
 

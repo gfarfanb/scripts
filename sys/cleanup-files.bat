@@ -2,10 +2,9 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-
-call ..\.win\require-var REGISTRY_BACKUP_HOME
-call ..\.win\require-var REGISTRY_BACKUP_TO_KEEP
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var REGISTRY_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var REGISTRY_BACKUP_TO_KEEP
 
 goto :main
 
@@ -51,7 +50,7 @@ echo Defender scan history cleaned
 del /s /q C:\Windows\Prefetch\* >nul 2>&1
 echo Prefetch files cleaned
 
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "%REGISTRY_BACKUP_HOME%" -RegistryBackupToKeep "%REGISTRY_BACKUP_TO_KEEP%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPTS_HOME%\sys\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "%REGISTRY_BACKUP_HOME%" -RegistryBackupToKeep "%REGISTRY_BACKUP_TO_KEEP%"
 
 goto :completed
 

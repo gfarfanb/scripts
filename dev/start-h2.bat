@@ -2,10 +2,10 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var H2_HOME
-call ..\.win\require-var H2_WEB_PORT
-call ..\.win\require-var H2_REQUIRED_JDK
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var H2_HOME
+call %SCRIPTS_HOME%\.win\require-var H2_WEB_PORT
+call %SCRIPTS_HOME%\.win\require-var H2_REQUIRED_JDK
 
 goto :main
 
@@ -21,7 +21,7 @@ goto :back
 :main
 if /i "%~1"=="-h" goto :__usage_page
 
-call .\setup-jdk "%H2_REQUIRED_JDK%"
+call %SCRIPTS_HOME%\dev\setup-jdk "%H2_REQUIRED_JDK%"
 
 cd %H2_HOME%
 

@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 _require_var SYS_CONTROL_DB_FILE
 _require_var MACHINE_CONTROL_NAME
@@ -30,7 +30,7 @@ while getopts "bsh" opt; do
     esac
 done
 
-$(command -v python3 || command -v python) "./.py/backup_repos.py" \
+$(command -v python3 || command -v python) "$SCRIPTS_HOME/sys/.py/backup_repos.py" \
     -n "$MACHINE_CONTROL_NAME" -o "$OS_CONTROL_NAME" $*
 
 _completed

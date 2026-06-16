@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. ../.libs/env-vars
+. $SCRIPTS_HOME/.libs/env-vars
 
 # Last assigned: 0.0.0.0:9010
 _require_var SPANNER_HOST_PORT
@@ -33,7 +33,7 @@ while getopts "h" opt; do
     esac
 done
 
-. ./.libs/select-project
+. $SCRIPTS_HOME/gcloud/.libs/select-project
 
 _require_var PROJECT_SELECTED
 

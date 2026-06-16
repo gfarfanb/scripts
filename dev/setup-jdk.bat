@@ -2,8 +2,8 @@
 set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
-call ..\.libs\env-vars
-call ..\.win\require-var JDK_HOMES_FILE
+call %SCRIPTS_HOME%\.libs\env-vars
+call %SCRIPTS_HOME%\.win\require-var JDK_HOMES_FILE
 
 goto :main
 
@@ -23,7 +23,7 @@ goto :back
 setlocal enableDelayedExpansion
 if /i "%~1"=="-h" goto :__usage_page
 
-call ..\.win\source-file "%JDK_HOMES_FILE%"
+call %SCRIPTS_HOME%\.win\source-file "%JDK_HOMES_FILE%"
 
 
 set "_JDK_INDEX="

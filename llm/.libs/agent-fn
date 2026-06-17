@@ -18,17 +18,35 @@ _setup_graphify() {
     if [ -z "$( _verify_graphify )" ]; then
         echo >&2
         echo "Installing skill for agent '$_agent'" >&2
-        graphify $_agent install --project
-
-        echo "Initializing graph [backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
-        graphify . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
+        graphify $_agent install --project >&2
     else
         echo >&2
         echo "Updating skill for agent '$_agent'" >&2
-        graphify $_agent install
+        graphify $_agent install >&2
+    fi
 
-        echo "Updating graph [backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
-        graphify . --update --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
+    if ! [ -f "./graphify-out/graph.json" ]; then
+        echo >&2
+        echo "Initializing graph ..." >&2
+        echo "[backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
+
+        graphify . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL" >&2
+    else
+        echo >&2
+        read -p "Re-extract changed files? [y/n] > " _update_flag
+        case $_update_flag in
+            [Yy])
+                echo "Updating graph - extracting changes files (this might take a few minutes) ..." >&2
+                echo "[backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
+
+                graphify update . --update . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL" >&2
+                ;;
+            *)
+                echo "Updating graph - extracting code files (AST-only) ..." >&2
+
+                graphify update update . >&2
+                ;;
+        esac
     fi
 }
 
@@ -44,13 +62,13 @@ _setup_codegraph() {
     if [ -z "$( _verify_codegraph )" ]; then
         echo >&2
         echo "Connecting to '$_agent' agent" >&2
-        codegraph install --target $_agent --location local
+        codegraph install --target $_agent --location local >&2
 
         echo "Initializing index" >&2
-        codegraph init -i
+        codegraph init -i >&2
     else
         echo >&2
-        codegraph status
+        codegraph status >&2
     fi
 }
 

@@ -4,7 +4,7 @@
 # Defines common Docker functions
 #
 # Usage in script:
-#   . $SCRIPTS_HOME/dev/.libs/docker-fn  # Relative source
+#   . $SCRIPTS_HOME/dev/.libs/docker-fn
 #   _default_compose_service_index=<n>  # Set to change default service index
 #   _default_compose_service_name=<service_name>  # Set to change default service name
 #   _docker_wait_secs=<n>  # Set to change default waiting time in seconds

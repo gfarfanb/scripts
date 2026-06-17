@@ -1,56 +1,10 @@
 #! /usr/bin/env bash
-SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
 
-. $SCRIPTS_HOME/.libs/env-vars
-
-_require_var GRAPHIFY_BACKEND
-_require_var GRAPHIFY_MODEL
-
-__usage_page() {
-    cat << EOF
-Initialize project and start a selected agent.
-
-Usage: $(basename $0) [<option>]*
-Option:
-    -h: Displays this help message
-EOF
-    exit 0
-}
-
-_registered_agents=(
-    "opencode"
-    "pi"
-)
-
-_registered_plugins=(
-    "Graphify"
-    "CodeGraph"
-)
-
-_select_agent() {
-    echo >&2
-    echo "Select an agent:" >&2
-    for _idx in "${!_registered_agents[@]}"; do
-        _agent="${_registered_agents[$_idx]}"
-
-        echo "$((_idx+1))) $_agent" >&2
-    done
-    read -p "agent-index> " _agent_idx
-
-    if [ -z "$_agent_idx" ]; then
-        echo "Invalid agent index" >&2
-        _stopped
-    fi
-
-    _agent="${_registered_agents[$((_agent_idx-1))]}"
-
-    if [ -z "$_agent" ]; then
-        echo "Invalid agent index" >&2
-        _stopped
-    fi
-
-    echo $_agent
-}
+# __usage_lib_page:
+# Defines common agent functions
+#
+# Usage in script:
+#   . $SCRIPTS_HOME/llm/.libs/agent-fn
 
 _verify_graphify() {
     if [ -f "./.opencode/plugins/graphify.js" ]; then
@@ -112,14 +66,14 @@ _select_plugin() {
 
     if [ -z "$_plugin_idx" ]; then
         echo "Invalid plugin index" >&2
-        _stopped
+        exit 1
     fi
 
     _plugin="${_registered_plugins[$((_plugin_idx-1))]}"
 
     if [ -z "$_plugin" ]; then
         echo "Invalid plugin index" >&2
-        _stopped
+        exit 1
     fi
 
     echo $_plugin
@@ -138,46 +92,20 @@ _verify_plugin() {
     fi
 }
 
-while getopts "h" opt; do
-    case "$opt" in
-        h)
-            __usage_page
+_setup_plugin() {
+    local _agent=${1:-}
+    local _plugin=$( _verify_plugin )
+
+    case $_plugin in
+        Graphify)
+            _setup_graphify $_agent
+            ;;
+        CodeGraph)
+            _setup_codegraph $_agent
+            ;;
+        *)
+            echo "Plugin not selected" >&2
+            exit 1
             ;;
     esac
-done
-
-echo >&2
-echo "Project: $SOURCEDIR" >&2
-
-cd "$SOURCEDIR"
-
-_agent=$( _select_agent )
-_plugin=$( _verify_plugin )
-
-case $_plugin in
-    Graphify)
-        _setup_graphify $_agent
-        ;;
-    CodeGraph)
-        _setup_codegraph $_agent
-        ;;
-    *)
-        echo "Plugin not selected" >&2
-        _stopped
-        ;;
-esac
-
-case $_agent in
-    opencode)
-        opencode
-        ;;
-    pi)
-        pi
-        ;;
-    *)
-        echo "Agent not selected" >&2
-        _stopped
-        ;;
-esac
-
-_completed
+}

@@ -4,7 +4,7 @@
 # Starts Mupen64Plus emulator
 #
 # Usage in script:
-#   . $SCRIPTS_HOME/games/.libs/start-mupen64plus  # Relative source
+#   . $SCRIPTS_HOME/games/.libs/start-mupen64plus
 
 . "$N64_PROFILES_FILE"
 

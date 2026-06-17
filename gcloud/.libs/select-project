@@ -7,7 +7,7 @@
 #   - PUSH_PORT_SELECTED
 #
 # Usage in script:
-#   . $SCRIPTS_HOME/gcloud/.libs/select-project  # Relative source
+#   . $SCRIPTS_HOME/gcloud/.libs/select-project
 
 echo >&2
 echo "Select a project:" >&2

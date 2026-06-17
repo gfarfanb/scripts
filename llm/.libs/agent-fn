@@ -28,7 +28,7 @@ _setup_graphify() {
         graphify $_agent install
 
         echo "Updating graph [backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
-        graphify update . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
+        graphify . --update --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL"
     fi
 }
 

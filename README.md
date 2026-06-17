@@ -69,8 +69,20 @@ Project initialization
 cd <project_home>
 
 graphify opencode install --project
+```
 
+Graph bulding
+```sh
+# Initialization
 graphify . --model <model>
+
+# Update
+graphify update . --model <model>
+```
+
+Skill update
+```sh
+graphify opencode install
 ```
 
 

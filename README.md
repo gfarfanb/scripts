@@ -43,6 +43,37 @@ source ~/.bashrc
 > ```
 
 
+## OpenCode configuration
+
+### Graphify
+
+[Graphify](https://github.com/safishamsi/graphify) installation
+```sh
+uv tool install graphifyy
+
+graphify --version
+
+# Add-ons
+uv tool install "graphifyy[pdf,office,google,mcp,svg,ollama,sql,postgres]"
+```
+> [uv](https://docs.astral.sh/uv/getting-started/installation/) is required here
+
+Required environment variables
+| Variable | Value |
+| --- | --- |
+| OPENAI_BASE_URL | <openai_compatible_base_url> |
+| OPENAI_API_KEY | <openai_api_key> |
+
+Project initialization
+```sh
+cd <project_home>
+
+graphify opencode install --project
+
+graphify . --model <model>
+```
+
+
 ## VS Code configuration
 
 **\<PROJECT_DIR>/.vscode/launch.json**

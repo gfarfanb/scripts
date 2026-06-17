@@ -1,0 +1,247 @@
+{
+  ".archived/dev/start-emacs": {
+    "mtime": 1781622239.0465584,
+    "ast_hash": "fd3d4234c1af0413118c69fd7e33c7cb",
+    "semantic_hash": "fd3d4234c1af0413118c69fd7e33c7cb"
+  },
+  ".archived/llm/start-pgpt": {
+    "mtime": 1781622254.9945555,
+    "ast_hash": "050b01f8bcb02d51eaa9a57648ccbacf",
+    "semantic_hash": "050b01f8bcb02d51eaa9a57648ccbacf"
+  },
+  ".archived/sys/backup-repos": {
+    "mtime": 1781622264.4475532,
+    "ast_hash": "736a044c9ce66f47e7f3b625301fb36b",
+    "semantic_hash": "736a044c9ce66f47e7f3b625301fb36b"
+  },
+  ".archived/sys/pull-repos": {
+    "mtime": 1781622268.3861785,
+    "ast_hash": "5286488d72a6f5fb7c26775a05ec78dd",
+    "semantic_hash": "5286488d72a6f5fb7c26775a05ec78dd"
+  },
+  ".archived/sys/sync-private": {
+    "mtime": 1781622271.5836377,
+    "ast_hash": "347063e264a3ca3ba64418022024c6ba",
+    "semantic_hash": "347063e264a3ca3ba64418022024c6ba"
+  },
+  ".libs/env-vars": {
+    "mtime": 1781622282.6944327,
+    "ast_hash": "4d91b3a95d4124f2a89f8ab300d02683",
+    "semantic_hash": "4d91b3a95d4124f2a89f8ab300d02683"
+  },
+  ".opencode/opencode.json": {
+    "mtime": 1781710590.372757,
+    "ast_hash": "abcc8b9dcd80bca5f9dde6d9f0c3ae79",
+    "semantic_hash": "abcc8b9dcd80bca5f9dde6d9f0c3ae79"
+  },
+  ".opencode/plugins/graphify.js": {
+    "mtime": 1781710590.3726292,
+    "ast_hash": "64ccd3c03dbfe0980b6095766f5c4e52",
+    "semantic_hash": "64ccd3c03dbfe0980b6095766f5c4e52"
+  },
+  ".py/env_vars.py": {
+    "mtime": 1780810493.5297096,
+    "ast_hash": "2dd175bf55a75bc5475137eaaa3dceaa",
+    "semantic_hash": "2dd175bf55a75bc5475137eaaa3dceaa"
+  },
+  "dev/.libs/docker-fn": {
+    "mtime": 1781622300.9924612,
+    "ast_hash": "44ca2ebdaecad7f3450b974f21827293",
+    "semantic_hash": "44ca2ebdaecad7f3450b974f21827293"
+  },
+  "dev/start-redis": {
+    "mtime": 1781622288.0608585,
+    "ast_hash": "bb62b41beb4a1219602c22567c9bca13",
+    "semantic_hash": "bb62b41beb4a1219602c22567c9bca13"
+  },
+  "dev/start-sqlite": {
+    "mtime": 1781622291.2739546,
+    "ast_hash": "5c0d7d4ba338658f61cfd55cf56e0ad1",
+    "semantic_hash": "5c0d7d4ba338658f61cfd55cf56e0ad1"
+  },
+  "games/.libs/start-mupen64plus": {
+    "mtime": 1781622623.4384882,
+    "ast_hash": "aa92d0dba858d4fcf36e36c52a2644bf",
+    "semantic_hash": "aa92d0dba858d4fcf36e36c52a2644bf"
+  },
+  "games/build-solus": {
+    "mtime": 1781622312.271293,
+    "ast_hash": "7cc78fff4b11030493d9112c2d594ce7",
+    "semantic_hash": "7cc78fff4b11030493d9112c2d594ce7"
+  },
+  "games/launch-console": {
+    "mtime": 1781622604.8704917,
+    "ast_hash": "35250e0fa03d65e9d7a5bf9305a08bdb",
+    "semantic_hash": "35250e0fa03d65e9d7a5bf9305a08bdb"
+  },
+  "gcloud/.libs/select-project": {
+    "mtime": 1781622990.0284936,
+    "ast_hash": "60dd0d7ed17d45e3d31c01bfaad44b01",
+    "semantic_hash": "60dd0d7ed17d45e3d31c01bfaad44b01"
+  },
+  "gcloud/pubsub-topics": {
+    "mtime": 1781622399.1534867,
+    "ast_hash": "512a3b4896ac3fa54a6e9e37d433c127",
+    "semantic_hash": "512a3b4896ac3fa54a6e9e37d433c127"
+  },
+  "gcloud/start-emu-pubsub": {
+    "mtime": 1781622952.8482924,
+    "ast_hash": "776640842d62d7ba150abd726af31c63",
+    "semantic_hash": "776640842d62d7ba150abd726af31c63"
+  },
+  "gcloud/start-emu-spanner": {
+    "mtime": 1781622974.5719657,
+    "ast_hash": "12c51e46af5e714cb9ca16c2e6d91c28",
+    "semantic_hash": "12c51e46af5e714cb9ca16c2e6d91c28"
+  },
+  "gcloud/stop-emu": {
+    "mtime": 1781622980.2010913,
+    "ast_hash": "bcbfbacb4546fff2a30810af4a1ebf78",
+    "semantic_hash": "bcbfbacb4546fff2a30810af4a1ebf78"
+  },
+  "llm/.db/llm-models.schema.sql": {
+    "mtime": 1780697534.3938878,
+    "ast_hash": "18096f53c3f2accba158862e1455cf83",
+    "semantic_hash": "18096f53c3f2accba158862e1455cf83"
+  },
+  "llm/.py/ollama_models.py": {
+    "mtime": 1781543165.414479,
+    "ast_hash": "a61ba7f84cf30059d6cfac1139dac677",
+    "semantic_hash": "a61ba7f84cf30059d6cfac1139dac677"
+  },
+  "llm/start-agent": {
+    "mtime": 1781709029.324845,
+    "ast_hash": "0a1ab5b8d97e305796555c7facde4eda",
+    "semantic_hash": "0a1ab5b8d97e305796555c7facde4eda"
+  },
+  "llm/start-opencode": {
+    "mtime": 1781622995.1255739,
+    "ast_hash": "bbc728c0a9b63f8e89deeadb94e09f0b",
+    "semantic_hash": "bbc728c0a9b63f8e89deeadb94e09f0b"
+  },
+  "llm/start-openwebui": {
+    "mtime": 1781623002.385064,
+    "ast_hash": "f115d38beb4cb6370a3a1cde7ac9e5d4",
+    "semantic_hash": "f115d38beb4cb6370a3a1cde7ac9e5d4"
+  },
+  "llm/sync-ollama": {
+    "mtime": 1781623031.5184147,
+    "ast_hash": "72e0d3f6ccf192732e527f6f076d76f9",
+    "semantic_hash": "72e0d3f6ccf192732e527f6f076d76f9"
+  },
+  "misc/.db/url-source.schema.sql": {
+    "mtime": 1780697548.0618558,
+    "ast_hash": "1165ea0b6a0b1c89de60543d542914fc",
+    "semantic_hash": "1165ea0b6a0b1c89de60543d542914fc"
+  },
+  "misc/.libs/url-source": {
+    "mtime": 1781623093.4478564,
+    "ast_hash": "cef272161f409b47a450e8baa028c79c",
+    "semantic_hash": "cef272161f409b47a450e8baa028c79c"
+  },
+  "misc/.py/netscape_cookies.py": {
+    "mtime": 1779899285.1103792,
+    "ast_hash": "283315df8de3348e49ae483f8ca5011c",
+    "semantic_hash": "283315df8de3348e49ae483f8ca5011c"
+  },
+  "misc/download-audio": {
+    "mtime": 1781623065.4144084,
+    "ast_hash": "9970769db48714795cfcf59b349b846a",
+    "semantic_hash": "9970769db48714795cfcf59b349b846a"
+  },
+  "misc/download-video": {
+    "mtime": 1781623075.529764,
+    "ast_hash": "fc637f7b37325856df4f69e573023af6",
+    "semantic_hash": "fc637f7b37325856df4f69e573023af6"
+  },
+  "misc/mp4-to-mp3": {
+    "mtime": 1781623079.8523283,
+    "ast_hash": "fd35f373594219d114299ab0734efb3c",
+    "semantic_hash": "fd35f373594219d114299ab0734efb3c"
+  },
+  "misc/transcribe": {
+    "mtime": 1781623084.863382,
+    "ast_hash": "7738fa1b165a8292d3b6805223ec2efb",
+    "semantic_hash": "7738fa1b165a8292d3b6805223ec2efb"
+  },
+  "sys/.cs/RegistryCleaner.cs": {
+    "mtime": 1779722657.3143437,
+    "ast_hash": "56d88c57c18bf28e64cebbd75bddd1aa",
+    "semantic_hash": "56d88c57c18bf28e64cebbd75bddd1aa"
+  },
+  "sys/.db/sys-control.schema.sql": {
+    "mtime": 1780700793.6088803,
+    "ast_hash": "430f556599b0f734cb5ab4af1f6637c5",
+    "semantic_hash": "430f556599b0f734cb5ab4af1f6637c5"
+  },
+  "sys/.ps/Registry-Cleaner.ps1": {
+    "mtime": 1781624552.6382957,
+    "ast_hash": "5786562a769c44ae0d7904a6fe320d90",
+    "semantic_hash": "5786562a769c44ae0d7904a6fe320d90"
+  },
+  "sys/.py/backup_repos.py": {
+    "mtime": 1780702074.1724594,
+    "ast_hash": "dedef896bb333da168bc0894a300a86d",
+    "semantic_hash": "dedef896bb333da168bc0894a300a86d"
+  },
+  "sys/.py/file_snapshot.py": {
+    "mtime": 1779899290.6547518,
+    "ast_hash": "ba181be27cde2a15fde1d87b24cd1c72",
+    "semantic_hash": "ba181be27cde2a15fde1d87b24cd1c72"
+  },
+  "sys/.py/update_plan.py": {
+    "mtime": 1781563175.0944633,
+    "ast_hash": "5eb25f1bf9ed6d2194938f28d041e4bd",
+    "semantic_hash": "5eb25f1bf9ed6d2194938f28d041e4bd"
+  },
+  "sys/cleanup-files": {
+    "mtime": 1781623098.7639103,
+    "ast_hash": "b0ae7c5e715d5ae79a3f6f2a6ad98f2c",
+    "semantic_hash": "b0ae7c5e715d5ae79a3f6f2a6ad98f2c"
+  },
+  "sys/dirs": {
+    "mtime": 1781623103.6357021,
+    "ast_hash": "12995f5bdb6a75ccdf067364c8d28a66",
+    "semantic_hash": "12995f5bdb6a75ccdf067364c8d28a66"
+  },
+  "sys/import-config": {
+    "mtime": 1780074578.0791855,
+    "ast_hash": "b1b06a9d9bf5f4a55ae654d7effcb1d8",
+    "semantic_hash": "b1b06a9d9bf5f4a55ae654d7effcb1d8"
+  },
+  "sys/props": {
+    "mtime": 1781623110.0510802,
+    "ast_hash": "6611929093f555d1c149ad7c1eab7630",
+    "semantic_hash": "6611929093f555d1c149ad7c1eab7630"
+  },
+  "sys/save-snapshot": {
+    "mtime": 1781623124.9916582,
+    "ast_hash": "f380f36ee8a901b8055057ef4cbc7972",
+    "semantic_hash": "f380f36ee8a901b8055057ef4cbc7972"
+  },
+  "sys/sync-cloud": {
+    "mtime": 1781623129.6534436,
+    "ast_hash": "c22661df1cec159c1c752d52d697b9d6",
+    "semantic_hash": "c22661df1cec159c1c752d52d697b9d6"
+  },
+  "sys/sync-repos": {
+    "mtime": 1781623138.5919974,
+    "ast_hash": "e4a44bd70efd5f91f0bc44eac31b84f6",
+    "semantic_hash": "e4a44bd70efd5f91f0bc44eac31b84f6"
+  },
+  "sys/update-apt": {
+    "mtime": 1781623388.6069057,
+    "ast_hash": "61e19b46b9ad19cbc2f09e74be3dcc72",
+    "semantic_hash": "61e19b46b9ad19cbc2f09e74be3dcc72"
+  },
+  "sys/update-dnf": {
+    "mtime": 1781623391.5980814,
+    "ast_hash": "acdbb81fe78fdd02e153369ff80e627f",
+    "semantic_hash": "acdbb81fe78fdd02e153369ff80e627f"
+  },
+  "sys/update-plan": {
+    "mtime": 1781623423.2655659,
+    "ast_hash": "3217eb5eddfdf16568c6b3c461ec4569",
+    "semantic_hash": "3217eb5eddfdf16568c6b3c461ec4569"
+  }
+}

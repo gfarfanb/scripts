@@ -89,7 +89,7 @@ _setup_codegraph() {
 
     if [ -z "$( _verify_codegraph )" ]; then
         echo >&2
-        echo "Connecting to agent '$_agent'" >&2
+        echo "Connecting to '$_agent' agent" >&2
         codegraph install --target $_agent --location local
 
         echo "Initializing index" >&2

@@ -1,0 +1,270 @@
+{
+  "communities": {
+    "0": [
+      "py_backup_repos",
+      "py_backup_repos_backup_repo",
+      "py_backup_repos_backup_repos",
+      "py_backup_repos_get_backup_link",
+      "py_backup_repos_get_clone_link",
+      "py_backup_repos_get_repo_defs",
+      "py_backup_repos_hub",
+      "py_backup_repos_hub_init",
+      "py_backup_repos_hub_str",
+      "py_backup_repos_load_hubs",
+      "py_backup_repos_main",
+      "py_backup_repos_pull_repo",
+      "py_backup_repos_pull_repos",
+      "py_backup_repos_repo",
+      "py_backup_repos_repo_init",
+      "py_backup_repos_repo_str",
+      "py_backup_repos_select_repo"
+    ],
+    "1": [
+      "py_file_snapshot",
+      "py_file_snapshot_cleanup_current",
+      "py_file_snapshot_cleanup_snapshots",
+      "py_file_snapshot_create_snapshot",
+      "py_file_snapshot_execute_recover",
+      "py_file_snapshot_execute_snapshot",
+      "py_file_snapshot_get_files_by_name",
+      "py_file_snapshot_get_snapshot_dir",
+      "py_file_snapshot_main",
+      "py_file_snapshot_name_without_ext",
+      "py_file_snapshot_recover_snapshot",
+      "py_file_snapshot_select_and_execute_recover",
+      "py_file_snapshot_select_and_execute_snapshot",
+      "py_file_snapshot_select_file",
+      "py_file_snapshot_select_snapshot"
+    ],
+    "2": [
+      "skill_agent_rules",
+      "skill_cluster_only",
+      "skill_cross_repo_merge",
+      "skill_explain_tool",
+      "skill_exports",
+      "skill_extraction_spec",
+      "skill_github_clone",
+      "skill_graphify",
+      "skill_hooks",
+      "skill_path_tool",
+      "skill_query_tool",
+      "skill_transcribe",
+      "skill_update_pipeline",
+      "skill_url_ingest",
+      "skill_watch_mode"
+    ],
+    "3": [
+      "py_update_plan",
+      "py_update_plan_command",
+      "py_update_plan_command_init",
+      "py_update_plan_command_str",
+      "py_update_plan_create_bash_command",
+      "py_update_plan_create_batch_command",
+      "py_update_plan_generate_bash",
+      "py_update_plan_generate_batch",
+      "py_update_plan_get_bash_shebang",
+      "py_update_plan_get_batch_shebang",
+      "py_update_plan_get_commands",
+      "py_update_plan_main",
+      "py_update_plan_printable_cmd",
+      "py_update_plan_select_command_index"
+    ],
+    "4": [
+      "progressbar",
+      "py_ollama_models",
+      "py_ollama_models_cleanup_models",
+      "py_ollama_models_expand_model",
+      "py_ollama_models_get_model_defs",
+      "py_ollama_models_get_opencode_spec",
+      "py_ollama_models_get_or_default",
+      "py_ollama_models_get_pi_spec",
+      "py_ollama_models_main",
+      "py_ollama_models_process_status",
+      "py_ollama_models_pull_models",
+      "py_ollama_models_sync_opencode",
+      "py_ollama_models_sync_pi"
+    ],
+    "5": [
+      "cs_registrycleaner",
+      "cs_registrycleaner_registrycleaner",
+      "cs_registrycleaner_registrycleaner_backupregistry",
+      "cs_registrycleaner_registrycleaner_cleanupoldbackups",
+      "cs_registrycleaner_registrycleaner_countentriesinzone",
+      "cs_registrycleaner_registrycleaner_exportregistryhive",
+      "cs_registrycleaner_registrycleaner_main",
+      "cs_registrycleaner_registrycleaner_scanmruentries",
+      "cs_registrycleaner_registrycleaner_scanregistry",
+      "cs_registrycleaner_registrycleaner_scanrunonceentries",
+      "cs_registrycleaner_registrycleaner_scanuninstallentries",
+      "list"
+    ],
+    "6": [
+      "llm_copilot_adapter",
+      "llm_docling_cuda_service",
+      "llm_docling_service",
+      "llm_open_webui_cuda",
+      "llm_open_webui_main",
+      "llm_postgres_service",
+      "llm_searxng_config",
+      "llm_searxng_service",
+      "llm_tika_service"
+    ],
+    "7": [
+      "py_env_vars",
+      "py_env_vars_env_value",
+      "py_env_vars_get_default_or_fail",
+      "py_env_vars_logging_level",
+      "py_env_vars_prop_value",
+      "py_env_vars_replace_all_envs"
+    ],
+    "8": [
+      "gcloud_pubsub_emulator",
+      "gcloud_spanner_emulator",
+      "gcloud_wsl_networking"
+    ],
+    "9": [
+      "py_netscape_cookies",
+      "py_netscape_cookies_format_cookies",
+      "py_netscape_cookies_main"
+    ],
+    "10": [
+      "plugins_graphify",
+      "plugins_graphify_graphifyplugin"
+    ],
+    "11": [
+      "readme_pylibspath",
+      "readme_scripts_home"
+    ],
+    "12": [
+      "ps_registry_cleaner"
+    ]
+  },
+  "cohesion": {
+    "0": 0.22794117647058823,
+    "1": 0.3333333333333333,
+    "2": 0.13333333333333333,
+    "3": 0.27472527472527475,
+    "4": 0.3333333333333333,
+    "5": 0.2878787878787879,
+    "6": 0.25,
+    "7": 0.6,
+    "8": 0.6666666666666666,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0
+  },
+  "gods": [
+    {
+      "id": "skill_graphify",
+      "label": "graphify skill",
+      "degree": 14
+    },
+    {
+      "id": "cs_registrycleaner_registrycleaner",
+      "label": "RegistryCleaner",
+      "degree": 11
+    },
+    {
+      "id": "py_file_snapshot_execute_recover",
+      "label": "execute_recover()",
+      "degree": 7
+    },
+    {
+      "id": "py_ollama_models_get_model_defs",
+      "label": "__get_model_defs()",
+      "degree": 6
+    },
+    {
+      "id": "py_backup_repos_backup_repos",
+      "label": "backup_repos()",
+      "degree": 6
+    },
+    {
+      "id": "py_file_snapshot_execute_snapshot",
+      "label": "execute_snapshot()",
+      "degree": 6
+    },
+    {
+      "id": "py_file_snapshot_select_and_execute_recover",
+      "label": "select_and_execute_recover()",
+      "degree": 6
+    },
+    {
+      "id": "py_env_vars_env_value",
+      "label": "env_value()",
+      "degree": 5
+    },
+    {
+      "id": "py_ollama_models_main",
+      "label": "main()",
+      "degree": 5
+    },
+    {
+      "id": "py_backup_repos_repo",
+      "label": "Repo",
+      "degree": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Agent invocation rules",
+      "target": "graphify skill",
+      "source_files": [
+        "AGENTS.md",
+        ".opencode/skills/graphify/SKILL.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; peripheral node `Agent invocation rules` unexpectedly reaches hub `graphify skill`"
+    },
+    {
+      "source": "graphify skill",
+      "target": "Cluster-only rerun",
+      "source_files": [
+        ".opencode/skills/graphify/SKILL.md",
+        "references/update.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "conceptually_related_to",
+      "why": "connects across different repos/directories; peripheral node `Cluster-only rerun` unexpectedly reaches hub `graphify skill`"
+    },
+    {
+      "source": "graphify skill",
+      "target": "Cross-repo graph merge",
+      "source_files": [
+        ".opencode/skills/graphify/SKILL.md",
+        "references/github-and-merge.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "conceptually_related_to",
+      "why": "connects across different repos/directories; peripheral node `Cross-repo graph merge` unexpectedly reaches hub `graphify skill`"
+    },
+    {
+      "source": "graphify skill",
+      "target": "graphify explain tool",
+      "source_files": [
+        ".opencode/skills/graphify/SKILL.md",
+        "references/query.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "conceptually_related_to",
+      "why": "connects across different repos/directories; peripheral node `graphify explain tool` unexpectedly reaches hub `graphify skill`"
+    },
+    {
+      "source": "graphify skill",
+      "target": "Export capabilities",
+      "source_files": [
+        ".opencode/skills/graphify/SKILL.md",
+        "references/exports.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "conceptually_related_to",
+      "why": "connects across different repos/directories; peripheral node `Export capabilities` unexpectedly reaches hub `graphify skill`"
+    }
+  ],
+  "tokens": {
+    "input": 25926,
+    "output": 3859
+  }
+}

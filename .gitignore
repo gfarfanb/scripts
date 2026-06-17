@@ -177,6 +177,9 @@ dump.rdb
 # Temporary
 .tmp/
 
+# OpenCode
+.opencode/
+
 # Graphify
 node_modules/
 dist/

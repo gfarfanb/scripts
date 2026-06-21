@@ -25,7 +25,7 @@ EOF
 
 . $SCRIPTS_HOME/misc/.libs/url-source
 
-_hosts_db_file="$URL_SOURCE_DB_FILE"
+_url_source_db_file="$URL_SOURCE_DB_FILE"
 _default_quality=4
 
 _pack_audios() {

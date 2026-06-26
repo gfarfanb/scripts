@@ -13,16 +13,25 @@ echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
+echo     -s: Starts OpenCode as server
 echo     -h: Displays this help message
 goto :back
 
 
 :main
+if /i "%~1"=="-s" goto :server
 if /i "%~1"=="-h" goto :__usage_page
+goto :tui
 
+:server
+echo Starting OpenCode as server...
 opencode serve --port %OPENCODE_SERVER_PORT% --hostname 0.0.0.0
 goto :completed
 
+:tui
+echo Starting OpenCode as TUI...
+opencode
+goto :completed
 
 :completed
 echo:

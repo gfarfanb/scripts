@@ -6,7 +6,7 @@ rem
 rem Dependencies:
 rem   call %SCRIPTS_HOME%\.libs\env-vars rem Relative call
 rem Usage in script:
-rem   call %SCRIPTS_HOME%\.win\eval <arg1> <arg2> <argn> # Relative call
+rem   call %SCRIPTS_HOME%\.win\eval <arg1> <arg2> <argn>
 
 setlocal
 

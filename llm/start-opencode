@@ -14,6 +14,7 @@ Starts OpenCode coding agent.
 Usage: $(basename $0) [<option>]*
 Option:
     -s: Starts OpenCode as server
+    -p: Starts OpenCode with plugins
     -h: Displays this help message
 EOF
     exit 0
@@ -25,14 +26,23 @@ EOF
 _start_server() {
     echo "Starting OpenCode as server..." >&2
     opencode serve --port $OPENCODE_SERVER_PORT --hostname 0.0.0.0
-
-    _completed
 }
+
+_start_tui() {
+    echo "Starting OpenCode as TUI..." >&2
+    opencode
+}
+
+_plugin_flag=0
+_server_flag=0
 
 while getopts "sh" opt; do
     case "$opt" in
         s)
-            _start_server
+            _server_flag=1
+            ;;
+        w)
+            _plugin_flag=1
             ;;
         h)
             __usage_page
@@ -45,8 +55,14 @@ echo "Project: $SOURCEDIR" >&2
 
 cd "$SOURCEDIR"
 
-_setup_plugin opencode
+if [ $_update_flag -eq 1 ]; then
+    _setup_plugin opencode
+fi
 
-opencode
+if [ $_server_flag -eq 1 ]; then
+    _start_server
+else
+    _start_tui
+fi
 
 _completed

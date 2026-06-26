@@ -6,7 +6,7 @@
 #   RegistryBackupHome - Dierctory for backup
 #   RegistryBackupToKeep - Backup files to keep
 # Usage in script:
-#   powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPTS_HOME%\sys\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "<home>" -RegistryBackupToKeep "<keep>" # Relative call
+#   powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPTS_HOME%\sys\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "<home>" -RegistryBackupToKeep "<keep>"
 
 param(
     [Parameter(Mandatory=$true)]

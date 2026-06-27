@@ -25,11 +25,16 @@ EOF
 
 _start_server() {
     echo "Starting OpenCode as server..." >&2
+    echo >&2
+    echo "> http://$WSL_IP:$OPENCODE_SERVER_PORT" >&2
+
+    echo >&2
     opencode serve --port $OPENCODE_SERVER_PORT --hostname 0.0.0.0
 }
 
 _start_tui() {
     echo "Starting OpenCode as TUI..." >&2
+
     opencode
 }
 
@@ -55,7 +60,7 @@ echo "Project: $SOURCEDIR" >&2
 
 cd "$SOURCEDIR"
 
-if [ $_update_flag -eq 1 ]; then
+if [ $_plugin_flag -eq 1 ]; then
     _setup_plugin opencode
 fi
 

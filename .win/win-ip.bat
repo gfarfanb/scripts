@@ -8,17 +8,10 @@ rem   %* - Input
 rem Usage in script:
 rem   call %SCRIPTS_HOME%\.win\win-ip
 
-setlocal enabledelayedexpansion
+setlocal
 
-set "_ps_cmd=Get-NetIPAddress -AddressFamily IPv4"
+set "_ps_cmd=Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $(Get-NetConnectionProfile ^| Select-Object -ExpandProperty InterfaceIndex) ^| Select-Object -ExpandProperty IPAddress"
 
-call :runps %_ps_cmd% _win_ip
-Echo %_win_ip%
-goto :eof
-
-
-:runps <PassPSCMD> <Return value to be set as variable>
-  for /F "usebackq tokens=*" %%i in (`Powershell %1`) do set "%2=%%i"
-goto: eof
+powershell %_ps_cmd%
 
 endlocal

@@ -25,11 +25,19 @@ goto :tui
 
 :server
 echo Starting OpenCode as server...
+
+for /f "delims=" %%a in ('call %SCRIPTS_HOME%\.win\win-ip') do set _win_ip=%%a
+
+echo:
+echo ^> http://%_win_ip%:%OPENCODE_SERVER_PORT%
+
+echo:
 opencode serve --port %OPENCODE_SERVER_PORT% --hostname 0.0.0.0
 goto :completed
 
 :tui
 echo Starting OpenCode as TUI...
+
 opencode
 goto :completed
 

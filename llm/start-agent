@@ -1,0 +1,167 @@
+#! /usr/bin/env bash
+SOURCEDIR=$(pwd); BASEDIR=$(dirname $0); cd $BASEDIR
+
+. $SCRIPTS_HOME/.libs/env-vars
+
+_require_var GRAPHIFY_BACKEND_MODEL
+
+__usage_page() {
+    cat << EOF
+Initialize project and start a selected agent.
+
+Usage: $(basename $0) [<option>]*
+Option:
+    -i: [codebase-memory-mcp] Index project for AST
+    -g: [Graphify] Setup and update project graph
+    -h: Displays this help message
+EOF
+    exit 0
+}
+
+_set_project() {
+    echo >&2
+    echo "Project: $SOURCEDIR" >&2
+
+    cd "$SOURCEDIR"
+}
+
+_setup_graphify() {
+    _set_project
+
+    if ! [ -f "$_agent_project_file_ref" ]; then
+        echo >&2
+        _init_flag=""
+        read -p "Initialize Graphify? [y/n] > " _init_flag
+        case $_init_flag in
+            [Yy])
+                echo >&2
+                echo "[Graphify] Installing skill for $_agent_name" >&2
+                graphify $_agent install --project >&2
+                ;;
+            *)
+                echo "Declined Graphify initialization" >&2
+                ;;
+        esac
+    else
+        echo >&2
+        echo "[Graphify] Updating skill for $_agent_name" >&2
+        graphify $_agent install --project >&2
+    fi
+
+    if [ -f "$_agent_project_file_ref" ]; then
+        if ! [ -f "./graphify-out/graph.json" ]; then
+            echo >&2
+            echo "[Graphify] Initializing graph ..." >&2
+            echo "[backend=openai model=$GRAPHIFY_BACKEND_MODEL]" >&2
+            graphify . --backend openai --model $GRAPHIFY_BACKEND_MODEL >&2
+        else
+            echo >&2
+            _update_flag=""
+            read -p "Re-extract changed files? [y/n] > " _update_flag
+            case $_update_flag in
+                [Yy])
+                    echo "[Graphify] Updating graph - extracting changed files (this might take a few minutes) ..." >&2
+                    echo "[backend=openai model=$GRAPHIFY_BACKEND_MODEL]" >&2
+                    graphify . --update --backend openai --model $GRAPHIFY_BACKEND_MODEL >&2
+                    ;;
+                *)
+                    echo "[Graphify] Updating graph - extracting code files (AST-only) ..." >&2
+                    graphify update . >&2
+                    ;;
+            esac
+        fi
+    fi
+}
+
+_setup_codebase_memory_mcp() {
+    _set_project
+
+    echo >&2
+    echo "[codebase-memory-mcp] Indexing project ..." >&2
+    codebase-memory-mcp cli index_repository --repo-path "$SOURCEDIR" --mode full
+
+    echo >&2
+    echo "[codebase-memory-mcp] Exploring project architecture ..." >&2
+    _project=$( codebase-memory-mcp cli list_projects | jq -r ".projects[] | select(.root_path == \"$SOURCEDIR\") | .name" )
+    codebase-memory-mcp cli get_architecture --project "$_project"
+}
+
+_codebase_memory_mcp_flag=""
+_graphify_flag=""
+
+while getopts "igh" opt; do
+    case "$opt" in
+        i)
+            _codebase_memory_mcp_flag=1
+            ;;
+        g)
+            _graphify_flag=1
+            ;;
+        h)
+            __usage_page
+            ;;
+    esac
+done
+
+echo >&2
+
+_agent_names=( "OpenCode" "Pi" )
+_default_index=1
+_index=0
+
+echo "Select agent:" >&2
+
+for _agent_name in "${_agent_names[@]}"; do
+    if [[ $_index -eq $_default_index ]]; then
+        echo "$((_index+1))) $_agent_name (default)" >&2
+    else
+        echo "$((_index+1))) $_agent_name" >&2
+    fi
+done
+
+_agent_index=""
+read -p "agent-index> " _agent_index
+
+if [ -z "$_agent_index" ]; then
+    _agent_index=$_default_index
+else
+    _agent_names=$((_agent_index-1))
+fi
+
+_agent_name="${_agent_names[$_agent_index]}"
+
+if [ -z "$_agent_name" ]; then
+    echo >&2
+    echo "Invalid agent option" >&2
+    exit 1
+fi
+
+_agent_cmd=""
+_agent_project_file_ref=""
+
+case "$_agent_name" in
+    OpenCode)
+        _agent_cmd=opencode
+        _agent_project_file_ref="./.opencode/plugins/graphify.js"
+        ;;
+    Pi)
+        _agent_cmd=pi
+        _agent_project_file_ref="./.pi/agent/skills/graphify/SKILL.md"
+        ;;
+    *)
+        echo "Invalid agent option" >&2
+        exit 1
+        ;;
+esac
+
+if [ -n "$_codebase_memory_mcp_flag" ]; then
+    _setup_codebase_memory_mcp
+fi
+
+if [ -n "$_graphify_flag" ]; then
+    _setup_graphify
+fi
+
+echo >&2
+echo "[$_agent_cmd] Starting $_agent_name ..." >&2
+$_agent_cmd

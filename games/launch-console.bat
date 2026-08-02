@@ -43,13 +43,14 @@ if /i "%~1"=="-h" goto :__usage_page
 :select
 echo Select a console:
 echo 1^) Zelda 64: Recompiled
-echo 2^) 1964 GEPD Edition
-echo 3^) GameCube/Wii [Dolphin]
-echo 4^) Nintendo 64 [Mupen64Plus]
-echo 5^) GBA/GBC/GB [mGBA]
-echo 6^) 3DS [Azahar]
-echo 7^) SNES [Snes9x]
-echo 8^) Celeste 64: Fragments of the Mountain
+echo 2^) Gen1Recomp
+echo 3^) 1964 GEPD Edition
+echo 4^) GameCube/Wii [Dolphin]
+echo 5^) Nintendo 64 [Mupen64Plus]
+echo 6^) GBA/GBC/GB [mGBA]
+echo 7^) 3DS [Azahar]
+echo 8^) SNES [Snes9x]
+echo 9^) Celeste 64: Fragments of the Mountain
 set "_console_index="
 set /P _console_index="console-index> "
 
@@ -58,13 +59,14 @@ if "%_console_index%"=="" (
 )
 
 if /i "%_console_index%"=="1" goto :launchzelda64
-if /i "%_console_index%"=="2" goto :launch1964gepd
-if /i "%_console_index%"=="3" goto :launchdolphin
-if /i "%_console_index%"=="4" goto :launchmupen64plus
-if /i "%_console_index%"=="5" goto :launchmgba
-if /i "%_console_index%"=="6" goto :launchazahar
-if /i "%_console_index%"=="7" goto :launchsnes9x
-if /i "%_console_index%"=="8" goto :launchceleste64
+if /i "%_console_index%"=="2" goto :launchgen1
+if /i "%_console_index%"=="3" goto :launch1964gepd
+if /i "%_console_index%"=="4" goto :launchdolphin
+if /i "%_console_index%"=="5" goto :launchmupen64plus
+if /i "%_console_index%"=="6" goto :launchmgba
+if /i "%_console_index%"=="7" goto :launchazahar
+if /i "%_console_index%"=="8" goto :launchsnes9x
+if /i "%_console_index%"=="9" goto :launchceleste64
 goto :invalid
 
 
@@ -93,7 +95,39 @@ if %_execute_console% equ 1 (
     robocopy "%ZELDA64RECOMPILED_SAVES_HOME%" "%ZELDA64RECOMPILED_BACKUP_HOME%" /z
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%ZELDA64RECOMPILED_BACKUP_HOME%" %_execute_recover%
+
+goto :completed
+
+
+:launchgen1
+echo:
+
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BACKUP_HOME
+
+echo IMPORTANT!! Recover backup is an option on Gen1Recomp UI
+@REM if %_recover_backup% equ 1 (
+@REM     echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_BACKUP_HOME%"
+
+@REM     del /q "%GEN1RECOMP_SAVES_HOME%\*"
+@REM     robocopy "%GEN1RECOMP_BACKUP_HOME%" "%GEN1RECOMP_SAVES_HOME%" /z
+
+@REM     goto :completed
+@REM )
+
+if %_execute_console% equ 1 (
+    echo Launching 'Gen1Recomp' at "%GEN1RECOMP_HOME%"
+
+    cd "%GEN1RECOMP_HOME%"
+    gen1recomp.exe
+
+    echo IMPORTANT!! Save file is an option on Gen1Recomp UI
+    robocopy "%GEN1RECOMP_SAVES_HOME%" "%GEN1RECOMP_BACKUP_HOME%" /z
+)
+
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -128,7 +162,7 @@ if %_execute_console% equ 1 (
     robocopy "%GEPD_1964_SAVES_HOME%" "%GEPD_1964_BACKUP_HOME%" /z
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEPD_1964_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -158,7 +192,7 @@ if %_execute_console% equ 1 (
     robocopy *.gci "%DOLPHIN_SAVES_HOME%" "%DOLPHIN_BACKUP_HOME%" /z
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%DOLPHIN_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -178,7 +212,7 @@ if %_execute_console% equ 1 (
     call "%SCRIPTS_HOME%\games\.libs\start-mupen64plus" %*
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%N64_SAVES_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%N64_SAVES_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -202,7 +236,7 @@ if %_execute_console% equ 1 (
     mGBA.exe
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%MGBA_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%MGBA_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -226,7 +260,7 @@ if %_execute_console% equ 1 (
     azahar.exe
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%AZAHAR_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%AZAHAR_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -250,7 +284,7 @@ if %_execute_console% equ 1 (
     snes9x-x64.exe
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%SNES9X_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%SNES9X_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 
@@ -280,7 +314,7 @@ if %_execute_console% equ 1 (
     robocopy "%CELESTE_64_SAVES_HOME%" "%CELESTE_64_BACKUP_HOME%" /z
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%CELESTE_64_BACKUP_HOME%" %_execute_recover%
 
 goto :completed
 

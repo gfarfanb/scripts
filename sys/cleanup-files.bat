@@ -16,12 +16,19 @@ echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
+echo     -r: Include registry cleanup
 echo     -h: Displays this help message
 goto :back
 
 :main
+set /a _registry_required=0
+if /i "%~1"=="-r" (
+    set /a _registry_required=1
+    goto :cleanup
+)
 if /i "%~1"=="-h" goto :__usage_page
 
+:cleanup
 del /s /q "%TEMP%\*" >nul 2>&1
 echo User temporary files cleaned
 
@@ -50,7 +57,9 @@ echo Defender scan history cleaned
 del /s /q C:\Windows\Prefetch\* >nul 2>&1
 echo Prefetch files cleaned
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPTS_HOME%\sys\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "%REGISTRY_BACKUP_HOME%" -RegistryBackupToKeep "%REGISTRY_BACKUP_TO_KEEP%"
+if %_registry_required% equ 1 (
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPTS_HOME%\sys\.ps\Registry-Cleaner.ps1" -RegistryBackupHome "%REGISTRY_BACKUP_HOME%" -RegistryBackupToKeep "%REGISTRY_BACKUP_TO_KEEP%"
+)
 
 goto :completed
 

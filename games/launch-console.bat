@@ -104,8 +104,12 @@ goto :completed
 echo:
 
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_BACKUP_HOME
 
 echo IMPORTANT!! Recover backup is an option on Gen1Recomp UI
 @REM if %_recover_backup% equ 1 (
@@ -124,11 +128,46 @@ if %_execute_console% equ 1 (
     gen1recomp.exe
 
     echo IMPORTANT!! Save file is an option on Gen1Recomp UI
-    robocopy "%GEN1RECOMP_SAVES_HOME%" "%GEN1RECOMP_BACKUP_HOME%" /z
+    if exist "%GEN1RECOMP_RED_SAVES_HOME%" (
+        robocopy "%GEN1RECOMP_RED_SAVES_HOME%" "%GEN1RECOMP_RED_BACKUP_HOME%" /z
+    )
+    if exist "%GEN1RECOMP_BLUE_SAVES_HOME%" (
+        robocopy "%GEN1RECOMP_BLUE_SAVES_HOME%" "%GEN1RECOMP_BLUE_BACKUP_HOME%" /z
+    )
+    if exist "%GEN1RECOMP_YELLOW_SAVES_HOME%" (
+        robocopy "%GEN1RECOMP_YELLOW_SAVES_HOME%" "%GEN1RECOMP_YELLOW_BACKUP_HOME%" /z
+    )
 )
 
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BACKUP_HOME%" %_execute_recover%
+echo Select a version:
+echo 1^) Pokemon Red Recompiled
+echo 2^) Pokemon Blue Recompiled
+echo 3^) Pokemon Yellow Recompiled
+set "_version_index="
+set /P _version_index="version-index> "
 
+if "%_version_index%"=="" (
+    goto :completed
+)
+
+if /i "%_version_index%"=="1" goto :gen1redsnapshot
+if /i "%_version_index%"=="2" goto :gen1bluesnapshot
+if /i "%_version_index%"=="3" goto :gen1yellowsnapshot
+goto :completed
+
+:gen1redsnapshot
+echo:
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_RED_BACKUP_HOME%" %_execute_recover%
+goto :completed
+
+:gen1bluesnapshot
+echo:
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BLUE_BACKUP_HOME%" %_execute_recover%
+goto :completed
+
+:gen1yellowsnapshot
+echo:
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_YELLOW_BACKUP_HOME%" %_execute_recover%
 goto :completed
 
 

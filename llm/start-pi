@@ -12,6 +12,8 @@ Starts Pi coding agent.
 
 Usage: $(basename $0) [<option>]*
 Option:
+    -i: [codebase-memory-mcp] Index project for AST
+    -g: [Graphify] Setup and update project graph
     -h: Displays this help message
 EOF
     exit 0
@@ -19,22 +21,34 @@ EOF
 
 . $SCRIPTS_HOME/llm/.libs/agent-fn
 
+_agent_graphify_file_ref="./.pi/agent/skills/graphify/SKILL.md"
+_default_graphify_backend="$GRAPHIFY_BACKEND"
+_default_graphify_model="$GRAPHIFY_MODEL"
 
-while getopts "h" opt; do
+
+_start_tui() {
+    _set_project
+
+    echo "Starting Pi as TUI..." >&2
+
+    pi
+}
+
+
+while getopts "igh" opt; do
     case "$opt" in
+        i)
+            _setup_codebase_memory_mcp
+            ;;
+        g)
+            _setup_graphify
+            ;;
         h)
             __usage_page
             ;;
     esac
 done
 
-echo >&2
-echo "Project: $SOURCEDIR" >&2
-
-cd "$SOURCEDIR"
-
-_setup_plugin pi
-
-pi
+_start_tui
 
 _completed

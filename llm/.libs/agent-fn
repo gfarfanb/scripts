@@ -5,125 +5,80 @@
 #
 # Usage in script:
 #   . $SCRIPTS_HOME/llm/.libs/agent-fn
+#   SOURCEDIR=<source_directory>                   # Set to change source directory
+#   _agent_graphify_file_ref=<graphify_file_ref>   # Set to change Graphify file ref
+#   _default_graphify_backend=<graphify_backend>   # Set to change Graphify backend
+#   _default_graphify_model=<graphify_model>       # Set to change Graphify model
 
-_verify_graphify() {
-    if [ -f "./.opencode/plugins/graphify.js" ]; then
-        echo "Graphify"
-    fi
+: "${SOURCEDIR:=$(pwd)}"
+: "${_agent_graphify_file_ref:=}"
+: "${_default_graphify_backend:=openai}"
+: "${_default_graphify_model:=}"
+
+_set_project() {
+    echo >&2
+    echo "Project: $SOURCEDIR" >&2
+
+    cd "$SOURCEDIR"
 }
 
 _setup_graphify() {
-    local _agent=${1:-}
+    _set_project
 
-    if [ -z "$( _verify_graphify )" ]; then
+    if ! [ -f "$_agent_graphify_file_ref" ]; then
         echo >&2
-        echo "Installing skill for agent '$_agent'" >&2
-        graphify $_agent install --project >&2
-    else
-        echo >&2
-        echo "Updating skill for agent '$_agent'" >&2
-        graphify $_agent install >&2
-    fi
-
-    if ! [ -f "./graphify-out/graph.json" ]; then
-        echo >&2
-        echo "Initializing graph ..." >&2
-        echo "[backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
-
-        graphify . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL" >&2
-    else
-        echo >&2
-        read -p "Re-extract changed files? [y/n] > " _update_flag
-        case $_update_flag in
+        _init_flag=""
+        read -p "Initialize Graphify? [y/n] > " _init_flag
+        case $_init_flag in
             [Yy])
-                echo "Updating graph - extracting changes files (this might take a few minutes) ..." >&2
-                echo "[backend=$GRAPHIFY_BACKEND model=$GRAPHIFY_MODEL]" >&2
-
-                graphify update . --update . --backend "$GRAPHIFY_BACKEND" --model "$GRAPHIFY_MODEL" >&2
+                echo >&2
+                echo "[Graphify] Installing skill" >&2
+                graphify $_agent install --project >&2
                 ;;
             *)
-                echo "Updating graph - extracting code files (AST-only) ..." >&2
-
-                graphify update update . >&2
+                echo "Declined Graphify initialization" >&2
                 ;;
         esac
-    fi
-}
-
-_verify_codegraph() {
-    if [ -d "./.codegraph" ]; then
-        echo "CodeGraph"
-    fi
-}
-
-_setup_codegraph() {
-    local _agent=${1:-}
-
-    if [ -z "$( _verify_codegraph )" ]; then
-        echo >&2
-        echo "Connecting to '$_agent' agent" >&2
-        codegraph install --target $_agent --location local >&2
-
-        echo "Initializing index" >&2
-        codegraph init -i >&2
     else
         echo >&2
-        codegraph status >&2
+        echo "[Graphify] Updating skill" >&2
+        graphify $_agent install --project >&2
+    fi
+
+    if [ -f "$_agent_graphify_file_ref" ]; then
+        if ! [ -f "./graphify-out/graph.json" ]; then
+            echo >&2
+            echo "[Graphify] Initializing graph ..." >&2
+            echo "[backend=$_default_graphify_backend model=$_default_graphify_model]" >&2
+            graphify . --backend $_default_graphify_backend --model $_default_graphify_model >&2
+        else
+            echo >&2
+            _update_flag=""
+            read -p "Re-extract changed files? [y/n] > " _update_flag
+            case $_update_flag in
+                [Yy])
+                    echo "[Graphify] Updating graph - extracting changed files (this might take a few minutes) ..." >&2
+                    echo "[backend=$_default_graphify_backend model=$_default_graphify_model]" >&2
+                    graphify . --update --backend $_default_graphify_backend --model $_default_graphify_model >&2
+                    ;;
+                *)
+                    echo "[Graphify] Updating graph - extracting code files (AST-only) ..." >&2
+                    graphify update . >&2
+                    ;;
+            esac
+        fi
     fi
 }
 
-_select_plugin() {
+_setup_codebase_memory_mcp() {
+    _set_project
+
     echo >&2
-    echo "Select a plugin:" >&2
-    for _idx in "${!_registered_plugins[@]}"; do
-        _plugin="${_registered_plugins[$_idx]}"
+    echo "[codebase-memory-mcp] Indexing project ..." >&2
+    codebase-memory-mcp cli index_repository --repo-path "$SOURCEDIR" --mode full
 
-        echo "$((_idx+1))) $_plugin" >&2
-    done
-    read -p "plugin-index> " _plugin_idx
-
-    if [ -z "$_plugin_idx" ]; then
-        echo "Invalid plugin index" >&2
-        exit 1
-    fi
-
-    _plugin="${_registered_plugins[$((_plugin_idx-1))]}"
-
-    if [ -z "$_plugin" ]; then
-        echo "Invalid plugin index" >&2
-        exit 1
-    fi
-
-    echo $_plugin
-}
-
-_verify_plugin() {
-    local _installed_plugins=()
-
-    [ -n "$( _verify_graphify )" ] && _installed_plugins+=( "Graphify" )
-    [ -n "$( _verify_codegraph )" ] && _installed_plugins+=( "CodeGraph" )
-
-    if [[ ${#_installed_plugins[@]} -eq 1 ]]; then
-        echo ${_installed_plugins[0]}
-    else
-        echo $( _select_plugin )
-    fi
-}
-
-_setup_plugin() {
-    local _agent=${1:-}
-    local _plugin=$( _verify_plugin )
-
-    case $_plugin in
-        Graphify)
-            _setup_graphify $_agent
-            ;;
-        CodeGraph)
-            _setup_codegraph $_agent
-            ;;
-        *)
-            echo "Plugin not selected" >&2
-            exit 1
-            ;;
-    esac
+    echo >&2
+    echo "[codebase-memory-mcp] Exploring project architecture ..." >&2
+    local _project=$( codebase-memory-mcp cli list_projects | jq -r ".projects[] | select(.root_path == \"$SOURCEDIR\") | .name" )
+    codebase-memory-mcp cli get_architecture --project "$_project"
 }

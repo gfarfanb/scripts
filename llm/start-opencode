@@ -14,7 +14,8 @@ Starts OpenCode coding agent.
 Usage: $(basename $0) [<option>]*
 Option:
     -s: Starts OpenCode as server
-    -p: Starts OpenCode with plugins
+    -i: [codebase-memory-mcp] Index project for AST
+    -g: [Graphify] Setup and update project graph
     -h: Displays this help message
 EOF
     exit 0
@@ -22,8 +23,14 @@ EOF
 
 . $SCRIPTS_HOME/llm/.libs/agent-fn
 
+_agent_graphify_file_ref="./.opencode/plugins/graphify.js"
+_default_graphify_backend="$GRAPHIFY_BACKEND"
+_default_graphify_model="$GRAPHIFY_MODEL"
+
 
 _start_server() {
+    _set_project
+
     echo "Starting OpenCode as server..." >&2
     echo >&2
     echo "> http://$WSL_IP:$OPENCODE_SERVER_PORT" >&2
@@ -33,36 +40,31 @@ _start_server() {
 }
 
 _start_tui() {
+    _set_project
+
     echo "Starting OpenCode as TUI..." >&2
 
     opencode
 }
 
-_plugin_flag=0
 _server_flag=0
 
-while getopts "sh" opt; do
+while getopts "sigh" opt; do
     case "$opt" in
         s)
             _server_flag=1
             ;;
-        w)
-            _plugin_flag=1
+        i)
+            _setup_codebase_memory_mcp
+            ;;
+        g)
+            _setup_graphify
             ;;
         h)
             __usage_page
             ;;
     esac
 done
-
-echo >&2
-echo "Project: $SOURCEDIR" >&2
-
-cd "$SOURCEDIR"
-
-if [ $_plugin_flag -eq 1 ]; then
-    _setup_plugin opencode
-fi
 
 if [ $_server_flag -eq 1 ]; then
     _start_server

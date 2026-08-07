@@ -5,7 +5,7 @@
 #
 # Usage in script:
 #   . $SCRIPTS_HOME/misc/.libs/url-source
-#   _url_source_db_file=<url_source_db_file>  # Set hosts database file
+#   _url_source_db_file=<url_source_db_file>   # Set hosts database file
 
 : "${_url_source_db_file:=}"
 

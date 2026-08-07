@@ -54,10 +54,6 @@ echo 9^) Celeste 64: Fragments of the Mountain
 set "_console_index="
 set /P _console_index="console-index> "
 
-if "%_console_index%"=="" (
-    goto :invalid
-)
-
 if /i "%_console_index%"=="1" goto :launchzelda64
 if /i "%_console_index%"=="2" goto :launchgen1
 if /i "%_console_index%"=="3" goto :launch1964gepd
@@ -112,14 +108,6 @@ call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_BACKUP_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_BACKUP_HOME
 
 echo IMPORTANT!! Recover backup is an option on Gen1Recomp UI
-@REM if %_recover_backup% equ 1 (
-@REM     echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_BACKUP_HOME%"
-
-@REM     del /q "%GEN1RECOMP_SAVES_HOME%\*"
-@REM     robocopy "%GEN1RECOMP_BACKUP_HOME%" "%GEN1RECOMP_SAVES_HOME%" /z
-
-@REM     goto :completed
-@REM )
 
 if %_execute_console% equ 1 (
     echo Launching 'Gen1Recomp' at "%GEN1RECOMP_HOME%"
@@ -145,10 +133,6 @@ echo 2^) Pokemon Blue Recompiled
 echo 3^) Pokemon Yellow Recompiled
 set "_version_index="
 set /P _version_index="version-index> "
-
-if "%_version_index%"=="" (
-    goto :completed
-)
 
 if /i "%_version_index%"=="1" goto :gen1redsnapshot
 if /i "%_version_index%"=="2" goto :gen1bluesnapshot

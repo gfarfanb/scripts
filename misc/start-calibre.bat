@@ -27,18 +27,21 @@ goto :calibre
 
 :calibre
 cd "%CALIBRE_HOME%"
+echo Starting Calibre...
 calibre-portable.exe
 goto :completed
 
 
 :editor
 cd "%CALIBRE_HOME%"
+echo Starting Calibre eBook Editor...
 ebook-edit-portable.exe
 goto :completed
 
 
 :viewer
 cd "%CALIBRE_HOME%"
+echo Starting Calibre eBook Viewer...
 ebook-viewer-portable.exe
 goto :completed
 

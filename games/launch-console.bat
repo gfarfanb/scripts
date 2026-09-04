@@ -108,13 +108,11 @@ call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_EXPORTS_BACKUP_HOME
 
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_EXPORTS_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_BACKUP_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_BACKUP_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME
 
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_EXPORTS_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_BACKUP_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME
 
@@ -191,17 +189,20 @@ goto :completed
 
 :gen1redsnapshot
 echo:
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_RED_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_RED_EXPORTS_BACKUP_HOME%" %_execute_recover%
 goto :completed
 
 :gen1bluesnapshot
 echo:
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BLUE_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME%" %_execute_recover%
 goto :completed
 
 :gen1yellowsnapshot
 echo:
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_YELLOW_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" %_execute_recover%
+call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME%" %_execute_recover%
 goto :completed
 
 

@@ -100,14 +100,53 @@ goto :completed
 echo:
 
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_BACKUP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_BACKUP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_BACKUP_HOME
 
-echo IMPORTANT!! Recover backup is an option on Gen1Recomp UI
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_EXPORTS_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_SAVES_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_EXPORTS_BACKUP_HOME
+
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_EXPORTS_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME
+
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_EXPORTS_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME
+
+echo IMPORTANT!! Recover save file is an option on Gen1Recomp UI
+
+if %_recover_backup% equ 1 (
+    if exist "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" (
+        echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%"
+
+        mkdir "%GEN1RECOMP_RED_SAVES_HOME%"
+        del /q "%GEN1RECOMP_RED_SAVES_HOME%\*"
+        robocopy "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" "%GEN1RECOMP_RED_SAVES_HOME%" /z
+    )
+
+    if exist "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" (
+        echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%"
+
+        mkdir "%GEN1RECOMP_BLUE_SAVES_HOME%"
+        del /q "%GEN1RECOMP_BLUE_SAVES_HOME%\*"
+        robocopy "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" "%GEN1RECOMP_BLUE_SAVES_HOME%" /z
+    )
+
+    if exist "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" (
+        echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%"
+
+        mkdir "%GEN1RECOMP_YELLOW_SAVES_HOME%"
+        del /q "%GEN1RECOMP_YELLOW_SAVES_HOME%\*"
+        robocopy "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" "%GEN1RECOMP_YELLOW_SAVES_HOME%" /z
+    )
+
+    goto :completed
+)
 
 if %_execute_console% equ 1 (
     echo Launching 'Gen1Recomp' at "%GEN1RECOMP_HOME%"
@@ -115,15 +154,26 @@ if %_execute_console% equ 1 (
     cd "%GEN1RECOMP_HOME%"
     gen1recomp.exe
 
-    echo IMPORTANT!! Save file is an option on Gen1Recomp UI
     if exist "%GEN1RECOMP_RED_SAVES_HOME%" (
-        robocopy "%GEN1RECOMP_RED_SAVES_HOME%" "%GEN1RECOMP_RED_BACKUP_HOME%" /z
+        robocopy "%GEN1RECOMP_RED_SAVES_HOME%" "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" /z
     )
     if exist "%GEN1RECOMP_BLUE_SAVES_HOME%" (
-        robocopy "%GEN1RECOMP_BLUE_SAVES_HOME%" "%GEN1RECOMP_BLUE_BACKUP_HOME%" /z
+        robocopy "%GEN1RECOMP_BLUE_SAVES_HOME%" "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" /z
     )
     if exist "%GEN1RECOMP_YELLOW_SAVES_HOME%" (
-        robocopy "%GEN1RECOMP_YELLOW_SAVES_HOME%" "%GEN1RECOMP_YELLOW_BACKUP_HOME%" /z
+        robocopy "%GEN1RECOMP_YELLOW_SAVES_HOME%" "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" /z
+    )
+
+    echo IMPORTANT!! Export save file is an option on Gen1Recomp UI
+
+    if exist "%GEN1RECOMP_RED_EXPORTS_HOME%" (
+        robocopy "%GEN1RECOMP_RED_EXPORTS_HOME%" "%GEN1RECOMP_RED_EXPORTS_BACKUP_HOME%" /z
+    )
+    if exist "%GEN1RECOMP_BLUE_EXPORTS_HOME%" (
+        robocopy "%GEN1RECOMP_BLUE_EXPORTS_HOME%" "%GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME%" /z
+    )
+    if exist "%GEN1RECOMP_YELLOW_EXPORTS_HOME%" (
+        robocopy "%GEN1RECOMP_YELLOW_EXPORTS_HOME%" "%GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME%" /z
     )
 )
 

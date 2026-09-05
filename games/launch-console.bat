@@ -101,47 +101,65 @@ echo:
 
 call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_HOME
 
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_EXPORTS_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_SAVES_BACKUP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_RED_EXPORTS_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BANK_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_CARTS_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_EXPORTS_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_SAVES_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_DATA_HOME
 
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_EXPORTS_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_SAVES_BACKUP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_BANK_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_CARTS_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_EXPORTS_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_SAVES_BACKUP_HOME
+call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_DATA_BACKUP_HOME
 
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_EXPORTS_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME
-call %SCRIPTS_HOME%\.win\require-var GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME
-
-echo IMPORTANT!! Recover save file is an option on Gen1Recomp UI
+echo IMPORTANT!! Export/Recover save file is an option on Gen1Recomp UI
+echo:
 
 if %_recover_backup% equ 1 (
-    if exist "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" (
-        echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%"
 
-        mkdir "%GEN1RECOMP_RED_SAVES_HOME%"
-        del /q "%GEN1RECOMP_RED_SAVES_HOME%\*"
-        robocopy "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" "%GEN1RECOMP_RED_SAVES_HOME%" /z
-    )
+    rem 'bank' recovery
+    echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_BANK_BACKUP_HOME%"
 
-    if exist "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" (
-        echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%"
+    mkdir "%GEN1RECOMP_BANK_HOME%"
+    cd /d %GEN1RECOMP_BANK_HOME%
 
-        mkdir "%GEN1RECOMP_BLUE_SAVES_HOME%"
-        del /q "%GEN1RECOMP_BLUE_SAVES_HOME%\*"
-        robocopy "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" "%GEN1RECOMP_BLUE_SAVES_HOME%" /z
-    )
+    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 
-    if exist "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" (
-        echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%"
+    robocopy "%GEN1RECOMP_BANK_BACKUP_HOME%" "%GEN1RECOMP_BANK_HOME%" /z /s
 
-        mkdir "%GEN1RECOMP_YELLOW_SAVES_HOME%"
-        del /q "%GEN1RECOMP_YELLOW_SAVES_HOME%\*"
-        robocopy "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" "%GEN1RECOMP_YELLOW_SAVES_HOME%" /z
-    )
+    rem 'carts' recovery
+    echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_CARTS_BACKUP_HOME%"
+
+    mkdir "%GEN1RECOMP_CARTS_HOME%"
+    cd /d %GEN1RECOMP_CARTS_HOME%
+
+    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+
+    robocopy "%GEN1RECOMP_CARTS_BACKUP_HOME%" "%GEN1RECOMP_CARTS_HOME%" /z /s
+
+    rem 'exports' recovery
+    echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_EXPORTS_BACKUP_HOME%"
+
+    mkdir "%GEN1RECOMP_EXPORTS_HOME%"
+    cd /d %GEN1RECOMP_EXPORTS_HOME%
+
+    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+
+    robocopy "%GEN1RECOMP_EXPORTS_BACKUP_HOME%" "%GEN1RECOMP_EXPORTS_HOME%" /z /s
+
+    rem 'saves' recovery
+    echo Getting 'Gen1Recomp' backup from "%GEN1RECOMP_SAVES_BACKUP_HOME%"
+
+    mkdir "%GEN1RECOMP_SAVES_HOME%"
+    cd /d %GEN1RECOMP_SAVES_HOME%
+
+    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+
+    robocopy "%GEN1RECOMP_SAVES_BACKUP_HOME%" "%GEN1RECOMP_SAVES_HOME%" /z /s
+
+    echo:
+    echo IMPORTANT!! Restore 'Gen1Recomp' data is omitted - "%GEN1RECOMP_DATA_BACKUP_HOME%"
 
     goto :completed
 )
@@ -152,57 +170,16 @@ if %_execute_console% equ 1 (
     cd "%GEN1RECOMP_HOME%"
     gen1recomp.exe
 
-    if exist "%GEN1RECOMP_RED_SAVES_HOME%" (
-        robocopy "%GEN1RECOMP_RED_SAVES_HOME%" "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" /z
-    )
-    if exist "%GEN1RECOMP_BLUE_SAVES_HOME%" (
-        robocopy "%GEN1RECOMP_BLUE_SAVES_HOME%" "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" /z
-    )
-    if exist "%GEN1RECOMP_YELLOW_SAVES_HOME%" (
-        robocopy "%GEN1RECOMP_YELLOW_SAVES_HOME%" "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" /z
-    )
-
-    echo IMPORTANT!! Export save file is an option on Gen1Recomp UI
-
-    if exist "%GEN1RECOMP_RED_EXPORTS_HOME%" (
-        robocopy "%GEN1RECOMP_RED_EXPORTS_HOME%" "%GEN1RECOMP_RED_EXPORTS_BACKUP_HOME%" /z
-    )
-    if exist "%GEN1RECOMP_BLUE_EXPORTS_HOME%" (
-        robocopy "%GEN1RECOMP_BLUE_EXPORTS_HOME%" "%GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME%" /z
-    )
-    if exist "%GEN1RECOMP_YELLOW_EXPORTS_HOME%" (
-        robocopy "%GEN1RECOMP_YELLOW_EXPORTS_HOME%" "%GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME%" /z
-    )
+    robocopy "%GEN1RECOMP_BANK_HOME%" "%GEN1RECOMP_BANK_BACKUP_HOME%" /z /s
+    robocopy "%GEN1RECOMP_CARTS_HOME%" "%GEN1RECOMP_CARTS_BACKUP_HOME%" /z /s
+    robocopy "%GEN1RECOMP_EXPORTS_HOME%" "%GEN1RECOMP_EXPORTS_BACKUP_HOME%" /z /s
+    robocopy "%GEN1RECOMP_SAVES_HOME%" "%GEN1RECOMP_SAVES_BACKUP_HOME%" /z /s
+    robocopy *.lua* "%GEN1RECOMP_DATA_HOME%" "%GEN1RECOMP_DATA_BACKUP_HOME%" /z
 )
 
-echo Select a version:
-echo 1^) Pokemon Red Recompiled
-echo 2^) Pokemon Blue Recompiled
-echo 3^) Pokemon Yellow Recompiled
-set "_version_index="
-set /P _version_index="version-index> "
-
-if /i "%_version_index%"=="1" goto :gen1redsnapshot
-if /i "%_version_index%"=="2" goto :gen1bluesnapshot
-if /i "%_version_index%"=="3" goto :gen1yellowsnapshot
-goto :completed
-
-:gen1redsnapshot
 echo:
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_RED_SAVES_BACKUP_HOME%" %_execute_recover%
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_RED_EXPORTS_BACKUP_HOME%" %_execute_recover%
-goto :completed
+echo WARNING!! Create snapshot is not implemented yet
 
-:gen1bluesnapshot
-echo:
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BLUE_SAVES_BACKUP_HOME%" %_execute_recover%
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_BLUE_EXPORTS_BACKUP_HOME%" %_execute_recover%
-goto :completed
-
-:gen1yellowsnapshot
-echo:
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_YELLOW_SAVES_BACKUP_HOME%" %_execute_recover%
-call "%SCRIPTS_HOME%\sys\save-snapshot" -s "%GEN1RECOMP_YELLOW_EXPORTS_BACKUP_HOME%" %_execute_recover%
 goto :completed
 
 
@@ -400,6 +377,7 @@ goto :back
 
 
 :completed
+echo:
 echo [Completed]: %0
 goto :back
 

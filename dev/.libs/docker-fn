@@ -153,6 +153,22 @@ _remove_compose() {
     echo "$0:compose/down"
 }
 
+_get_current_compose_file() {
+    local _container=${1:-}
+    local _container_id="$(docker ps -q -a -f name=$_container)"
+    local _compose_file=$( docker inspect "$_container_id" --format '{{index .Config.Labels "com.docker.compose.project.config_files"}}' )
+
+    echo "$_compose_file"
+}
+
+_get_current_env_file() {
+    local _container=${1:-}
+    local _container_id="$(docker ps -q -a -f name=$_container)"
+    local _env_file=$( docker inspect "$_container_id" --format '{{index .Config.Labels "com.docker.compose.project.environment_file"}}' )
+
+    echo "$_env_file"
+}
+
 _select_compose_service() {
     local _services=($( _docker_compose config --services ))
     local _default_index=$_default_compose_service_index

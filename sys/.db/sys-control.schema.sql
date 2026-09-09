@@ -14,7 +14,8 @@ CREATE TABLE machines (
     parent_id INTEGER,
     deleted INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (os_id) REFERENCES operating_systems(id),
-    FOREIGN KEY (parent_id) REFERENCES machines(id)
+    FOREIGN KEY (parent_id) REFERENCES machines(id),
+    UNIQUE (name, os_id)
 );
 
 

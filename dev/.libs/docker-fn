@@ -156,17 +156,25 @@ _remove_compose() {
 _get_current_compose_file() {
     local _container=${1:-}
     local _container_id="$(docker ps -q -a -f name=$_container)"
-    local _compose_file=$( docker inspect "$_container_id" --format '{{index .Config.Labels "com.docker.compose.project.config_files"}}' )
 
-    echo "$_compose_file"
+    if [ -n "$_container_id" ]; then
+        local _compose_file=$( docker inspect "$_container_id" --format '{{index .Config.Labels "com.docker.compose.project.config_files"}}' )
+
+        echo "$_compose_file"
+        return
+    fi
 }
 
 _get_current_env_file() {
     local _container=${1:-}
     local _container_id="$(docker ps -q -a -f name=$_container)"
-    local _env_file=$( docker inspect "$_container_id" --format '{{index .Config.Labels "com.docker.compose.project.environment_file"}}' )
 
-    echo "$_env_file"
+    if [ -n "$_container_id" ]; then
+        local _env_file=$( docker inspect "$_container_id" --format '{{index .Config.Labels "com.docker.compose.project.environment_file"}}' )
+
+        echo "$_env_file"
+        return
+    fi
 }
 
 _select_compose_service() {

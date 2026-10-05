@@ -5,6 +5,7 @@ cd %BASEDIR%
 call %SCRIPTS_HOME%\.libs\env-vars
 call %SCRIPTS_HOME%\.win\require-var PKHEX_HOME
 call %SCRIPTS_HOME%\.win\require-var PKHEX_RELEASE_HOME
+call %SCRIPTS_HOME%\.win\require-var PKHEX_LAUNCHER_HOME
 
 goto :main
 
@@ -27,7 +28,12 @@ goto :execute
 :build
 cd "%PKHEX_HOME%"
 
-dotnet publish PKHeX.sln -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true
+echo dotnet publish PKHeX.sln -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true
+goto :binaries
+
+
+:binaries
+robocopy "%PKHEX_RELEASE_HOME%" "%PKHEX_LAUNCHER_HOME%" /s /z 
 goto :completed
 
 

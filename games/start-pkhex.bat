@@ -16,11 +16,13 @@ for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -b: Builds the executable
+echo     -l: Moves binaries to launcher
 echo     -h: Displays this help message
 goto :eof
 
 :main
 if /i "%~1"=="-b" goto :build
+if /i "%~1"=="-l" goto :launcher
 if /i "%~1"=="-h" goto :__usage_page
 goto :execute
 
@@ -28,11 +30,11 @@ goto :execute
 :build
 cd "%PKHEX_HOME%"
 
-echo dotnet publish PKHeX.sln -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true
-goto :binaries
+dotnet publish PKHeX.sln -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true
+goto :launcher
 
 
-:binaries
+:launcher
 robocopy "%PKHEX_RELEASE_HOME%" "%PKHEX_LAUNCHER_HOME%" /s /z 
 goto :completed
 

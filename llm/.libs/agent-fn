@@ -77,8 +77,10 @@ _setup_codebase_memory_mcp() {
     echo "[codebase-memory-mcp] Indexing project ..." >&2
     codebase-memory-mcp cli index_repository --repo-path "$SOURCEDIR" --mode full
 
+    # list_projects prints: "  <name> <root_path> <branch>"
+    local _project=$( codebase-memory-mcp cli list_projects | awk -v root="$SOURCEDIR" '$2 == root { print $1 }' )
+
     echo >&2
-    echo "[codebase-memory-mcp] Exploring project architecture ..." >&2
-    local _project=$( codebase-memory-mcp cli list_projects | jq -r ".projects[] | select(.root_path == \"$SOURCEDIR\") | .name" )
+    echo "[codebase-memory-mcp] Exploring project architecture for project [$_project]..." >&2
     codebase-memory-mcp cli get_architecture --project "$_project"
 }

@@ -3,26 +3,32 @@ set "SOURCEDIR=%cd%" && for %%F in (%0) do set BASEDIR=%%~dpF
 cd %BASEDIR%
 
 call %SCRIPTS_HOME%\.libs\env-vars
-call %SCRIPTS_HOME%\.win\require-var EIGHTBITDO_FIRMWARE_UPDATER_HOME
+call %SCRIPTS_HOME%\.win\require-var MUPEN64PLUS_GUI_HOME
+call %SCRIPTS_HOME%\.win\require-var MUPEN64PLUS_GUI_RELEASE_HOME
+call %SCRIPTS_HOME%\.win\require-var MUPEN64PLUS_GUI_LAUNCHER_HOME
 
 goto :main
 
 :__usage_page
-echo Starts '8BitDo Firmware Updater' app using binaires.
+echo Builds Mupen64Plus GUI.
 echo:
 for %%F in (%0) do set BASENAME=%%~nF
 echo Usage: %BASENAME% [^<option^>]*
 echo Option:
 echo     -h: Displays this help message
-goto :back
-
+goto :eof
 
 :main
 if /i "%~1"=="-h" goto :__usage_page
+goto :build
 
-cd "%EIGHTBITDO_FIRMWARE_UPDATER_HOME%"
 
-"8BitDo Firmware Updater.exe"
+:build
+cd "%MUPEN64PLUS_GUI_HOME%"
+
+powershell scripts\build.ps1
+
+robocopy "%MUPEN64PLUS_GUI_RELEASE_HOME%" "%MUPEN64PLUS_GUI_LAUNCHER_HOME%" /s /z 
 goto :completed
 
 

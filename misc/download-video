@@ -173,6 +173,7 @@ _download_video() {
     local _cookies=${3:-}
     local _source=$( _get_source "$_url" )
 
+    mkdir -vp "$YT_DLP_VIDEO_OUTPUT_FOLDER/$_source"
     cd "$YT_DLP_VIDEO_OUTPUT_FOLDER/$_source"
 
     if [ -f "$_cookies" ]; then
